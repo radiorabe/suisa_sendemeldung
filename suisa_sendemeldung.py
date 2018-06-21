@@ -7,17 +7,17 @@ from requests import get
 # argument definition
 parser = ArgumentParser(description='ACRCloud client for SUISA reporting @ RaBe.')
 default_date = (date.today() - timedelta(days=1)).strftime("%Y%m%d")
+parser.add_argument('--access_key',
+	help='the access key for ACRCloud (required)',
+	required=True)
+parser.add_argument('--stream_id',
+	help='the id of the stream at ACRCloud (required)',
+	required=True)
 parser.add_argument('--date',
 	help='date in format YYYYMMDD to fetch data for (defaults to yesterday)',
 	default=default_date)
 parser.add_argument('--output',
 	help='file to write to (defaults to <script_name>_<date>.csv)')
-parser.add_argument('--stream_id',
-	help='the id of the stream at ACRCloud (required)',
-	required=True)
-parser.add_argument('--access_key',
-	help='the access key for ACRCloud (required)',
-	required=True)
 args = parser.parse_args()
 
 # sanity checks
