@@ -10,6 +10,8 @@ default_date = (date.today() - timedelta(days=1)).strftime("%Y%m%d")
 parser.add_argument('--date',
 	help='date in format YYYYMMDD to fetch data for (defaults to yesterday)',
 	default=default_date)
+parser.add_argument('--output',
+	help='file to write to (defaults to <script_name>_<date>.csv)')
 parser.add_argument('--stream_id',
 	help='the id of the stream at ACRCloud (required)',
 	required=True)
@@ -59,7 +61,10 @@ if not response.status_code == 200:
 
 data = response.json()
 # write results to filename_date.csv
-filename = __file__.replace('.py','_{}.csv').format(default_date)
+if args.output:
+	filename = args.output
+else:
+	filename = __file__.replace('.py','_{}.csv').format(default_date)
 with open(filename, 'w', newline='') as csvfile:
 	# excel compatibility (https://superuser.com/questions/606272/how-to-get-excel-to-interpret-the-comma-as-a-default-delimiter-in-csv-files/686415#686415)
 	csvfile.write('sep=,\n')
