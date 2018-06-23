@@ -34,11 +34,11 @@ if not len(args.access_key) == 32:
 
 stream_id=args.stream_id
 url = 'https://api.acrcloud.com/v1/monitor-streams/{}/results'.format(stream_id)
-date = args.date
+requested_date = args.date
 
 url_params = dict(
     access_key=args.access_key,
-    date=date 
+    date=requested_date 
 )
 csv_headers = [
     'Sendedatum',
@@ -64,9 +64,9 @@ data = response.json()
 if args.output:
     filename = args.output
 else:
-    filename = __file__.replace('.py','_{}.csv').format(default_date)
+    filename = __file__.replace('.py','_{}.csv').format(args.date)
 with open(filename, 'w', newline='') as csvfile:
-    # excel compatibility (https://superuser.com/questions/606272/how-to-get-excel-to-interpret-the-comma-as-a-default-delimiter-in-csv-files/686415#686415)
+    # excel compatibility (https://superuser.com/questions/606272#686415)
     csvfile.write('sep=,\n')
 
     csv_writer = writer(csvfile, dialect='excel')
@@ -77,8 +77,8 @@ with open(filename, 'w', newline='') as csvfile:
         # import timestamp from metadata (comes in format "yyyy-mm-dd HH:MM:SS")
         timestamp = datetime.strptime(metadata.get('timestamp_utc'), '%Y-%m-%d %H:%M:%S')
         # format date, time and duration according to requirements from SUISA
-        date = timestamp.strftime('%d/%m/%y')
-        time = timestamp.strftime('%H:%M:%S')
+        track_date = timestamp.strftime('%d/%m/%y')
+        track_time = timestamp.strftime('%H:%M:%S')
         duration = timedelta(seconds=metadata.get('played_duration'))
         index = 0
         '''
@@ -104,4 +104,4 @@ with open(filename, 'w', newline='') as csvfile:
         score = music.get('score')
 
         # write to the csv file
-        csv_writer.writerow([date, time, duration, title, authors, performers, isrc, label])
+        csv_writer.writerow([track_date, track_time, duration, title, authors, performers, isrc, label])
