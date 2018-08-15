@@ -77,17 +77,12 @@ def write_csv(filename, data):
 if __name__ == '__main__':
     parser = ArgumentParser(
                 description='ACRCloud client for SUISA reporting @ RaBe.')
-    default_date = (date.today() - timedelta(days=1)).strftime("%Y%m%d")
     parser.add_argument('--access_key',
                         help='the access key for ACRCloud (required)',
                         required=True)
     parser.add_argument('--stream_id',
                         help='the id of the stream at ACRCloud (required)',
                         required=True)
-    parser.add_argument('--date',
-                        help='date in format YYYYMMDD to fetch data for \
-                              (defaults to yesterday)',
-                        default=default_date)
     parser.add_argument('--output',
                         help='file to write to (defaults to \
                              <script_name>_<date>.csv)')
