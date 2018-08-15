@@ -83,6 +83,10 @@ if __name__ == '__main__':
     parser.add_argument('--stream_id',
                         help='the id of the stream at ACRCloud (required)',
                         required=True)
+    parser.add_argument('--start_date',
+                        help='the start date of the interval')
+    parser.add_argument('--end_date',
+                        help='the end date of the interval')
     parser.add_argument('--output',
                         help='file to write to (defaults to \
                              <script_name>_<date>.csv)')
@@ -94,18 +98,22 @@ if __name__ == '__main__':
         quit(1)
     if not len(args.access_key) == 32:
         print_error('wrong format on access_key')
+    if not args.end_date:
+        end_date = date.today()
+    else:
+        end_date = datetime.strptime(args.end_date, '%Y-%m-%d').date()
+    if not args.start_date:
+        start_date = end_date - timedelta(days=30)
+    else:
+        start_date = datetime.strptime(args.start_date, '%Y-%m-%d').date()
 
     client = ACRClient(args.access_key)
     data = []
 
-    # calculate last day of last month
-    last = date.today().replace(day=1) - timedelta(days=1)
-    # calculate last day of month before
-    current = last.replace(day=1) - timedelta(days=1)
-    # iterate over the whole last month including last day of the month before
-    while(current <= last):
+    current = start_date
+    # iterate over the interval specified by start_date and end_date
+    while(current <= end_date):
         data = data + client.get_data(args.stream_id, requested_date=current)
         current = current + timedelta(days=1)
 
     write_csv(args.output, data)
-    quit(0)
