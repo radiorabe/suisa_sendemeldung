@@ -26,6 +26,13 @@ class ACRClient:
         response.raise_for_status()
         return response.json()
 
+    def get_interval_data(self, stream_id, start, end):
+        data = []
+        while start <= end:
+            data = data + client.get_data(args.stream_id, requested_date=start)
+            start = start + timedelta(days=1)
+        return data
+
 
 def write_csv(filename, data):
     header = [
@@ -64,14 +71,9 @@ def write_csv(filename, data):
             else:
                 isrc = ""
             label = music.get('label')
-            score = music.get('score')
 
-            csv_writer.writerow([date, time, duration, title,
-                                 artist, isrc, label])
-            if score < 50:
-                print(metadata)
-                print(score)
-                quit(1)
+            csv_writer.writerow([date, time, duration,
+                                 title, artist, isrc, label])
 
 
 if __name__ == '__main__':
@@ -84,12 +86,14 @@ if __name__ == '__main__':
                         help='the id of the stream at ACRCloud (required)',
                         required=True)
     parser.add_argument('--start_date',
-                        help='the start date of the interval')
+                        help='the start date of the interval \
+                              in format YYYY-MM-DD')
     parser.add_argument('--end_date',
-                        help='the end date of the interval')
+                        help='the end date of the interval \
+                              in format YYYY-MM-DD')
     parser.add_argument('--output',
                         help='file to write to (defaults to \
-                             <script_name>_<date>.csv)')
+                              <script_name>_<date>.csv)')
     args = parser.parse_args()
 
     def print_error(msg):
@@ -108,12 +112,6 @@ if __name__ == '__main__':
         start_date = datetime.strptime(args.start_date, '%Y-%m-%d').date()
 
     client = ACRClient(args.access_key)
-    data = []
-
-    current = start_date
-    # iterate over the interval specified by start_date and end_date
-    while(current <= end_date):
-        data = data + client.get_data(args.stream_id, requested_date=current)
-        current = current + timedelta(days=1)
+    data = client.get_interval_data(args.stream_id, start_date, end_date)
 
     write_csv(args.output, data)
