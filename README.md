@@ -14,7 +14,9 @@ optional arguments:
                         the id of the stream at ACRCloud (required)
   --start_date START_DATE
                         the start date of the interval in format YYYY-MM-DD
+                        (defaults to 30 days before end_date)
   --end_date END_DATE   the end date of the interval in format YYYY-MM-DD
+                        (defaults to today)
   --output OUTPUT       file to write to (defaults to
-                        <script_name>_<date>.csv)
+                        <script_name>_<start_date>.csv)
 ```

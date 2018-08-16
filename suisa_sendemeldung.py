@@ -86,14 +86,14 @@ if __name__ == '__main__':
                         help='the id of the stream at ACRCloud (required)',
                         required=True)
     parser.add_argument('--start_date',
-                        help='the start date of the interval \
-                              in format YYYY-MM-DD')
+                        help='the start date of the interval in format \
+                              YYYY-MM-DD (defaults to 30 days before end_date)')
     parser.add_argument('--end_date',
-                        help='the end date of the interval \
-                              in format YYYY-MM-DD')
+                        help='the end date of the interval in format \
+                              YYYY-MM-DD (defaults to today)')
     parser.add_argument('--output',
                         help='file to write to (defaults to \
-                              <script_name>_<date>.csv)')
+                              <script_name>_<start_date>.csv)')
     args = parser.parse_args()
 
     def print_error(msg):
@@ -102,14 +102,19 @@ if __name__ == '__main__':
         quit(1)
     if not len(args.access_key) == 32:
         print_error('wrong format on access_key')
-    if not args.end_date:
-        end_date = date.today()
-    else:
+
+    if args.end_date:
         end_date = datetime.strptime(args.end_date, '%Y-%m-%d').date()
-    if not args.start_date:
-        start_date = end_date - timedelta(days=30)
     else:
+        end_date = date.today()
+    if args.start_date:
         start_date = datetime.strptime(args.start_date, '%Y-%m-%d').date()
+    else:
+        start_date = end_date - timedelta(days=30)
+    if args.output:
+        output = args.output
+    else:
+        output = __file__.replace('.py', '_{}.csv').format(start_date)
 
     client = ACRClient(args.access_key)
     data = client.get_interval_data(args.stream_id, start_date, end_date)
