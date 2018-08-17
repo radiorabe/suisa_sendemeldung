@@ -119,4 +119,4 @@ if __name__ == '__main__':
     client = ACRClient(args.access_key)
     data = client.get_interval_data(args.stream_id, start_date, end_date)
 
-    write_csv(args.output, data)
+    write_csv(output, data)
