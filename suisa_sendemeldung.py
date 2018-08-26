@@ -96,12 +96,8 @@ if __name__ == '__main__':
                               <script_name>_<start_date>.csv)')
     args = parser.parse_args()
 
-    def print_error(msg):
-        print('ERROR: {}\n'.format(msg))
-        parser.print_help()
-        quit(1)
     if not len(args.access_key) == 32:
-        print_error('wrong format on access_key')
+        parser.error('wrong format on access_key')
 
     if args.end_date:
         end_date = datetime.strptime(args.end_date, '%Y-%m-%d').date()
