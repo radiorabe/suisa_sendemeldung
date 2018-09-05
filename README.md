@@ -2,7 +2,8 @@
 ```
 usage: suisa_sendemeldung.py [-h] --access_key ACCESS_KEY --stream_id
                              STREAM_ID [--start_date START_DATE]
-                             [--end_date END_DATE] [--output OUTPUT]
+                             [--end_date END_DATE] [--last_month]
+                             [--output OUTPUT]
 
 ACRCloud client for SUISA reporting @ RaBe.
 
@@ -17,6 +18,7 @@ optional arguments:
                         (defaults to 30 days before end_date)
   --end_date END_DATE   the end date of the interval in format YYYY-MM-DD
                         (defaults to today)
+  --last_month          download data of whole last month
   --output OUTPUT       file to write to (defaults to
                         <script_name>_<start_date>.csv)
 ```
