@@ -7,6 +7,8 @@ import requests
 
 
 class ACRClient:
+    # format of timestamp in api answer
+    TS_FMT = '%Y-%m-%d %H:%M:%S'
 
     def __init__(self, access_key):
         self.access_key = access_key
@@ -14,23 +16,79 @@ class ACRClient:
         self.url = ('https://api.acrcloud.com/v1/'
                     'monitor-streams/{stream_id}/results')
 
-    def get_data(self, stream_id, requested_date=None):
+    def get_data(self, stream_id, requested_date=None,
+                 localize_timestamps=True):
         if requested_date is None:
             requested_date = self.default_date
         url_params = dict(
             access_key=self.access_key,
-            date=requested_date.strftime("%Y%m%d")
+            date=requested_date.strftime('%Y%m%d')
         )
         url = self.url.format(stream_id=stream_id)
         response = requests.get(url=url, params=url_params)
         response.raise_for_status()
+
+        if localize_timestamps:
+            data = response.json()
+            for entry in data:
+                metadata = entry.get('metadata')
+                ts_utc = datetime.strptime(metadata.get('timestamp_utc'),
+                                           ACRClient.TS_FMT)
+                ts_local = ts_utc.replace(tzinfo=timezone.utc) \
+                                 .astimezone(tz=None)
+                metadata.update({
+                    'timestamp_local': ts_local.strftime(ACRClient.TS_FMT)
+                })
+            return data
+
         return response.json()
 
-    def get_interval_data(self, stream_id, start, end):
+    def trim_data(self, data, start, end):
+        # traverse data in reversed order so we are not altering the flow
+        # https://stackoverflow.com/questions/14267722/
+        for entry in reversed(data):
+            metadata = entry.get('metadata')
+            if metadata.get('timestamp_local'):
+                ts = metadata.get('timestamp_local')
+            else:
+                ts = metadata.get('timestamp_utc')
+            date = datetime.strptime(ts, ACRClient.TS_FMT).date()
+            if date < start or date > end:
+                data.remove(entry)
+
+        return data
+
+    def get_interval_data(self, stream_id, start, end,
+                          localize_timestamps=True):
+        trim = False
+        # if we have to localize the timestamps we may need more data
+        if localize_timestamps:
+            # compute utc offset
+            offset = datetime.now(timezone.utc).astimezone().utcoffset()
+            # decrease start by 1 day if we're ahead of utc
+            if offset > timedelta(seconds=1):
+                computed_start = start - timedelta(days=1)
+                computed_end = end
+                trim = True
+            # increase end by 1 day if we're behind of utc
+            elif offset < timedelta(seconds=1):
+                computed_start = start
+                computed_end = end + timedelta(days=1)
+                trim = True
+        else:
+            computed_start = start
+            computed_end = end
+
         data = []
-        while start <= end:
-            data = data + client.get_data(args.stream_id, requested_date=start)
-            start = start + timedelta(days=1)
+        ptr = computed_start
+        while ptr <= computed_end:
+            data += self.get_data(stream_id, requested_date=ptr,
+                                  localize_timestamps=localize_timestamps)
+            ptr += timedelta(days=1)
+
+        if trim:
+            data = self.trim_data(data, start, end)
+
         return data
 
 
@@ -52,12 +110,9 @@ def write_csv(filename, data):
 
         for entry in data:
             metadata = entry.get('metadata')
-            # parse timestamp (is in format "yyyy-mm-dd HH:MM:SS")
-            timestamp = datetime.strptime(metadata.get('timestamp_utc'),
-                                          '%Y-%m-%d %H:%M:%S')
-            timestamp = (timestamp
-                         .replace(tzinfo=timezone.utc)
-                         .astimezone(tz=None))
+            # parse timestamp
+            timestamp = datetime.strptime(metadata.get('timestamp_local'),
+                                          ACRClient.TS_FMT)
 
             date = timestamp.strftime('%d/%m/%y')
             time = timestamp.strftime('%H:%M:%S')
@@ -87,26 +142,49 @@ if __name__ == '__main__':
                         required=True)
     parser.add_argument('--start_date',
                         help='the start date of the interval in format \
-                              YYYY-MM-DD (defaults to 30 days before end_date)')
+                              YYYY-MM-DD (defaults to 30 days before \
+                              end_date)')
     parser.add_argument('--end_date',
                         help='the end date of the interval in format \
                               YYYY-MM-DD (defaults to today)')
+    parser.add_argument('--last_month',
+                        action='store_true',
+                        help='download data of whole last month')
     parser.add_argument('--output',
                         help='file to write to (defaults to \
                               <script_name>_<start_date>.csv)')
     args = parser.parse_args()
 
+    # validate inputs
     if not len(args.access_key) == 32:
-        parser.error('wrong format on access_key')
+        parser.error('wrong format on access_key, expected 32 characters '
+                     'but got {}.'.format(len(args.access_key)))
+    if not len(args.stream_id) == 9:
+        parser.error('wrong format on stream_id, expected 9 characters '
+                     'but got {}.'.format(len(args.stream_id)))
 
-    if args.end_date:
-        end_date = datetime.strptime(args.end_date, '%Y-%m-%d').date()
+    # date parsing logic
+    if args.last_month:
+        if args.start_date or args.end_date:
+            parser.error('argument --last_month not allowed with '
+                         '--start_date or --end_date')
+        today = date.today()
+        # get first of last month
+        start_date = date(today.year, today.month-1, 1)
+        # get first of this month
+        this_month = today.replace(day=1)
+        # last day of last month = first day of this month - 1 day
+        end_date = this_month - timedelta(days=1)
     else:
-        end_date = date.today()
-    if args.start_date:
-        start_date = datetime.strptime(args.start_date, '%Y-%m-%d').date()
-    else:
-        start_date = end_date - timedelta(days=30)
+        if args.end_date:
+            end_date = datetime.strptime(args.end_date, '%Y-%m-%d').date()
+        else:
+            end_date = date.today()
+        if args.start_date:
+            start_date = datetime.strptime(args.start_date, '%Y-%m-%d').date()
+        else:
+            start_date = end_date - timedelta(days=30)
+
     if args.output:
         output = args.output
     else:
@@ -114,5 +192,4 @@ if __name__ == '__main__':
 
     client = ACRClient(args.access_key)
     data = client.get_interval_data(args.stream_id, start_date, end_date)
-
     write_csv(output, data)
