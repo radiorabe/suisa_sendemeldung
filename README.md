@@ -6,7 +6,7 @@ usage: suisa_sendemeldung.py [-h] --access_key ACCESS_KEY --stream_id
                              EMAIL_PASS [--email_subject EMAIL_SUBJECT]
                              [--email_text EMAIL_TEXT]
                              [--start_date START_DATE] [--end_date END_DATE]
-                             [--last_month] [--filename FILENAME]
+                             [--last_month] [--filename FILENAME] [--stdout]
 
 ACRCloud client for SUISA reporting @ RaBe.
 
@@ -35,4 +35,5 @@ optional arguments:
   --last_month          download data of whole last month
   --filename FILENAME   file to write to (defaults to
                         <script_name>_<start_date>.csv)
+  --stdout              also print to stdout
 ```

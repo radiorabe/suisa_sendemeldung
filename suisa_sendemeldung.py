@@ -136,7 +136,12 @@ def get_csv(data):
 
         csv_writer.writerow([date, time, duration,
                              title, artist, isrc, label])
-    return csv.getvalue().encode('utf-8')
+    return csv.getvalue()
+
+
+def write_csv(filename, csv):
+    with open(filename, mode='w') as csvfile:
+        csvfile.write(csv)
 
 
 def send_email(sender, to, subject, text, filename, csv,
@@ -148,7 +153,7 @@ def send_email(sender, to, subject, text, filename, csv,
     msg.attach(MIMEText(text))
 
     part = MIMEBase('text', 'csv')
-    part.set_payload(csv)
+    part.set_payload(csv.encode('utf-8'))
     encode_base64(part)
     part.add_header('Content-Disposition',
                     'attachment; filename="{}"'.format(basename(filename)))
@@ -197,6 +202,8 @@ def main():
     parser.add_argument('--filename',
                         help='file to write to (defaults to \
                               <script_name>_<start_date>.csv)')
+    parser.add_argument('--stdout',
+                        help='also print to stdout', action='store_true')
     args = parser.parse_args()
 
     # validate inputs
@@ -239,9 +246,13 @@ def main():
 
     client = ACRClient(args.access_key)
     data = client.get_interval_data(args.stream_id, start_date, end_date)
+    csv = get_csv(data)
     send_email(args.email_from, args.email_to.split(','), args.email_subject,
-               args.email_text, filename, get_csv(data),
+               args.email_text, filename, csv,
                server=args.email_server, password=args.email_pass)
+    write_csv(filename, csv)
+    if args.stdout:
+        print(csv)
 
 
 if __name__ == '__main__':
