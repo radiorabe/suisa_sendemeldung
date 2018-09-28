@@ -1,0 +1,12 @@
+[Unit]
+Description=ACRCloud client for SUISA reporting
+
+[Service]
+Type=OneShot
+EnvironmentFile=-/etc/sysconfig/suisa_sendemeldung
+ExecStart=/usr/bin/suisa_sendemeldung $OPTIONS
+User=suisa_sendemeldung
+Group=suisa_sendemeldung
+
+[Install]
+WantedBy=multi-user.target
