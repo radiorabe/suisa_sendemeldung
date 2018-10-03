@@ -18,6 +18,11 @@ class ACRClient:
     TS_FMT = '%Y-%m-%d %H:%M:%S'
 
     def __init__(self, access_key):
+        """ACRCloud client to fetch metadata
+
+        Args:
+            access_key: The access key for ACRCloud.
+        """
         self.access_key = access_key
         self.default_date = date.today()-timedelta(days=1)
         self.url = ('https://api.acrcloud.com/v1/'
@@ -25,6 +30,16 @@ class ACRClient:
 
     def get_data(self, stream_id, requested_date=None,
                  localize_timestamps=True):
+        """Fetch metadata from ACRCloud for `stream_id`.
+        Args:
+            stream_id: The ID of the stream.
+            requested_date (optional): The date of the entries you want.
+            localize_timestamps (optional): If True add an additional field
+                `timestamp_local` to the response.
+
+        Returns:
+            json: The ACR data from date
+        """
         if requested_date is None:
             requested_date = self.default_date
         url_params = dict(
@@ -51,6 +66,18 @@ class ACRClient:
         return response.json()
 
     def trim_data(self, data, start, end):
+        """Trim overlapping entries by start end end date
+
+        Args:
+            data: The data to trim.
+            start: The start date to trim by. Older entries will be removed
+                from data.
+            end: The end date to trim by. Newer entries will be removed from
+                data.
+
+        Returns:
+            The data without removed entries.
+        """
         # traverse data in reversed order so we are not altering the flow
         # https://stackoverflow.com/questions/14267722/
         for entry in reversed(data):
@@ -67,6 +94,17 @@ class ACRClient:
 
     def get_interval_data(self, stream_id, start, end,
                           localize_timestamps=True):
+        """Get data specified by interval from start to end
+
+        Args:
+            stream_id: The ID of the stream.
+            start: The start date of the interval.
+            end: The end date of the interval.
+            localize_timestamps: will be passed to `get_data()`.
+
+        Returns:
+            json: The ACR data from start to end.
+        """
         trim = False
         # if we have to localize the timestamps we may need more data
         if localize_timestamps:
@@ -94,6 +132,8 @@ class ACRClient:
             ptr += timedelta(days=1)
 
         if trim:
+            # if timestamps are localized we will have to removed the unneeded
+            # entries.
             data = self.trim_data(data, start, end)
 
         return data
