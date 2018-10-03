@@ -65,33 +65,6 @@ class ACRClient:
 
         return response.json()
 
-    def trim_data(self, data, start, end):
-        """Trim overlapping entries by start end end date
-
-        Args:
-            data: The data to trim.
-            start: The start date to trim by. Older entries will be removed
-                from data.
-            end: The end date to trim by. Newer entries will be removed from
-                data.
-
-        Returns:
-            The data without removed entries.
-        """
-        # traverse data in reversed order so we are not altering the flow
-        # https://stackoverflow.com/questions/14267722/
-        for entry in reversed(data):
-            metadata = entry.get('metadata')
-            if metadata.get('timestamp_local'):
-                ts = metadata.get('timestamp_local')
-            else:
-                ts = metadata.get('timestamp_utc')
-            date = datetime.strptime(ts, ACRClient.TS_FMT).date()
-            if date < start or date > end:
-                data.remove(entry)
-
-        return data
-
     def get_interval_data(self, stream_id, start, end,
                           localize_timestamps=True):
         """Get data specified by interval from start to end
@@ -135,6 +108,33 @@ class ACRClient:
             # if timestamps are localized we will have to removed the unneeded
             # entries.
             data = self.trim_data(data, start, end)
+
+        return data
+
+    def trim_data(self, data, start, end):
+        """Trim overlapping entries by start end end date
+
+        Args:
+            data: The data to trim.
+            start: The start date to trim by. Older entries will be removed
+                from data.
+            end: The end date to trim by. Newer entries will be removed from
+                data.
+
+        Returns:
+            The data without removed entries.
+        """
+        # traverse data in reversed order so we are not altering the flow
+        # https://stackoverflow.com/questions/14267722/
+        for entry in reversed(data):
+            metadata = entry.get('metadata')
+            if metadata.get('timestamp_local'):
+                ts = metadata.get('timestamp_local')
+            else:
+                ts = metadata.get('timestamp_utc')
+            date = datetime.strptime(ts, ACRClient.TS_FMT).date()
+            if date < start or date > end:
+                data.remove(entry)
 
         return data
 
