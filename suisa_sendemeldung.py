@@ -140,6 +140,14 @@ class ACRClient:
 
 
 def get_csv(data):
+    """Create SUISA compatible csv data
+
+    Arguments:
+        data: To data to create csv from
+
+    Returns:
+        csv: The converted data
+    """
     header = [
         'Sendedatum',
         'Sendezeit',
@@ -180,12 +188,30 @@ def get_csv(data):
 
 
 def write_csv(filename, csv):
+    """Write contents of `csv` to file
+
+    Arguments:
+        filename: The file to write to.
+        csv: The data to write to `filename`.
+    """
     with open(filename, mode='w') as csvfile:
         csvfile.write(csv)
 
 
 def send_email(sender, to, subject, text, filename, csv,
                server='127.0.0.1', password=None):
+    """Send email
+
+    Arguments:
+        sender: The sender of the email. Login will be made with this user.
+        to: The recipient of the email. Can be a list.
+        subject: The subject of the email.
+        text: The body of the email.
+        filename: The filename to attach `csv` by.
+        csv: The attachment data.
+        server: The SMTP server to use to send the email.
+        password: The password for `sender`@`server`.
+    """
     msg = MIMEMultipart()
     msg['From'] = sender
     msg['To'] = ', '.join(to)
