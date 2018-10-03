@@ -2,6 +2,13 @@
 from argparse import ArgumentParser
 from csv import writer
 from datetime import datetime, date, timedelta, timezone
+from email.encoders import encode_base64
+from email.mime.base import MIMEBase
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from io import StringIO
+from os.path import basename
+from smtplib import SMTP
 
 import requests
 
@@ -92,7 +99,7 @@ class ACRClient:
         return data
 
 
-def write_csv(filename, data):
+def get_csv(data):
     header = [
         'Sendedatum',
         'Sendezeit',
@@ -102,36 +109,64 @@ def write_csv(filename, data):
         'ISRC',
         'Label'
     ]
+    csv = StringIO()
+    csv.write('sep=,\n')
+
+    csv_writer = writer(csv, dialect='excel')
+    csv_writer.writerow(header)
+
+    for entry in data:
+        metadata = entry.get('metadata')
+        # parse timestamp
+        timestamp = datetime.strptime(metadata.get('timestamp_local'),
+                                      ACRClient.TS_FMT)
+
+        date = timestamp.strftime('%d/%m/%y')
+        time = timestamp.strftime('%H:%M:%S')
+        duration = timedelta(seconds=metadata.get('played_duration'))
+
+        music = metadata.get('music')[0]
+        title = music.get('title')
+        artist = ', '.join([a.get('name') for a in music.get('artists')])
+        if len(music.get('external_ids')) > 0:
+            isrc = music.get('external_ids').get('isrc')
+        else:
+            isrc = ""
+        label = music.get('label')
+
+        csv_writer.writerow([date, time, duration,
+                             title, artist, isrc, label])
+    return csv.getvalue()
+
+
+def write_csv(filename, csv):
     with open(filename, mode='w') as csvfile:
-        csvfile.write('sep=,\n')
-
-        csv_writer = writer(csvfile, dialect='excel')
-        csv_writer.writerow(header)
-
-        for entry in data:
-            metadata = entry.get('metadata')
-            # parse timestamp
-            timestamp = datetime.strptime(metadata.get('timestamp_local'),
-                                          ACRClient.TS_FMT)
-
-            date = timestamp.strftime('%d/%m/%y')
-            time = timestamp.strftime('%H:%M:%S')
-            duration = timedelta(seconds=metadata.get('played_duration'))
-
-            music = metadata.get('music')[0]
-            title = music.get('title')
-            artist = ', '.join([a.get('name') for a in music.get('artists')])
-            if len(music.get('external_ids')) > 0:
-                isrc = music.get('external_ids').get('isrc')
-            else:
-                isrc = ""
-            label = music.get('label')
-
-            csv_writer.writerow([date, time, duration,
-                                 title, artist, isrc, label])
+        csvfile.write(csv)
 
 
-if __name__ == '__main__':
+def send_email(sender, to, subject, text, filename, csv,
+               server='127.0.0.1', password=None):
+    msg = MIMEMultipart()
+    msg['From'] = sender
+    msg['To'] = ', '.join(to)
+    msg['Subject'] = subject
+    msg.attach(MIMEText(text))
+
+    part = MIMEBase('text', 'csv')
+    part.set_payload(csv.encode('utf-8'))
+    encode_base64(part)
+    part.add_header('Content-Disposition',
+                    'attachment; filename="{}"'.format(basename(filename)))
+    msg.attach(part)
+
+    with SMTP(server) as smtp:
+        smtp.starttls()
+        if password:
+            smtp.login(sender, password)
+        smtp.sendmail(sender, to, msg.as_string())
+
+
+def main():
     parser = ArgumentParser(
                 description='ACRCloud client for SUISA reporting @ RaBe.')
     parser.add_argument('--access_key',
@@ -140,6 +175,20 @@ if __name__ == '__main__':
     parser.add_argument('--stream_id',
                         help='the id of the stream at ACRCloud (required)',
                         required=True)
+    parser.add_argument('--email_from', help='the sender of the email',
+                        required=True)
+    parser.add_argument('--email_to', help='the recipient of the email',
+                        required=True)
+    parser.add_argument('--email_server',
+                        help='the smtp server to send the mail with',
+                        required=True)
+    parser.add_argument('--email_pass',
+                        help='the password for the smtp server',
+                        required=True)
+    parser.add_argument('--email_subject', help='the subject of the email',
+                        default='SUISA Sendemeldung')
+    parser.add_argument('--email_text', help='the text of the email',
+                        default='Anbei die monatlich gespielten Titel.')
     parser.add_argument('--start_date',
                         help='the start date of the interval in format \
                               YYYY-MM-DD (defaults to 30 days before \
@@ -150,9 +199,11 @@ if __name__ == '__main__':
     parser.add_argument('--last_month',
                         action='store_true',
                         help='download data of whole last month')
-    parser.add_argument('--output',
+    parser.add_argument('--filename',
                         help='file to write to (defaults to \
                               <script_name>_<start_date>.csv)')
+    parser.add_argument('--stdout',
+                        help='also print to stdout', action='store_true')
     args = parser.parse_args()
 
     # validate inputs
@@ -185,11 +236,24 @@ if __name__ == '__main__':
         else:
             start_date = end_date - timedelta(days=30)
 
-    if args.output:
-        output = args.output
+    if args.filename:
+        filename = args.filename
+    elif args.last_month:
+        filename = (__file__.replace('.py', '_{}.csv')
+                            .format(start_date.strftime('%B')))
     else:
-        output = __file__.replace('.py', '_{}.csv').format(start_date)
+        filename = __file__.replace('.py', '_{}.csv').format(start_date)
 
     client = ACRClient(args.access_key)
     data = client.get_interval_data(args.stream_id, start_date, end_date)
-    write_csv(output, data)
+    csv = get_csv(data)
+    send_email(args.email_from, args.email_to.split(','), args.email_subject,
+               args.email_text, filename, csv,
+               server=args.email_server, password=args.email_pass)
+    write_csv(filename, csv)
+    if args.stdout:
+        print(csv)
+
+
+if __name__ == '__main__':
+    main()
