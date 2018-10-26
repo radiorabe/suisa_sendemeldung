@@ -283,8 +283,7 @@ def main():
                         help='file to write to (defaults to \
                               <script_name>_<start_date>.csv)')
     parser.add_argument('--stdout', env_var='STDOUT',
-                        help='also print to stdout', action='store_true',
-                        default=True)
+                        help='also print to stdout', action='store_true')
 
     args = parser.parse_args()
 
@@ -340,7 +339,8 @@ def main():
         send_email(args.email_from, args.email_to.split(','),
                    args.email_subject, args.email_text, filename, csv,
                    server=args.email_server, password=args.email_pass)
-    write_csv(filename, csv)
+    if args.csv:
+        write_csv(filename, csv)
     if args.stdout:
         print(csv)
 
