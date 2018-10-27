@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-from argparse import ArgumentParser
 from csv import writer
 from datetime import datetime, date, timedelta, timezone
 from email.encoders import encode_base64
@@ -7,9 +6,10 @@ from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from io import StringIO
-from os.path import basename
+from os.path import basename, expanduser
 from smtplib import SMTP
 
+from configargparse import ArgumentParser
 import requests
 
 
@@ -233,52 +233,70 @@ def send_email(sender, to, subject, text, filename, csv,
 
 
 def main():
+    default_config_file = basename(__file__).replace('.py', '.conf')
+    # config file in /etc gets overriden by the one in $HOME which gets
+    # overriden by the one in the current directory
+    default_config_files = [
+        '/etc/' + default_config_file,
+        expanduser('~') + '/' + default_config_file,
+        default_config_file
+    ]
     parser = ArgumentParser(
+                default_config_files=default_config_files,
                 description='ACRCloud client for SUISA reporting @ RaBe.')
-    parser.add_argument('--access_key',
+
+    parser.add_argument('--access_key', env_var='ACCESS_KEY',
                         help='the access key for ACRCloud (required)',
                         required=True)
-    parser.add_argument('--stream_id',
+    parser.add_argument('--stream_id', env_var='STREAM_ID',
                         help='the id of the stream at ACRCloud (required)',
                         required=True)
-    parser.add_argument('--email_from', help='the sender of the email',
-                        required=True)
-    parser.add_argument('--email_to', help='the recipient of the email',
-                        required=True)
-    parser.add_argument('--email_server',
-                        help='the smtp server to send the mail with',
-                        required=True)
-    parser.add_argument('--email_pass',
-                        help='the password for the smtp server',
-                        required=True)
-    parser.add_argument('--email_subject', help='the subject of the email',
+    parser.add_argument('--csv', env_var='CSV', help='create a csv file',
+                        action='store_true')
+    parser.add_argument('--email', env_var='EMAIL', help='send an email',
+                        action='store_true')
+    parser.add_argument('--email_from', env_var='EMAIL_FROM',
+                        help='the sender of the email')
+    parser.add_argument('--email_to', env_var='EMAIL_TO',
+                        help='the recipient of the email')
+    parser.add_argument('--email_server', env_var='EMAIL_SERVER',
+                        help='the smtp server to send the mail with')
+    parser.add_argument('--email_pass', env_var='EMAIL_PASS',
+                        help='the password for the smtp server')
+    parser.add_argument('--email_subject', env_var='EMAIL_SUBJECT',
+                        help='the subject of the email',
                         default='SUISA Sendemeldung')
-    parser.add_argument('--email_text', help='the text of the email',
-                        default='Anbei die monatlich gespielten Titel.')
-    parser.add_argument('--start_date',
+    parser.add_argument('--email_text', env_var='EMAIL_TEXT',
+                        help='the text of the email', default='')
+    parser.add_argument('--start_date', env_var='START_DATE',
                         help='the start date of the interval in format \
                               YYYY-MM-DD (defaults to 30 days before \
                               end_date)')
-    parser.add_argument('--end_date',
+    parser.add_argument('--end_date', env_var='END_DATE',
                         help='the end date of the interval in format \
                               YYYY-MM-DD (defaults to today)')
-    parser.add_argument('--last_month',
+    parser.add_argument('--last_month', env_var='LAST_MONTH',
                         action='store_true',
                         help='download data of whole last month')
-    parser.add_argument('--filename',
+    parser.add_argument('--filename', env_var='FILENAME',
                         help='file to write to (defaults to \
                               <script_name>_<start_date>.csv)')
-    parser.add_argument('--stdout',
+    parser.add_argument('--stdout', env_var='STDOUT',
                         help='also print to stdout', action='store_true')
+
     args = parser.parse_args()
 
-    # validate inputs
+    # validate arguments
     if not len(args.access_key) == 32:
         parser.error('wrong format on access_key, expected 32 characters '
                      'but got {}.'.format(len(args.access_key)))
     if not len(args.stream_id) == 9:
         parser.error('wrong format on stream_id, expected 9 characters '
                      'but got {}.'.format(len(args.stream_id)))
+    # one output option has to be set
+    if not (args.csv or args.email or args.stdout):
+        parser.error('no output option has been set, specify one of --csv, '
+                     '--email or --stdout')
 
     # date parsing logic
     if args.last_month:
@@ -286,7 +304,7 @@ def main():
             parser.error('argument --last_month not allowed with '
                          '--start_date or --end_date')
         today = date.today()
-        # get first of last month
+        # get first day of last month
         start_date = date(today.year, today.month-1, 1)
         # get first of this month
         this_month = today.replace(day=1)
@@ -296,14 +314,17 @@ def main():
         if args.end_date:
             end_date = datetime.strptime(args.end_date, '%Y-%m-%d').date()
         else:
+            # if no end_date was set, default to today
             end_date = date.today()
         if args.start_date:
             start_date = datetime.strptime(args.start_date, '%Y-%m-%d').date()
         else:
+            # if no start_date was set, default to 30 days before end_date
             start_date = end_date - timedelta(days=30)
 
     if args.filename:
         filename = args.filename
+    # depending on date args either append the month or the start_date
     elif args.last_month:
         filename = (__file__.replace('.py', '_{}.csv')
                             .format(start_date.strftime('%B')))
@@ -313,10 +334,12 @@ def main():
     client = ACRClient(args.access_key)
     data = client.get_interval_data(args.stream_id, start_date, end_date)
     csv = get_csv(data)
-    send_email(args.email_from, args.email_to.split(','), args.email_subject,
-               args.email_text, filename, csv,
-               server=args.email_server, password=args.email_pass)
-    write_csv(filename, csv)
+    if args.email:
+        send_email(args.email_from, args.email_to.split(','),
+                   args.email_subject, args.email_text, filename, csv,
+                   server=args.email_server, password=args.email_pass)
+    if args.csv:
+        write_csv(filename, csv)
     if args.stdout:
         print(csv)
 
