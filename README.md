@@ -1,5 +1,7 @@
 # suisa_sendemeldung
 
+ACRCloud client that fetches data on our playout history and formats them in a CSV file format containing the data (like Track, Title and ISRC) requested by SUISA. Also takes care of sending the report to SUISA via email for hands-off operations.
+
 ## Installation
 
 You will be able to install a package from [Open Build Service](https://openbuildservice.org/).
