@@ -267,8 +267,7 @@ def main():
                         help='the subject of the email',
                         default='SUISA Sendemeldung')
     parser.add_argument('--email_text', env_var='EMAIL_TEXT',
-                        help='the text of the email',
-                        default='Anbei die monatlich gespielten Titel.')
+                        help='the text of the email', default='')
     parser.add_argument('--start_date', env_var='START_DATE',
                         help='the start date of the interval in format \
                               YYYY-MM-DD (defaults to 30 days before \
