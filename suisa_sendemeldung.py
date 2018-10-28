@@ -175,11 +175,14 @@ def get_csv(data):
 
         music = metadata.get('music')[0]
         title = music.get('title')
-        artist = ', '.join([a.get('name') for a in music.get('artists')])
+        if music.get('artists') is not None:
+            artist = ', '.join([a.get('name') for a in music.get('artists')])
+        else:
+            artist = ''
         if len(music.get('external_ids')) > 0:
             isrc = music.get('external_ids').get('isrc')
         else:
-            isrc = ""
+            isrc = ''
         label = music.get('label')
 
         csv_writer.writerow([date, time, duration,
