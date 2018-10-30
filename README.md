@@ -4,7 +4,29 @@ ACRCloud client that fetches data on our playout history and formats them in a C
 
 ## Installation
 
-You will be able to install a package from [Open Build Service](https://openbuildservice.org/).
+### [Open Build Service](https://openbuildservice.org/)
+
+### Docker
+
+You can build a Docker image using the included [Dockerfile](Dockerfile):
+
+```bash
+git clone https://github.com/radiorabe/suisa_sendemeldung
+cd suisa_sendemeldung
+sudo docker build -t suisa_sendemeldung .
+```
+
+Then you can run it by passing in command line switches:
+
+```bash
+sudo docker run --rm suisa_sendemeldung --access_key abcdefghijklmnopqrstuvwxyzabcdef --stream_id a-bcdefgh --stdout
+```
+
+Or by setting environment variables:
+
+```bash
+sudo docker run --rm --env ACCESS_KEY=abcdefghijklmnopqrstuvwxyzabcdef --env STREAM_ID=a-bcdefgh --env STDOUT=True suisa_sendemeldung
+```
 
 ## Usage
 
