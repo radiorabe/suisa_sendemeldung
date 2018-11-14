@@ -103,4 +103,16 @@ For details on how to set configuration values, have a look at [suisa_sendemeldu
 
 ### Environment variables
 
+Environment variables can also be passed as options. The relevant variables are listed in the [Usage](#Usage) part of this document. For example run the script as follows:
+
+```bash
+ACCESS_KEY=abcdefghijklmnopqrstuvwxyzabcdef STREAM_ID=a-bcdefgh STDOUT=True ./suisa_sendemeldung.py
+```
+
 ### Command line switches
+
+As documented in [Usage](#Usage), you can also pass in options on the command line as arguments. Simply run the script as follows:
+
+```bash
+./suisa_sendemeldung.py --access_key=abcdefghijklmnopqrstuvwxyzabcdef --stream_id=a-bcdefgh --stdout
+```
