@@ -1,0 +1,17 @@
+language: minimal
+
+services:
+  - docker
+
+jobs:
+  include:
+    - stage: packaging tests
+      name: "Docker"
+      before_install:
+        - docker pull radiorabe/suisa_sendemeldung
+      script: docker build -t suisa_sendemeldung --cache-from radiorabe/suisa_sendemeldung .
+    - stage: packaging tests
+      name: "RPM"
+      before_install:
+        - docker pull quay.io/hairmare/centos_rpmdev
+      script: docker run --rm -ti -v `pwd`:'/git' quay.io/hairmare/centos_rpmdev /git/.travis/rpm.sh
