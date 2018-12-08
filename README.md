@@ -6,6 +6,15 @@ ACRCloud client that fetches data on our playout history and formats them in a C
 
 ### [Open Build Service](https://openbuildservice.org/)
 
+There are pre-built binary packages for CentOS 7 available on [Radio RaBe's OBS sendemeldungs package repository](https://build.opensuse.org/project/show/home:radiorabe:sendemeldung), which can be installed as follows:
+
+```bash
+curl -o /etc/yum.repos.d/home:radiorabe:sendemeldung.repo \
+     http://download.opensuse.org/repositories/home:/radiorabe:/sendemeldung/CentOS_7/home:radiorabe:sendemeldung.repo
+
+yum install suisa_sendemeldung
+```
+
 ### Docker
 
 You can build a Docker image using the included [Dockerfile](Dockerfile):
@@ -99,7 +108,7 @@ The configuration files will be evaluated in the following order (last takes pre
   2. `$HOME/suisa_sendemeldung.conf`
   3. `./suisa_sendemeldung.conf`
 
-For details on how to set configuration values, have a look at [suisa_sendemeldung.conf](suisa_sendemeldung.conf).
+For details on how to set configuration values, have a look at [suisa_sendemeldung.conf](etc/suisa_sendemeldung.conf).
 
 ### Environment variables
 
