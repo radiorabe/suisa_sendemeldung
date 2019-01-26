@@ -1,4 +1,4 @@
-FROM python:3-alpine@sha256:f708ad35a86f079e860ecdd05e1da7844fd877b58238e7a9a588b2ca3b1534d8
+FROM python:3-alpine@sha256:bdd28cbb0c70c1360289bae9a7f7ed50d1e48200b8f950d20d27b3c91984b1bb
 
 WORKDIR /src
 COPY requirements.txt /src/
