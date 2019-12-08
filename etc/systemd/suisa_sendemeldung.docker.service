@@ -1,0 +1,15 @@
+[Unit]
+Description=ACRCloud client for SUISA reporting container
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=OneShot
+ExecStartPre=-/usr/bin/docker stop %n
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStartPre=/usr/bin/docker pull radiorabe/suisa_sendemeldung
+ExecStartPre=/usr/bin/touch -a /etc/suisa_sendemeldung.conf
+ExecStart=/usr/bin/docker run --rm --name %n -v /etc/suisa_sendemeldung.conf:/etc/suisa_sendemeldung.conf radiorabe/suisa_sendemeldung
+
+[Install]
+WantedBy=multi-user.target
