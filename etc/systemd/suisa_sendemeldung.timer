@@ -2,7 +2,7 @@
 Description=Run ACRCloud client for SUISA reporting on first Monday of every month
 
 [Timer]
-OnCalendar=Mon *-*-1..7 9:00:00
+OnCalendar=*-*-1 9:00:00
 Persistent=true
 
 [Install]
