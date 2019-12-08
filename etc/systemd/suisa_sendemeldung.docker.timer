@@ -1,0 +1,9 @@
+[Unit]
+Description=Run ACRCloud client for SUISA reporting container on first Monday of every month
+
+[Timer]
+OnCalendar=Mon *-*-* 13:37:00
+Persistent=true
+
+[Install]
+WantedBy=timers.target
