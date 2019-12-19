@@ -10,5 +10,4 @@ chown root:root suisa_sendemeldung.spec
 
 create-source-tarball.sh /git suisa_sendemeldung-master.tar.gz
 
-yum -y install python3-devel
 build-rpm-package.sh suisa_sendemeldung.spec
