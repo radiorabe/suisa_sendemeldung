@@ -43,6 +43,7 @@ BuildRequires:  python%{python3_pkgversion}-configargparse
 BuildRequires:  python%{python3_pkgversion}-devel
 BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python%{python3_pkgversion}-requests
+BuildRequires:  python3-devel
 %{?systemd_requires}
 BuildRequires:  systemd
 Requires(pre):  shadow-utils
