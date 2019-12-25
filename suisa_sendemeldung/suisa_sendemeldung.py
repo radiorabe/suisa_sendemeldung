@@ -70,8 +70,10 @@ def write_csv(filename, csv):
         csvfile.write(csv)
 
 
-def send_email(sender, recipient, subject, text, filename, csv, server='127.0.0.1', password=None):
-    """Send email
+# reducing the arguments even more does not seem practical
+#pylint: disable-msg=too-many-arguments
+def create_message(sender, recipient, subject, text, filename, csv):
+    """Create email message
 
     Arguments:
         sender: The sender of the email. Login will be made with this user.
@@ -80,26 +82,37 @@ def send_email(sender, recipient, subject, text, filename, csv, server='127.0.0.
         text: The body of the email.
         filename: The filename to attach `csv` by.
         csv: The attachment data.
-        server: The SMTP server to use to send the email.
-        password: The password for `sender`@`server`.
     """
     msg = MIMEMultipart()
     msg['From'] = sender
     msg['To'] = ', '.join(recipient)
     msg['Subject'] = subject
+    # set body
     msg.attach(MIMEText(text))
-
+    # attach csv
     part = MIMEBase('text', 'csv')
     part.set_payload(csv.encode('utf-8'))
     encode_base64(part)
     part.add_header('Content-Disposition', 'attachment; filename="{}"'.format(basename(filename)))
     msg.attach(part)
 
+    return msg
+#pylint: enable-msg=too-many-arguments
+
+
+def send_message(msg, server='127.0.0.1', password=None):
+    """Send email
+
+    Arguments:
+        msg: The message to send (an email.messag.Message object)
+        server: The SMTP server to use to send the email.
+        password: The password for `sender`@`server`.
+    """
     with SMTP(server) as smtp:
         smtp.starttls()
         if password:
-            smtp.login(sender, password)
-        smtp.sendmail(sender, recipient, msg.as_string())
+            smtp.login(msg['From'], password)
+        smtp.send_message(msg)
 
 
 def main():
@@ -191,8 +204,9 @@ def main():
     data = client.get_interval_data(args.stream_id, start_date, end_date)
     csv = get_csv(data)
     if args.email:
-        send_email(args.email_from, args.email_to.split(','), args.email_subject, args.email_text,
-                   filename, csv, server=args.email_server, password=args.email_pass)
+        msg = create_message(args.email_from, args.email_to.split(','), args.email_subject,
+                             args.email_text, filename, csv)
+        send_message(msg, server=args.email_server, password=args.email_pass)
     if args.csv:
         write_csv(filename, csv)
     if args.stdout:
