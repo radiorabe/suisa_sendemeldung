@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+"""
+ACRCloud client that fetches data on our playout history and formats them in a CSV file format
+containing the data (like Track, Title and ISRC) requested by SUISA. Also takes care of sending
+the report to SUISA via email for hands-off operations.
+"""
 from csv import writer
 from datetime import datetime, date, timedelta
 from email.encoders import encode_base64
@@ -43,8 +48,8 @@ def get_csv(data):
         timestamp = datetime.strptime(metadata.get('timestamp_local'),
                                       ACRClient.TS_FMT)
 
-        date = timestamp.strftime('%d/%m/%y')
-        time = timestamp.strftime('%H:%M:%S')
+        ts_date = timestamp.strftime('%d/%m/%y')
+        ts_time = timestamp.strftime('%H:%M:%S')
         duration = timedelta(seconds=metadata.get('played_duration'))
 
         music = metadata.get('music')[0]
@@ -59,7 +64,7 @@ def get_csv(data):
             isrc = ''
         label = music.get('label')
 
-        csv_writer.writerow([date, time, duration,
+        csv_writer.writerow([ts_date, ts_time, duration,
                              title, artist, isrc, label])
     return csv.getvalue()
 
@@ -75,13 +80,13 @@ def write_csv(filename, csv):
         csvfile.write(csv)
 
 
-def send_email(sender, to, subject, text, filename, csv,
+def send_email(sender, recipient, subject, text, filename, csv,
                server='127.0.0.1', password=None):
     """Send email
 
     Arguments:
         sender: The sender of the email. Login will be made with this user.
-        to: The recipient of the email. Can be a list.
+        recipient: The recipient of the email. Can be a list.
         subject: The subject of the email.
         text: The body of the email.
         filename: The filename to attach `csv` by.
@@ -91,7 +96,7 @@ def send_email(sender, to, subject, text, filename, csv,
     """
     msg = MIMEMultipart()
     msg['From'] = sender
-    msg['To'] = ', '.join(to)
+    msg['To'] = ', '.join(recipient)
     msg['Subject'] = subject
     msg.attach(MIMEText(text))
 
@@ -106,10 +111,11 @@ def send_email(sender, to, subject, text, filename, csv,
         smtp.starttls()
         if password:
             smtp.login(sender, password)
-        smtp.sendmail(sender, to, msg.as_string())
+        smtp.sendmail(sender, recipient, msg.as_string())
 
 
 def main():
+    """main function"""
     default_config_file = basename(__file__).replace('.py', '.conf')
     # config file in /etc gets overriden by the one in $HOME which gets
     # overriden by the one in the current directory
@@ -203,7 +209,7 @@ def main():
     # depending on date args either append the month or the start_date
     elif args.last_month:
         filename = (__file__.replace('.py', '_{}.csv')
-                            .format(start_date.strftime('%B')))
+                    .format(start_date.strftime('%B')))
     else:
         filename = __file__.replace('.py', '_{}.csv').format(start_date)
 
