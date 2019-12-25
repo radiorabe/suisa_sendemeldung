@@ -94,37 +94,16 @@ class ACRClient:
                                   localize_timestamps=localize_timestamps)
             ptr += timedelta(days=1)
 
+        # if timestamps are localized we will have to removed the unneeded entries.
         if trim:
-            # if timestamps are localized we will have to removed the unneeded
-            # entries.
-            data = self.trim_data(data, start, end)
-
-        return data
-
-    @staticmethod
-    def trim_data(data, start, end):
-        """Trim overlapping entries by start end end date
-
-        Args:
-            data: The data to trim.
-            start: The start date to trim by. Older entries will be removed
-                from data.
-            end: The end date to trim by. Newer entries will be removed from
-                data.
-
-        Returns:
-            The data without removed entries.
-        """
-        # traverse data in reversed order so we are not altering the flow
-        # https://stackoverflow.com/questions/14267722/
-        for entry in reversed(data):
-            metadata = entry.get('metadata')
-            if metadata.get('timestamp_local'):
-                timestamp = metadata.get('timestamp_local')
-            else:
-                timestamp = metadata.get('timestamp_utc')
-            timestamp_date = datetime.strptime(timestamp, ACRClient.TS_FMT).date()
-            if timestamp_date < start or timestamp_date > end:
-                data.remove(entry)
+            for entry in reversed(data):
+                metadata = entry.get('metadata')
+                if metadata.get('timestamp_local'):
+                    timestamp = metadata.get('timestamp_local')
+                else:
+                    timestamp = metadata.get('timestamp_utc')
+                timestamp_date = datetime.strptime(timestamp, ACRClient.TS_FMT).date()
+                if timestamp_date < start or timestamp_date > end:
+                    data.remove(entry)
 
         return data
