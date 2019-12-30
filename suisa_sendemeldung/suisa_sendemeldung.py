@@ -16,7 +16,11 @@ from smtplib import SMTP
 
 from configargparse import ArgumentParser
 
-from acrclient import ACRClient
+try:
+    # this only works when the program has been installed
+    from suisa_sendemeldung.acrclient import ACRClient
+except ModuleNotFoundError:
+    from acrclient import ACRClient
 
 def get_csv(data):
     """Create SUISA compatible csv data
