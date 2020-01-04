@@ -307,12 +307,11 @@ def main():
             parser.error('argument --last_month not allowed with '
                          '--start_date or --end_date')
         today = date.today()
-        # get first day of last month
-        start_date = date(today.year, today.month-1, 1)
         # get first of this month
         this_month = today.replace(day=1)
         # last day of last month = first day of this month - 1 day
         end_date = this_month - timedelta(days=1)
+        start_date = end_date.replace(day=1)
     else:
         if args.end_date:
             end_date = datetime.strptime(args.end_date, '%Y-%m-%d').date()
