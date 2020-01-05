@@ -68,6 +68,8 @@ def get_arguments(parser):
     parser.add_argument('--email_to', env_var='EMAIL_TO', help='the recipient of the email')
     parser.add_argument('--email_server', env_var='EMAIL_SERVER',
                         help='the smtp server to send the mail with')
+    parser.add_argument('--email_login', env_var='EMAIL_LOGIN',
+                        help='the username to logon to the smtp server (default: email_from)')
     parser.add_argument('--email_pass', env_var='EMAIL_PASS',
                         help='the password for the smtp server')
     parser.add_argument('--email_subject', env_var='EMAIL_SUBJECT', help='the subject of the email',
@@ -219,7 +221,7 @@ def create_message(sender, recipient, subject, text, filename, csv):
 #pylint: enable-msg=too-many-arguments
 
 
-def send_message(msg, server='127.0.0.1', password=None):
+def send_message(msg, server='127.0.0.1', login=None, password=None):
     """Send email
 
     Arguments:
@@ -230,7 +232,10 @@ def send_message(msg, server='127.0.0.1', password=None):
     with SMTP(server) as smtp:
         smtp.starttls()
         if password:
-            smtp.login(msg['From'], password)
+            if login:
+                smtp.login(login, password)
+            else:
+                smtp.login(msg['From'], password)
         smtp.send_message(msg)
 
 
@@ -258,7 +263,7 @@ def main():
     if args.email:
         msg = create_message(args.email_from, args.email_to.split(','), args.email_subject,
                              args.email_text, filename, csv)
-        send_message(msg, server=args.email_server, password=args.email_pass)
+        send_message(msg, server=args.email_server, login=args.email_login, password=args.email_pass)
     if args.csv:
         write_csv(filename, csv)
     if args.stdout:
