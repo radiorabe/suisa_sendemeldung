@@ -26,6 +26,7 @@ except ModuleNotFoundError:
 def validate_arguments(parser, args):
     """Validate the arguments provided to the script. After this function we are sure that there
     are no conflicts in the arguments
+
     Arguments:
         parser: the ArgumentParser to use for throwing errors
         args: the arguments to validate
@@ -53,8 +54,10 @@ def validate_arguments(parser, args):
 def get_arguments(parser):
     """Setup the provided ArgumentParser (a configargparse.ArgumentParser object) with arguments
     and return arguments
+
     Arguments:
         parser: the parser to add arguments
+
     Returns:
         args: the parsed args from the parser
     """
@@ -65,7 +68,9 @@ def get_arguments(parser):
     parser.add_argument('--csv', env_var='CSV', help='create a csv file', action='store_true')
     parser.add_argument('--email', env_var='EMAIL', help='send an email', action='store_true')
     parser.add_argument('--email_from', env_var='EMAIL_FROM', help='the sender of the email')
-    parser.add_argument('--email_to', env_var='EMAIL_TO', help='the recipient of the email')
+    parser.add_argument('--email_to', env_var='EMAIL_TO', help='the recipients of the email')
+    parser.add_argument('--email_cc', env_var='EMAIL_CC', help='the cc recipients of the email')
+    parser.add_argument('--email_bcc', env_var='EMAIL_BCC', help='the bcc recipients of the email')
     parser.add_argument('--email_server', env_var='EMAIL_SERVER',
                         help='the smtp server to send the mail with')
     parser.add_argument('--email_login', env_var='EMAIL_LOGIN',
@@ -94,8 +99,10 @@ def get_arguments(parser):
 
 def parse_date(args):
     """Parse date from args
+
     Arguments:
         args: the arguments provided to the script
+
     Returns:
         start_date: the start date of the requested interval
         end_date: the end date of the requested interval
@@ -124,8 +131,10 @@ def parse_date(args):
 
 def parse_filename(args, start_date):
     """Parse filename from args and start_date
+
     Arguments:
         args: the arguments provided to the script
+
     Returns:
         filename: the filename to use for the csv data
     """
@@ -192,8 +201,8 @@ def write_csv(filename, csv):
 
 
 # reducing the arguments even more does not seem practical
-#pylint: disable-msg=too-many-arguments
-def create_message(sender, recipient, subject, text, filename, csv):
+#pylint: disable-msg=too-many-arguments,invalid-name
+def create_message(sender, recipient, subject, text, filename, csv, cc=None, bcc=None):
     """Create email message
 
     Arguments:
@@ -207,6 +216,10 @@ def create_message(sender, recipient, subject, text, filename, csv):
     msg = MIMEMultipart()
     msg['From'] = sender
     msg['To'] = ', '.join(recipient)
+    if cc:
+        msg['Cc'] = ', '.join(cc)
+    if bcc:
+        msg['Bcc'] = ', '.join(bcc)
     msg['Subject'] = subject
     # set body
     msg.attach(MIMEText(text))
@@ -218,7 +231,7 @@ def create_message(sender, recipient, subject, text, filename, csv):
     msg.attach(part)
 
     return msg
-#pylint: enable-msg=too-many-arguments
+#pylint: enable-msg=too-many-arguments,invalid-name
 
 
 def send_message(msg, server='127.0.0.1', login=None, password=None):
@@ -262,8 +275,10 @@ def main():
     csv = get_csv(data)
     if args.email:
         msg = create_message(args.email_from, args.email_to.split(','), args.email_subject,
-                             args.email_text, filename, csv)
-        send_message(msg, server=args.email_server, login=args.email_login, password=args.email_pass)
+                             args.email_text, filename, csv, cc=args.email_cc.split(','),
+                             bcc=args.email_bcc.split(','))
+        send_message(msg, server=args.email_server,
+                     login=args.email_login, password=args.email_pass)
     if args.csv:
         write_csv(filename, csv)
     if args.stdout:
