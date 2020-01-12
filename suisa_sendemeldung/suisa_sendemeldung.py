@@ -274,8 +274,10 @@ def main():
     data = client.get_interval_data(args.stream_id, start_date, end_date)
     csv = get_csv(data)
     if args.email:
-        msg = create_message(args.email_from, args.email_to, args.email_subject, args.email_text,
-                             filename, csv, cc=args.email_cc, bcc=args.email_bcc)
+        email_subject = start_date.strftime(args.email_subject)
+        email_text = start_date.strftime(args.email_text)
+        msg = create_message(args.email_from, args.email_to, email_subject, email_text, filename,
+                             csv, cc=args.email_cc, bcc=args.email_bcc)
         send_message(msg, server=args.email_server,
                      login=args.email_login, password=args.email_pass)
     if args.csv:
