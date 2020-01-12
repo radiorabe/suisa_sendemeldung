@@ -10,6 +10,7 @@ from email.encoders import encode_base64
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.utils import formatdate
 from io import StringIO
 from os.path import basename, expanduser
 from smtplib import SMTP
@@ -220,6 +221,7 @@ def create_message(sender, recipient, subject, text, filename, csv, cc=None, bcc
         msg['Cc'] = cc
     if bcc:
         msg['Bcc'] = bcc
+    msg['Date'] = formatdate(localtime=True)
     msg['Subject'] = subject
     # set body
     msg.attach(MIMEText(text))
