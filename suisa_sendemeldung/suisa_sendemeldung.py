@@ -215,11 +215,11 @@ def create_message(sender, recipient, subject, text, filename, csv, cc=None, bcc
     """
     msg = MIMEMultipart()
     msg['From'] = sender
-    msg['To'] = ', '.join(recipient)
+    msg['To'] = recipient
     if cc:
-        msg['Cc'] = ', '.join(cc)
+        msg['Cc'] = cc
     if bcc:
-        msg['Bcc'] = ', '.join(bcc)
+        msg['Bcc'] = bcc
     msg['Subject'] = subject
     # set body
     msg.attach(MIMEText(text))
@@ -274,9 +274,8 @@ def main():
     data = client.get_interval_data(args.stream_id, start_date, end_date)
     csv = get_csv(data)
     if args.email:
-        msg = create_message(args.email_from, args.email_to.split(','), args.email_subject,
-                             args.email_text, filename, csv, cc=args.email_cc.split(','),
-                             bcc=args.email_bcc.split(','))
+        msg = create_message(args.email_from, args.email_to, args.email_subject, args.email_text,
+                             filename, csv, cc=args.email_cc, bcc=args.email_bcc)
         send_message(msg, server=args.email_server,
                      login=args.email_login, password=args.email_pass)
     if args.csv:
