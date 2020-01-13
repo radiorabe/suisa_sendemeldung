@@ -278,6 +278,7 @@ def main():
     if args.email:
         email_subject = start_date.strftime(args.email_subject)
         email_text = start_date.strftime(args.email_text)
+        email_text = email_text.replace('\\n','\n')
         msg = create_message(args.email_from, args.email_to, email_subject, email_text, filename,
                              csv, cc=args.email_cc, bcc=args.email_bcc)
         send_message(msg, server=args.email_server,
