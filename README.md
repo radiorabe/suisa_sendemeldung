@@ -41,19 +41,15 @@ sudo docker run --rm --env ACCESS_KEY=abcdefghijklmnopqrstuvwxyzabcdef --env STR
 
 This is the output of `suisa_sendemeldung -h`.
 ```
-usage: suisa_sendemeldung.py [-h] --access_key ACCESS_KEY --stream_id STREAM_ID [--csv] [--email]
-                             [--email_from EMAIL_FROM] [--email_to EMAIL_TO] [--email_cc EMAIL_CC]
-                             [--email_bcc EMAIL_BCC] [--email_server EMAIL_SERVER]
-                             [--email_login EMAIL_LOGIN] [--email_pass EMAIL_PASS]
-                             [--email_subject EMAIL_SUBJECT] [--email_text EMAIL_TEXT]
-                             [--start_date START_DATE] [--end_date END_DATE] [--last_month]
-                             [--filename FILENAME] [--stdout]
+usage: suisa_sendemeldung.py [-h] --access_key ACCESS_KEY --stream_id STREAM_ID [--csv] [--email] [--email_from EMAIL_FROM] [--email_to EMAIL_TO]
+                             [--email_cc EMAIL_CC] [--email_bcc EMAIL_BCC] [--email_server EMAIL_SERVER] [--email_login EMAIL_LOGIN]
+                             [--email_pass EMAIL_PASS] [--email_subject EMAIL_SUBJECT] [--email_text EMAIL_TEXT] [--start_date START_DATE]
+                             [--end_date END_DATE] [--last_month] [--timezone TIMEZONE] [--filename FILENAME] [--stdout]
 
-ACRCloud client for SUISA reporting @ RaBe. Args that start with '--' (eg. --access_key) can also be set in
-a config file (/etc/suisa_sendemeldung.conf or $HOME/suisa_sendemeldung.conf or
-suisa_sendemeldung.conf). Config file syntax allows: key=value, flag=true, stuff=[a,b,c] (for details, see
-syntax at https://goo.gl/R74nmi). If an arg is specified in more than one place, then commandline values
-override environment variables which override config file values which override defaults.
+ACRCloud client for SUISA reporting @ RaBe. Args that start with '--' (eg. --access_key) can also be set in a config file
+(/etc/suisa_sendemeldung.conf or /home/jonas/suisa_sendemeldung.conf or suisa_sendemeldung.conf). Config file syntax allows: key=value, flag=true,
+stuff=[a,b,c] (for details, see syntax at https://goo.gl/R74nmi). If an arg is specified in more than one place, then commandline values override
+environment variables which override config file values which override defaults.
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -72,8 +68,7 @@ optional arguments:
   --email_server EMAIL_SERVER
                         the smtp server to send the mail with [env var: EMAIL_SERVER]
   --email_login EMAIL_LOGIN
-                        the username to logon to the smtp server (default: email_from) [env var:
-                        EMAIL_LOGIN]
+                        the username to logon to the smtp server (default: email_from) [env var: EMAIL_LOGIN]
   --email_pass EMAIL_PASS
                         the password for the smtp server [env var: EMAIL_PASS]
   --email_subject EMAIL_SUBJECT
@@ -81,14 +76,13 @@ optional arguments:
   --email_text EMAIL_TEXT
                         the text of the email [env var: EMAIL_TEXT]
   --start_date START_DATE
-                        the start date of the interval in format YYYY-MM-DD (default: 30 days before
-                        end_date) [env var: START_DATE]
-  --end_date END_DATE   the end date of the interval in format YYYY-MM-DD (default: today) [env var:
-                        END_DATE]
+                        the start date of the interval in format YYYY-MM-DD (default: 30 days before end_date) [env var: START_DATE]
+  --end_date END_DATE   the end date of the interval in format YYYY-MM-DD (default: today) [env var: END_DATE]
   --last_month          download data of whole last month [env var: LAST_MONTH]
+  --timezone TIMEZONE   set the timezone for localization [env var: TIMEZONE]
   --filename FILENAME   file to write to (default: <script_name>_<start_date>.csv) [env var: FILENAME]
   --stdout              also print to stdout [env var: STDOUT]
-```
+  ```
                              
 ## Configuration
 

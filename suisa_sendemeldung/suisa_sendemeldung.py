@@ -89,6 +89,8 @@ def get_arguments(parser):
                         help='the end date of the interval in format YYYY-MM-DD (default: today)')
     parser.add_argument('--last_month', env_var='LAST_MONTH', action='store_true',
                         help='download data of whole last month')
+    parser.add_argument('--timezone', env_var='TIMEZONE', help='set the timezone for localization',
+                        default='UTC')
     parser.add_argument('--filename', env_var='FILENAME',
                         help='file to write to (default: <script_name>_<start_date>.csv)')
     parser.add_argument('--stdout', env_var='STDOUT', help='also print to stdout',
@@ -273,12 +275,12 @@ def main():
     filename = parse_filename(args, start_date)
 
     client = ACRClient(args.access_key)
-    data = client.get_interval_data(args.stream_id, start_date, end_date)
+    data = client.get_interval_data(args.stream_id, start_date, end_date, timezone=args.timezone)
     csv = get_csv(data)
     if args.email:
         email_subject = start_date.strftime(args.email_subject)
         email_text = start_date.strftime(args.email_text)
-        email_text = email_text.replace('\\n','\n')
+        email_text = email_text.replace('\\n', '\n')
         msg = create_message(args.email_from, args.email_to, email_subject, email_text, filename,
                              csv, cc=args.email_cc, bcc=args.email_bcc)
         send_message(msg, server=args.email_server,
