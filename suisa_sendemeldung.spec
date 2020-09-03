@@ -27,7 +27,7 @@
 #
 %global srcname suisa_sendemeldung
 
-%{?el7:%global python3_pkgversion 34}
+%{?el7:%global python3_pkgversion 36}
 
 Name:           %{srcname}
 Version:        master
@@ -41,13 +41,15 @@ Source0:        https://github.com/radiorabe/suisa_sendemeldung/archive/%{versio
 BuildArch:      noarch
 BuildRequires:  python%{python3_pkgversion}-configargparse
 BuildRequires:  python%{python3_pkgversion}-devel
-BuildRequires:  python%{python3_pkgversion}-setuptools
+BuildRequires:  python%{python3_pkgversion}-pytz
 BuildRequires:  python%{python3_pkgversion}-requests
+BuildRequires:  python%{python3_pkgversion}-setuptools
 BuildRequires:  python3-devel
 %{?systemd_requires}
 BuildRequires:  systemd
 Requires(pre):  shadow-utils
 Requires:       python%{python3_pkgversion}-configargparse
+Requires:       python%{python3_pkgversion}-pytz
 Requires:       python%{python3_pkgversion}-requests
 %{?python_enable_dependency_generator}
 
@@ -57,7 +59,6 @@ formats them in a CSV file format containing the data (like
 Track, Title and, ISRC) requested by SUISA.
 Also takes care of sending the report to SUISA via email for
 hands-off operations.
-
 
 %prep
 %autosetup -n %{srcname}-%{version}

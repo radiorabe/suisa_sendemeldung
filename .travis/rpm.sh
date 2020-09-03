@@ -4,8 +4,6 @@
 
 set -xe
 
-curl -o /etc/yum.repos.d/sendemeldung.repo https://download.opensuse.org/repositories/home:/radiorabe:/sendemeldung/CentOS_7/home:radiorabe:sendemeldung.repo
-
 chown root:root suisa_sendemeldung.spec
 
 create-source-tarball.sh /git suisa_sendemeldung-master.tar.gz
