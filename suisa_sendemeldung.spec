@@ -27,7 +27,7 @@
 #
 %global srcname suisa_sendemeldung
 
-%{?el7:%global python3_pkgversion 34}
+%{?el7:%global python3_pkgversion 36}
 
 Name:           %{srcname}
 Version:        master
