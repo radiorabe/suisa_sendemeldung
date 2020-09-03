@@ -151,6 +151,48 @@ def parse_filename(args, start_date):
     return filename
 
 
+def check_duplicate(entry_a, entry_b):
+    """Check if two entries are duplicates by checking their acrid in all music items
+
+    Arguments:
+        entry_a: first entry
+        entry_b: second entry
+
+    Returns:
+        True if the entries are duplicates, False otherwise
+    """
+    for music_a in entry_a['metadata']['music']:
+        for music_b in entry_b['metadata']['music']:
+            if music_a['acrid'] == music_b['acrid']:
+                return True
+    return False
+
+
+def merge_duplicates(data):
+    """Merge consecutive entries into one if they are duplicates
+
+    Arguments:
+        data: The data provided by ACRClient
+
+    Returns:
+        data: The processed data
+    """
+    prev = data[0]
+    mark = []
+    for entry in data[1:]:
+        if check_duplicate(prev, entry):
+            prev['metadata']['played_duration'] = prev['metadata']['played_duration'] + \
+                                                  entry['metadata']['played_duration']
+            # mark entry for removal
+            mark.append(entry)
+        else:
+            prev = entry
+    # remove marked entries
+    for entry in mark:
+        data.remove(entry)
+    return data
+
+
 def get_csv(data):
     """Create SUISA compatible csv data
 
@@ -276,7 +318,7 @@ def main():
 
     client = ACRClient(args.access_key)
     data = client.get_interval_data(args.stream_id, start_date, end_date, timezone=args.timezone)
-    csv = get_csv(data)
+    csv = get_csv(merge_duplicates(data))
     if args.email:
         email_subject = start_date.strftime(args.email_subject)
         email_text = start_date.strftime(args.email_text)
