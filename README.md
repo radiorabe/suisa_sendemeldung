@@ -37,6 +37,12 @@ Or by setting environment variables:
 sudo docker run --rm --env ACCESS_KEY=abcdefghijklmnopqrstuvwxyzabcdef --env STREAM_ID=a-bcdefgh --env STDOUT=True suisa_sendemeldung
 ```
 
+A prebuilt image is available from the GitHub Package Registry:
+
+```bash
+docker pull ghcr.io/radiorabe/suisasendemeldung:master
+```
+
 ## Usage
 
 This is the output of `suisa_sendemeldung -h`.
