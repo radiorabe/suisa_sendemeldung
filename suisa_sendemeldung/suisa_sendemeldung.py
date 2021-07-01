@@ -161,8 +161,16 @@ def check_duplicate(entry_a, entry_b):
     Returns:
         True if the entries are duplicates, False otherwise
     """
-    for music_a in entry_a['metadata']['music']:
-        for music_b in entry_b['metadata']['music']:
+    try:
+        entry_a = entry_a['metadata']['music']
+    except KeyError:
+        entry_a = entry_a['metadata']['custom_files']
+    try:
+        entry_b = entry_b['metadata']['music']
+    except KeyError:
+        entry_b = entry_b['metadata']['custom_files']
+    for music_a in entry_a:
+        for music_b in entry_b:
             if music_a['acrid'] == music_b['acrid']:
                 return True
     return False
@@ -218,14 +226,27 @@ def get_csv(data):
         ts_time = timestamp.strftime('%H:%M:%S')
         duration = timedelta(seconds=metadata.get('played_duration'))
 
-        music = metadata.get('music')[0]
+        try:
+            music = metadata.get('music')[0]
+        except TypeError:
+            music = metadata.get('custom_files')[0]
         title = music.get('title')
         if music.get('artists') is not None:
             artist = ', '.join([a.get('name') for a in music.get('artists')])
+        elif music.get('artist') is not None:
+            artist = music.get('artist')
+        elif music.get('Artist') is not None:
+            """
+            Uppercase is a hack needed for Jun 2021 since there is a 'wrong' entry in the database.
+            Going forward the record will be available as 'artist' in lowercase.
+            """
+            artist = music.get('Artist')
         else:
             artist = ''
-        if len(music.get('external_ids')) > 0:
+        if music.get('external_ids') and len(music.get('external_ids')) > 0:
             isrc = music.get('external_ids').get('isrc')
+        elif music.get('isrc'):
+            isrc = music.get('isrc')
         else:
             isrc = ''
         label = music.get('label')
