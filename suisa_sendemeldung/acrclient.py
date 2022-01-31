@@ -1,28 +1,29 @@
-"""module containing the ACRCloud client"""
+"""module containing the ACRCloud client."""
 from datetime import date, datetime, timedelta
 
 import pytz
 import requests
 
+
 class ACRClient:
-    """ACRCloud client to fetch metadata
+    """ACRCloud client to fetch metadata.
 
     Args:
         access_key: The access key for ACRCloud.
     """
+
     # format of timestamp in api answer
-    TS_FMT = '%Y-%m-%d %H:%M:%S'
+    TS_FMT = "%Y-%m-%d %H:%M:%S"
     # timezone of ACRCloud
-    ACR_TIMEZONE = 'UTC'
+    ACR_TIMEZONE = "UTC"
 
     def __init__(self, access_key):
         self.access_key = access_key
-        self.default_date = date.today()-timedelta(days=1)
-        self.url = ('https://api.acrcloud.com/v1/'
-                    'monitor-streams/{stream_id}/results')
+        self.default_date = date.today() - timedelta(days=1)
 
     def get_data(self, stream_id, requested_date=None, timezone=ACR_TIMEZONE):
         """Fetch metadata from ACRCloud for `stream_id`.
+
         Args:
             stream_id: The ID of the stream.
             requested_date (optional): The date of the entries you want (default: yesterday).
@@ -34,28 +35,26 @@ class ACRClient:
         if requested_date is None:
             requested_date = self.default_date
         url_params = dict(
-            access_key=self.access_key,
-            date=requested_date.strftime('%Y%m%d')
+            access_key=self.access_key, date=requested_date.strftime("%Y%m%d")
         )
-        url = self.url.format(stream_id=stream_id)
+        url = f"https://api.acrcloud.com/v1/monitor-streams/{stream_id}/results"
         response = requests.get(url=url, params=url_params)
         response.raise_for_status()
 
         data = response.json()
 
         for entry in data:
-            metadata = entry.get('metadata')
-            ts_utc = pytz.utc.localize(datetime.strptime(metadata.get('timestamp_utc'),
-                                                         ACRClient.TS_FMT))
+            metadata = entry.get("metadata")
+            ts_utc = pytz.utc.localize(
+                datetime.strptime(metadata.get("timestamp_utc"), ACRClient.TS_FMT)
+            )
             ts_local = ts_utc.astimezone(pytz.timezone(timezone))
-            metadata.update({
-                'timestamp_local': ts_local.strftime(ACRClient.TS_FMT)
-            })
+            metadata.update({"timestamp_local": ts_local.strftime(ACRClient.TS_FMT)})
 
         return data
 
     def get_interval_data(self, stream_id, start, end, timezone=ACR_TIMEZONE):
-        """Get data specified by interval from start to end
+        """Get data specified by interval from start to end.
 
         Args:
             stream_id: The ID of the stream.
@@ -94,8 +93,8 @@ class ACRClient:
         # if timestamps are localized we will have to removed the unneeded entries.
         if trim:
             for entry in reversed(data):
-                metadata = entry.get('metadata')
-                timestamp = metadata.get('timestamp_local')
+                metadata = entry.get("metadata")
+                timestamp = metadata.get("timestamp_local")
                 timestamp_date = datetime.strptime(timestamp, ACRClient.TS_FMT).date()
                 if timestamp_date < start or timestamp_date > end:
                     data.remove(entry)

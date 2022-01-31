@@ -1,0 +1,32 @@
+repos:
+  - repo: local
+    hooks:
+      - id: black
+        name: black
+        language: system
+        entry: black
+        types: [python]
+      - id: isort
+        name: isort
+        language: system
+        entry: isort
+        types: [python]
+      - id: flake8
+        name: flake8
+        language: system
+        entry: flake8
+        types: [python]
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.4.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^src/api/client.js$
+      - id: end-of-file-fixer
+        exclude: ^src/api/client.js$
+      - id: check-symlinks
+      - id: check-merge-conflict
+      - id: check-case-conflict
+      - id: detect-aws-credentials
+        args:
+          - --allow-missing-credentials
+      - id: detect-private-key
