@@ -1,8 +1,20 @@
-FROM python:3-alpine@sha256:3998e97aeeabfdeea57c6e05c7544c460ae158f24cc74371b7d4eca18fbc3171
+FROM ghcr.io/radiorabe/s2i-python:0.3.0 AS build
 
-WORKDIR /src
-COPY requirements.txt /src/
-RUN ["pip","install","--no-cache-dir","-r","/src/requirements.txt"]
-COPY . /src/
+COPY ./ $HOME
 
-ENTRYPOINT ["/src/suisa_sendemeldung/suisa_sendemeldung.py"]
+RUN python3 setup.py bdist_wheel
+
+
+FROM ghcr.io/radiorabe/python-minimal:0.4.0 AS app
+
+COPY --from=build /opt/app-root/src/dist/*.whl /tmp/dist/
+
+RUN    python3 -mpip --no-cache-dir install /tmp/dist/*.whl \
+    && rm -rf /tmp/dist/
+
+# make requests use os ca certs that contain the RaBe root CA
+ENV REQUESTS_CA_BUNDLE=/etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
+
+USER nobody
+
+ENTRYPOINT ["suisa_sendemeldung"]
