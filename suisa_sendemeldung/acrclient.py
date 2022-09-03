@@ -38,7 +38,11 @@ class ACRClient:
             access_key=self.access_key, date=requested_date.strftime("%Y%m%d")
         )
         url = f"https://api.acrcloud.com/v1/monitor-streams/{stream_id}/results"
-        response = requests.get(url=url, params=url_params)
+        response = requests.get(
+            url=url,
+            params=url_params,
+            timeout=900,  # 15 minutes should be more than enough
+        )
         response.raise_for_status()
 
         data = response.json()
