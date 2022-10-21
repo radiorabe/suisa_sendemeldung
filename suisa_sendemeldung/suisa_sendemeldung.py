@@ -270,6 +270,7 @@ def get_csv(data):
         "Sendedauer",
         "Titel",
         "Künstler",
+        "Komponist",
         "ISRC",
         "Label",
     ]
@@ -293,6 +294,7 @@ def get_csv(data):
         except TypeError:
             music = metadata.get("custom_files")[0]
         title = music.get("title")
+
         if music.get("artists") is not None:
             artist = ", ".join([a.get("name") for a in music.get("artists")])
         elif music.get("artist") is not None:
@@ -305,6 +307,12 @@ def get_csv(data):
             artist = music.get("Artist")
         else:
             artist = ""
+
+        if music.get("contributors") and music.get("contributors").get("composers"):
+            composer = ", ".join(music.get("contributors").get("composers"))
+        else:
+            composer = artist
+
         if music.get("external_ids") and len(music.get("external_ids")) > 0:
             isrc = music.get("external_ids").get("isrc")
         elif music.get("isrc"):
@@ -313,7 +321,9 @@ def get_csv(data):
             isrc = ""
         label = music.get("label")
 
-        csv_writer.writerow([ts_date, ts_time, duration, title, artist, isrc, label])
+        csv_writer.writerow(
+            [ts_date, ts_time, duration, title, artist, composer, isrc, label]
+        )
     return csv.getvalue()
 
 
