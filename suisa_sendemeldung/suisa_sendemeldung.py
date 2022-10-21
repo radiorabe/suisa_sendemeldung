@@ -255,6 +255,8 @@ def merge_duplicates(data):
     return data
 
 
+# all local vars are required, eight are already used for the csv entries
+# pylint: disable-msg=too-many-locals
 def get_csv(data):
     """Create SUISA compatible csv data.
 
