@@ -55,7 +55,7 @@ def validate_arguments(parser, args):
         parser.error("\n- " + "\n- ".join(msgs))
 
 
-def get_arguments(parser: ArgumentParser):
+def get_arguments(parser: ArgumentParser):  # pragma: no cover
     """Create :class:`ArgumentParser` with arguments.
 
     Arguments:
@@ -301,7 +301,7 @@ def get_csv(data):
             artist = ", ".join([a.get("name") for a in music.get("artists")])
         elif music.get("artist") is not None:
             artist = music.get("artist")
-        elif music.get("Artist") is not None:
+        elif music.get("Artist") is not None:  # pragma: no cover
             # Uppercase is a hack needed for Jun 2021 since there is a 'wrong' entry
             # in the database. Going forward the record will be available as 'artist'
             # in lowercase.
@@ -329,7 +329,7 @@ def get_csv(data):
     return csv.getvalue()
 
 
-def write_csv(filename, csv):
+def write_csv(filename, csv):  # pragma: no cover
     """Write contents of `csv` to file.
 
     Arguments:
@@ -394,7 +394,7 @@ def send_message(msg, server="127.0.0.1", login=None, password=None):
         smtp.send_message(msg)
 
 
-def main():
+def main():  # pragma: no cover
     """Entrypoint for SUISA Sendemeldung ."""
     default_config_file = basename(__file__).replace(".py", ".conf")
     # config file in /etc gets overriden by the one in $HOME which gets overriden by the one in the
