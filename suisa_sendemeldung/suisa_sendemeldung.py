@@ -17,6 +17,8 @@ from io import StringIO
 from os.path import basename, expanduser
 from smtplib import SMTP
 
+import cridlib
+import pytz
 from configargparse import ArgumentParser
 
 from .acrclient import ACRClient
@@ -275,6 +277,7 @@ def get_csv(data):
         "Komponist",
         "ISRC",
         "Label",
+        "Identifikationsnummer",
     ]
     csv = StringIO()
     csv.write("sep=,\n")
@@ -323,8 +326,17 @@ def get_csv(data):
             isrc = ""
         label = music.get("label")
 
+        # cridlib only supports timezone-aware datetime values, so we convert one
+        timestamp_utc = pytz.utc.localize(
+            datetime.strptime(metadata.get("timestamp_utc"), ACRClient.TS_FMT)
+        )
+        # we include the acrid in our CRID so we know about the data's provenience
+        # in case any questions about the data we delivered are asked
+        acrid = music.get("acrid")
+        local_id = cridlib.get(timestamp=timestamp_utc, fragment=f"acrid={acrid}")
+
         csv_writer.writerow(
-            [ts_date, ts_time, duration, title, artist, composer, isrc, label]
+            [ts_date, ts_time, duration, title, artist, composer, isrc, label, local_id]
         )
     return csv.getvalue()
 
