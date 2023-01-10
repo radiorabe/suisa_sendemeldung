@@ -20,8 +20,8 @@ from string import Template
 
 import cridlib
 import pytz
-import requests_cache
 from configargparse import ArgumentParser
+from dateutil.relativedelta import relativedelta
 
 from .acrclient import ACRClient
 
@@ -33,9 +33,10 @@ Im Anhang finden Sie die Sendemeldung von $station_name für den $month $year.
 Wir senden ihnen diese Sendemeldung da wir bis Ende $previous_year nicht informiert
 wurden, dass $station_name im laufenden Jahr von der Meldepflicht befreit ist.
 
-In der Sendungsmeldung enthalten sind die unter Buchstaben G in "Gemeinsamer Tarif S"
-genannten Programmangaben in elektronischer Form. Es handelt sich bei der Datei
-um eine Comma-Separated Values (CSV) Datei welche dem RFC 4180 Standard folgt.
+In der Sendungsmeldung enthalten sind die unter Buchstaben G im Tarif
+"Gemeinsamer Tarif S 2020 - 2023" genannten Programmangaben in elektronischer
+Form. Es handelt sich bei der Datei um eine Comma-Separated Values (CSV)
+Datei welche dem RFC 4180 Standard folgt.
 
 Diese Sendemeldung enthält unter anderem folgende Angaben:
 
@@ -49,7 +50,7 @@ Diese Sendemeldung enthält unter anderem folgende Angaben:
 - Sendedauer
 
 Die Datei folgt nach bestem Wissen und Gewissen und wo dies technisch möglich
-ist der Vorlage in "Gemeinsamer Tarif S" S. 15 ff.
+ist der Vorlage in "Gemeinsamer Tarif S 2020 - 2023" S. 15 ff.
 
 Das Feld ISRC ist dabei mindestens in Fällen wo der ISRC zusammen mit der Aufnahme
 vom Lieferanten der Aufnahme in irgendeiner Form mitgeteilt bzw. mitgeliefert
@@ -61,7 +62,10 @@ verarbeiten und ihnen mitteilen.
 Wir bitten sie höflich uns den Erhalt wie auch die erfolgreiche, automatisierte
 Verarbeitung dieser Sendemeldung zu bestätigen. Bitte kontaktieren sie uns
 dringlich und unverzüglich falls diese Sendemeldung Mängel wie Inkorrektheit
-oder andere Missstände aufweist.
+oder andere Missstände wie Fehler oder Lücken aufweist. Beanstandungen zu dieser
+Sendemeldung lassen sie uns bitte in den nächsten drei Monaten vor dem $in_three_months
+zukommen. Im Falle einer Beanstandung streben wir an etwaige Mängel raschmöglichst
+innerhalb der Nachfrist von 45 Tagen zu beheben.
 
 Diese Email wurde automatisch generiert. Bei vertraglichen Fragen erreichen
 sie uns an besten zu Bürozeiten unter $responsible_phone. Technische Anliegen
@@ -564,8 +568,6 @@ def main():  # pragma: no cover
     start_date, end_date = parse_date(args)
     filename = parse_filename(args, start_date)
 
-    requests_cache.install_cache("suisa_sendemeldungen_cache")
-
     client = ACRClient(args.access_key)
     data = client.get_interval_data(
         args.stream_id, start_date, end_date, timezone=args.timezone
@@ -581,13 +583,14 @@ def main():  # pragma: no cover
                 "station_name": args.station_name,
                 "month": start_date.strftime("%B"),
                 "year": start_date.strftime("%Y"),
-                "previous_year": (start_date - timedelta(days=3 * 365)).strftime("%Y"),
+                "previous_year": (start_date - timedelta(days=365)).strftime("%Y"),
+                "in_three_months": (end_date + relativedelta(months=+3)).strftime(
+                    "%d. %B %Y"
+                ),
                 "responsible_email": args.responsible_email,
                 "responsible_phone": args.responsible_phone,
             }
         )
-        print(text)
-        exit(0)
         msg = create_message(
             args.email_from,
             args.email_to,
