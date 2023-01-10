@@ -50,7 +50,7 @@ Diese Sendemeldung enthält unter anderem folgende Angaben:
 - Sendedauer
 
 Die Datei folgt nach bestem Wissen und Gewissen und wo dies technisch möglich
-ist der Vorlage in "Gemeinsamer Tarif S 2020 - 2023" S. 15 ff.
+ist der Vorlage in "Gemeinsamer Tarif S 2020 - 2023" Anhang 1.
 
 Das Feld ISRC ist dabei mindestens in Fällen wo der ISRC zusammen mit der Aufnahme
 vom Lieferanten der Aufnahme in irgendeiner Form mitgeteilt bzw. mitgeliefert
