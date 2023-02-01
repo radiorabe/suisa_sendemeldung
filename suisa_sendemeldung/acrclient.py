@@ -34,9 +34,10 @@ class ACRClient:
         """
         if requested_date is None:
             requested_date = self.default_date
-        url_params = dict(
-            access_key=self.access_key, date=requested_date.strftime("%Y%m%d")
-        )
+        url_params = {
+            "access_key": self.access_key,
+            "date": requested_date.strftime("%Y%m%d"),
+        }
         url = f"https://api.acrcloud.com/v1/monitor-streams/{stream_id}/results"
         response = requests.get(url=url, params=url_params, timeout=10)
         response.raise_for_status()
