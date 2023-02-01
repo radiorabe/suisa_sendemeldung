@@ -225,6 +225,17 @@ def test_get_csv():
                 ],
             }
         },
+        {
+            "metadata": {
+                "timestamp_local": "1993-03-01 17:17:17",
+                "played_duration": 60,
+                "custom_files": [
+                    {
+                        "artists": "Artists as string not list",
+                    }
+                ],
+            }
+        },
     ]
     csv = suisa_sendemeldung.get_csv(data)
     # pylint: disable=line-too-long
@@ -234,6 +245,7 @@ def test_get_csv():
         "01/03/93,13:12:00,0:01:00,Uhrenvergleich,,,,\r\n"
         "01/03/93,13:37:00,0:01:00,Meme Dub,Da Gang,Da Composah,id-from-well-published-isrc-database,\r\n"
         '01/03/93,16:20:00,0:01:00,Bubbles,"Mary\'s Surprise Act, Climmy Jiff","Mary\'s Surprise Act, Climmy Jiff",important-globally-well-managed-id,Jane Records\r\n'
+        "01/03/93,17:17:17,0:01:00,,Artists as string not list,Artists as string not list,,\r\n"
     )
     # pylint: enable=line-too-long
 

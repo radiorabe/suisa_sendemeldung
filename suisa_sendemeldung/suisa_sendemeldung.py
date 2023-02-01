@@ -269,7 +269,7 @@ def get_artist(music):
         artists = music.get("artists")
         if isinstance(artists, list):
             artist = ", ".join([a.get("name") for a in artists])
-        else:  # pragma: no cover
+        else:
             # Yet another 'wrong' entry in the database:
             # artists in custom_files was sometimes recorded as single value
             # @TODO also remove once way in the past? (2023-01-31)
