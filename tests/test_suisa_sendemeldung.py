@@ -241,6 +241,17 @@ def test_get_csv(mock_cridlib_get):
                 ],
             }
         },
+        {
+            "metadata": {
+                "timestamp_local": "1993-03-01 17:17:17",
+                "played_duration": 60,
+                "custom_files": [
+                    {
+                        "artists": "Artists as string not list",
+                    }
+                ],
+            }
+        },
     ]
     csv = suisa_sendemeldung.get_csv(data, station_name="Station Name")
     # pylint: disable=line-too-long
@@ -249,6 +260,7 @@ def test_get_csv(mock_cridlib_get):
         "Uhrenvergleich,,,,Station Name,19930301,0:01:00,13:12:00,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
         "Meme Dub,Da Composah,Da Gang,,Station Name,19930301,0:01:00,13:37:00,,id-from-well-published-isrc-database,,,,,2023,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
         'Bubbles,,"Mary\'s Surprise Act, Climmy Jiff",,Station Name,19930301,0:01:00,16:20:00,,important-globally-well-managed-id,Jane Records,,,,20221213,Da Alboom,,,,,,,,greedy-capitalist-number,crid://rabe.ch/v1/test\r\n'
+        ",,Artists as string not list,,Station Name,19930301,17:17:17,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
     )
     # pylint: enable=line-too-long
     mock_cridlib_get.assert_has_calls(

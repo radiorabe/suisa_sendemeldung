@@ -358,6 +358,36 @@ def funge_release_date(release_date):
     return release_date
 
 
+def get_artist(music):
+    """Get artist from a given dict.
+
+    Arguments:
+        music: music dict from API
+
+    Returns:
+        artist: string representing the artist
+    """
+    artist = ""
+    if music.get("artists") is not None:
+        artists = music.get("artists")
+        if isinstance(artists, list):
+            artist = ", ".join([a.get("name") for a in artists])
+        else:
+            # Yet another 'wrong' entry in the database:
+            # artists in custom_files was sometimes recorded as single value
+            # @TODO also remove once way in the past? (2023-01-31)
+            artist = artists
+    elif music.get("artist") is not None:
+        artist = music.get("artist")
+    elif music.get("Artist") is not None:  # pragma: no cover
+        # Uppercase is a hack needed for Jun 2021 since there is a 'wrong' entry
+        # in the database. Going forward the record will be available as 'artist'
+        # in lowercase.
+        # @TODO remove once is waaaay in the past
+        artist = music.get("Artist")
+    return artist
+
+
 # all local vars are required, eight are already used for the csv entries
 # pylint: disable-msg=too-many-locals
 def get_csv(data, station_name=""):
@@ -415,18 +445,7 @@ def get_csv(data, station_name=""):
             music = metadata.get("custom_files")[0]
         title = music.get("title")
 
-        if music.get("artists") is not None:
-            artist = ", ".join([a.get("name") for a in music.get("artists")])
-        elif music.get("artist") is not None:
-            artist = music.get("artist")
-        elif music.get("Artist") is not None:  # pragma: no cover
-            # Uppercase is a hack needed for Jun 2021 since there is a 'wrong' entry
-            # in the database. Going forward the record will be available as 'artist'
-            # in lowercase.
-            # @TODO remove once is waaaay in the past
-            artist = music.get("Artist")
-        else:
-            artist = ""
+        artist = get_artist(music)
 
         composer = ", ".join(music.get("contributors", {}).get("composers", ""))
 
