@@ -18,6 +18,7 @@ from os.path import basename, expanduser
 from smtplib import SMTP
 
 from configargparse import ArgumentParser
+from iso3901 import ISRC
 
 from .acrclient import ACRClient
 
@@ -285,6 +286,20 @@ def get_artist(music):
     return artist
 
 
+def get_isrc(music):
+    """Get a valid ISRC from the music record or return an empty string."""
+    isrc = ""
+    if music.get("external_ids") and len(music.get("external_ids")) > 0:
+        isrc = music.get("external_ids").get("isrc")
+    elif music.get("isrc"):
+        isrc = music.get("isrc")
+    if isrc and isrc[:4] == "ISRC":
+        isrc = isrc[4:]
+    if not ISRC.validate(isrc):
+        isrc = ""
+    return isrc
+
+
 # all local vars are required, eight are already used for the csv entries
 # pylint: disable-msg=too-many-locals
 def get_csv(data):
@@ -334,12 +349,7 @@ def get_csv(data):
         else:
             composer = artist
 
-        if music.get("external_ids") and len(music.get("external_ids")) > 0:
-            isrc = music.get("external_ids").get("isrc")
-        elif music.get("isrc"):
-            isrc = music.get("isrc")
-        else:
-            isrc = ""
+        isrc = get_isrc(music)
         label = music.get("label")
 
         csv_writer.writerow(

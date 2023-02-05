@@ -6,6 +6,7 @@ from unittest.mock import patch
 
 from configargparse import ArgumentParser
 from freezegun import freeze_time
+from pytest import mark
 
 from suisa_sendemeldung import suisa_sendemeldung
 
@@ -197,9 +198,7 @@ def test_get_csv():
                                 "Da Composah",
                             ]
                         },
-                        "external_ids": {
-                            "isrc": "id-from-well-published-isrc-database"
-                        },
+                        "external_ids": {"isrc": "AA6Q72000047"},
                     }
                 ],
             }
@@ -219,7 +218,7 @@ def test_get_csv():
                                 "name": "Climmy Jiff",
                             },
                         ],
-                        "isrc": "important-globally-well-managed-id",
+                        "isrc": "AA6Q72000047",
                         "label": "Jane Records",
                     }
                 ],
@@ -243,8 +242,8 @@ def test_get_csv():
         "sep=,\n"
         "Sendedatum,Sendezeit,Sendedauer,Titel,Künstler,Komponist,ISRC,Label\r\n"
         "01/03/93,13:12:00,0:01:00,Uhrenvergleich,,,,\r\n"
-        "01/03/93,13:37:00,0:01:00,Meme Dub,Da Gang,Da Composah,id-from-well-published-isrc-database,\r\n"
-        '01/03/93,16:20:00,0:01:00,Bubbles,"Mary\'s Surprise Act, Climmy Jiff","Mary\'s Surprise Act, Climmy Jiff",important-globally-well-managed-id,Jane Records\r\n'
+        "01/03/93,13:37:00,0:01:00,Meme Dub,Da Gang,Da Composah,AA6Q72000047,\r\n"
+        '01/03/93,16:20:00,0:01:00,Bubbles,"Mary\'s Surprise Act, Climmy Jiff","Mary\'s Surprise Act, Climmy Jiff",AA6Q72000047,Jane Records\r\n'
         "01/03/93,17:17:17,0:01:00,,Artists as string not list,Artists as string not list,,\r\n"
     )
     # pylint: enable=line-too-long
@@ -299,3 +298,20 @@ def test_send_message():
         ctx = mock.return_value.__enter__.return_value
         ctx.starttls.assert_called_once()
         ctx.login.assert_called_once_with("test@example.org", "password")
+
+
+@mark.parametrize(
+    "test_music,expected",
+    [
+        ({"external_ids": {"isrc": "AA6Q72000047"}}, "AA6Q72000047"),
+        ({"isrc": "AA6Q72000047"}, "AA6Q72000047"),
+        ({"isrc": "AA6Q72000047"}, "AA6Q72000047"),
+        ({"isrc": "ISRCAA6Q72000047"}, "AA6Q72000047"),
+        ({"isrc": "123456789-1"}, ""),
+    ],
+)
+def test_get_isrc(test_music, expected):
+    """Test get_isrc."""
+
+    isrc = suisa_sendemeldung.get_isrc(test_music)
+    assert isrc == expected
