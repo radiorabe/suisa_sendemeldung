@@ -304,12 +304,15 @@ def test_send_message():
     "test_music,expected",
     [
         ({"external_ids": {"isrc": "AA6Q72000047"}}, "AA6Q72000047"),
-        ({"isrc": "AA6Q72000047"}, "AA6Q72000047"),
+        ({"external_ids": {"isrc": ["AA6Q72000047"]}}, "AA6Q72000047"),
+        ({"external_ids": {"isrc": "AA 6Q7 20 00047"}}, "AA6Q72000047"),
+        ({"external_ids": {"isrc": "ISRCAA6Q72000047"}}, "AA6Q72000047"),
+        ({"external_ids": {"isrc": "123456789-1"}}, ""),
         ({"isrc": "AA6Q72000047"}, "AA6Q72000047"),
         ({"isrc": ["AA6Q72000047"]}, "AA6Q72000047"),
         ({"isrc": "ISRCAA6Q72000047"}, "AA6Q72000047"),
-        ({"isrc": "123456789-1"}, ""),
         ({"isrc": "AA 6Q7 20 00047"}, "AA6Q72000047"),
+        ({"isrc": "123456789-1"}, ""),
     ],
 )
 def test_get_isrc(test_music, expected):
