@@ -293,8 +293,19 @@ def get_isrc(music):
         isrc = music.get("external_ids").get("isrc")
     elif music.get("isrc"):
         isrc = music.get("isrc")
+    # was a list with a singular entry for a while back in 2021
+    if isinstance(isrc, list):
+        isrc = isrc[0]
+    # some records contain the "ISRC" prefix that is described as legacy
+    # in the ISRC handbook from IFPI.
     if isrc and isrc[:4] == "ISRC":
         isrc = isrc[4:]
+    # take care of cases where the isrc is space delimited even though the
+    # record is technically wrong but happens often enough to warrant this
+    # hack.
+    if isrc:
+        isrc = isrc.replace(" ", "")
+
     if not ISRC.validate(isrc):
         isrc = ""
     return isrc
