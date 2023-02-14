@@ -16,7 +16,7 @@ def test_validate_arguments():
 
     args = ArgumentParser()
     # length of bearer_token should be 32 or more chars long
-    args.bearer_token = "iamclearlynotthritytwocharslong"
+    args.bearer_token = "iamclearlynotthirtytwocharslong"
     # check length of stream_id
     args.stream_id = "iamnot9chars"
     # one output option has to be set (but none is)

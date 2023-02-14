@@ -9,19 +9,19 @@ You can build a Docker image using the included [Dockerfile](Dockerfile):
 ```bash
 git clone https://github.com/radiorabe/suisa_sendemeldung
 cd suisa_sendemeldung
-sudo docker build -t suisa_sendemeldung .
+podman build -t suisa_sendemeldung .
 ```
 
 Then you can run it by passing in command line switches:
 
 ```bash
-sudo docker run --rm suisa_sendemeldung --bearer-token abcdefghijklmnopqrstuvwxyzabcdef --stream_id a-bcdefgh --stdout
+podman run --rm suisa_sendemeldung --bearer-token abcdefghijklmnopqrstuvwxyzabcdef --stream_id a-bcdefgh --stdout
 ```
 
 Or by setting environment variables:
 
 ```bash
-sudo docker run --rm --env BEARER_TOKEN=abcdefghijklmnopqrstuvwxyzabcdef --env STREAM_ID=a-bcdefgh --env STDOUT=True suisa_sendemeldung
+podman run --rm --env BEARER_TOKEN=abcdefghijklmnopqrstuvwxyzabcdef --env STREAM_ID=a-bcdefgh --env STDOUT=True suisa_sendemeldung
 ```
 
 A prebuilt image is available from the GitHub Package Registry:
@@ -40,14 +40,14 @@ usage: suisa_sendemeldung.py [-h] --bearer-token BEARER_TOKEN --stream_id STREAM
                              [--end_date END_DATE] [--last_month] [--timezone TIMEZONE] [--filename FILENAME] [--stdout]
 
 ACRCloud client for SUISA reporting @ RaBe. Args that start with '--' (eg. --bearer-token) can also be set in a config file
-(/etc/suisa_sendemeldung.conf or /home/jonas/suisa_sendemeldung.conf or suisa_sendemeldung.conf). Config file syntax allows: key=value, flag=true,
+(/etc/suisa_sendemeldung.conf or $HOME/suisa_sendemeldung.conf or suisa_sendemeldung.conf). Config file syntax allows: key=value, flag=true,
 stuff=[a,b,c] (for details, see syntax at https://goo.gl/R74nmi). If an arg is specified in more than one place, then commandline values override
 environment variables which override config file values which override defaults.
 
 optional arguments:
   -h, --help            show this help message and exit
   --bearer-token BEARER_TOKEN
-                        the access key for ACRCloud (required) [env var: BEARER_TOKEN]
+                        the bearer token for ACRCloud (required) [env var: BEARER_TOKEN]
   --stream_id STREAM_ID
                         the id of the stream at ACRCloud (required) [env var: STREAM_ID]
   --csv                 create a csv file [env var: CSV]
