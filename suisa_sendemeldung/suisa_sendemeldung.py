@@ -424,7 +424,7 @@ def get_csv(data, station_name=""):
         "Marke",
         "Label Code",
         "EAN/GTIN",
-        "vom Sender der Aufnahme selbst zugewiesene Identifikationsnummer",
+        "Identifikationsnummer",
     ]
     csv = StringIO()
     csv_writer = writer(csv, dialect="excel")
