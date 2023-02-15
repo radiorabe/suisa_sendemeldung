@@ -22,6 +22,7 @@ import cridlib
 import pytz
 from configargparse import ArgumentParser
 from dateutil.relativedelta import relativedelta
+from iso3901 import ISRC
 
 from .acrclient import ACRClient
 
@@ -388,6 +389,31 @@ def get_artist(music):
     return artist
 
 
+def get_isrc(music):
+    """Get a valid ISRC from the music record or return an empty string."""
+    isrc = ""
+    if music.get("external_ids") and len(music.get("external_ids")) > 0:
+        isrc = music.get("external_ids").get("isrc")
+    elif music.get("isrc"):
+        isrc = music.get("isrc")
+    # was a list with a singular entry for a while back in 2021
+    if isinstance(isrc, list):
+        isrc = isrc[0]
+    # some records contain the "ISRC" prefix that is described as legacy
+    # in the ISRC handbook from IFPI.
+    if isrc and isrc[:4] == "ISRC":
+        isrc = isrc[4:]
+    # take care of cases where the isrc is space delimited even though the
+    # record is technically wrong but happens often enough to warrant this
+    # hack.
+    if isrc:
+        isrc = isrc.replace(" ", "")
+
+    if not ISRC.validate(isrc):
+        isrc = ""
+    return isrc
+
+
 # all local vars are required, eight are already used for the csv entries
 # pylint: disable-msg=too-many-locals
 def get_csv(data, station_name=""):
@@ -449,12 +475,7 @@ def get_csv(data, station_name=""):
 
         composer = ", ".join(music.get("contributors", {}).get("composers", ""))
 
-        if music.get("external_ids", {}).get("isrc", ""):
-            isrc = music.get("external_ids").get("isrc")
-        elif music.get("isrc"):
-            isrc = music.get("isrc")
-        else:
-            isrc = ""
+        isrc = get_isrc(music)
         label = music.get("label")
 
         # load some "best-effort" fields

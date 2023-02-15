@@ -5,6 +5,7 @@ from unittest.mock import call, patch
 
 from configargparse import ArgumentParser
 from freezegun import freeze_time
+from pytest import mark
 
 from suisa_sendemeldung import suisa_sendemeldung
 
@@ -204,9 +205,7 @@ def test_get_csv(mock_cridlib_get):
                             ]
                         },
                         "release_date": "2023",
-                        "external_ids": {
-                            "isrc": "id-from-well-published-isrc-database"
-                        },
+                        "external_ids": {"isrc": "AA6Q72000047"},
                     }
                 ],
             }
@@ -232,7 +231,7 @@ def test_get_csv(mock_cridlib_get):
                                 "name": "Climmy Jiff",
                             },
                         ],
-                        "isrc": "important-globally-well-managed-id",
+                        "isrc": "AA6Q72000047",
                         "label": "Jane Records",
                         "external_ids": {
                             "upc": "greedy-capitalist-number",
@@ -259,8 +258,8 @@ def test_get_csv(mock_cridlib_get):
     assert csv == (
         "Titel,Komponist,Interpret,Interpreten-Info,Sender,Sendedatum,Sendedauer,Sendezeit,Werkverzeichnisangaben,ISRC,Label,CD ID / Katalog-Nummer,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Titel des Tonträgers (Albumtitel),Autor Text,Track Nummer,Genre,Programm,Bestellnummer,Marke,Label Code,EAN/GTIN,Identifikationsnummer\r\n"
         "Uhrenvergleich,,,,Station Name,19930301,0:01:00,13:12:00,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
-        "Meme Dub,Da Composah,Da Gang,,Station Name,19930301,0:01:00,13:37:00,,id-from-well-published-isrc-database,,,,,2023,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
-        'Bubbles,,"Mary\'s Surprise Act, Climmy Jiff",,Station Name,19930301,0:01:00,16:20:00,,important-globally-well-managed-id,Jane Records,,,,20221213,Da Alboom,,,,,,,,greedy-capitalist-number,crid://rabe.ch/v1/test\r\n'
+        "Meme Dub,Da Composah,Da Gang,,Station Name,19930301,0:01:00,13:37:00,,AA6Q72000047,,,,,2023,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
+        'Bubbles,,"Mary\'s Surprise Act, Climmy Jiff",,Station Name,19930301,0:01:00,16:20:00,,AA6Q72000047,Jane Records,,,,20221213,Da Alboom,,,,,,,,greedy-capitalist-number,crid://rabe.ch/v1/test\r\n'
         ",,Artists as string not list,,Station Name,19930301,0:01:00,17:17:17,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
     )
     # pylint: enable=line-too-long
@@ -331,3 +330,25 @@ def test_send_message():
         ctx = mock.return_value.__enter__.return_value
         ctx.starttls.assert_called_once()
         ctx.login.assert_called_once_with("test@example.org", "password")
+
+
+@mark.parametrize(
+    "test_music,expected",
+    [
+        ({"external_ids": {"isrc": "AA6Q72000047"}}, "AA6Q72000047"),
+        ({"external_ids": {"isrc": ["AA6Q72000047"]}}, "AA6Q72000047"),
+        ({"external_ids": {"isrc": "AA 6Q7 20 00047"}}, "AA6Q72000047"),
+        ({"external_ids": {"isrc": "ISRCAA6Q72000047"}}, "AA6Q72000047"),
+        ({"external_ids": {"isrc": "123456789-1"}}, ""),
+        ({"isrc": "AA6Q72000047"}, "AA6Q72000047"),
+        ({"isrc": ["AA6Q72000047"]}, "AA6Q72000047"),
+        ({"isrc": "ISRCAA6Q72000047"}, "AA6Q72000047"),
+        ({"isrc": "AA 6Q7 20 00047"}, "AA6Q72000047"),
+        ({"isrc": "123456789-1"}, ""),
+    ],
+)
+def test_get_isrc(test_music, expected):
+    """Test get_isrc."""
+
+    isrc = suisa_sendemeldung.get_isrc(test_music)
+    assert isrc == expected
