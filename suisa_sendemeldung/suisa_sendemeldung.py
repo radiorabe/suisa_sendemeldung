@@ -392,7 +392,7 @@ def get_artist(music):
 def get_isrc(music):
     """Get a valid ISRC from the music record or return an empty string."""
     isrc = ""
-    if music.get("external_ids") and len(music.get("external_ids")) > 0:
+    if music.get("external_ids", {}).get("isrc"):
         isrc = music.get("external_ids").get("isrc")
     elif music.get("isrc"):
         isrc = music.get("isrc")
