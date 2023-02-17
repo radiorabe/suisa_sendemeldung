@@ -280,7 +280,6 @@ def parse_filename(args, start_date):
     Returns:
         filename: the filename to use for the csv data
     """
-    print(args.station_name_short)
     if args.filename:
         filename = args.filename
     # depending on date args either append the month or the start_date
@@ -616,8 +615,6 @@ def main():  # pragma: no cover
     if args.email:
         email_subject = start_date.strftime(args.email_subject)
         # generate body
-        print(args.email_text)
-        print(filename)
         text = Template(args.email_text).substitute(
             {
                 "station_name": args.station_name,
