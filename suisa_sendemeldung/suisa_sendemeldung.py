@@ -16,11 +16,66 @@ from email.utils import formatdate
 from io import StringIO
 from os.path import basename, expanduser
 from smtplib import SMTP
+from string import Template
 
+import cridlib
+import pytz
 from configargparse import ArgumentParser
+from dateutil.relativedelta import relativedelta
 from iso3901 import ISRC
 
 from .acrclient import ACRClient
+
+_EMAIL_TEMPLATE = """
+Hallo SUISA
+
+Im Anhang finden Sie die Sendemeldung von $station_name für den $month $year.
+
+Wir senden ihnen diese Sendemeldung da wir bis Ende $previous_year nicht informiert
+wurden, dass $station_name im laufenden Jahr von der Meldepflicht befreit ist.
+
+In der Sendungsmeldung enthalten sind die unter Buchstaben G im Tarif
+"Gemeinsamer Tarif S 2020 - 2023" genannten Programmangaben in elektronischer
+Form. Es handelt sich bei der Datei um eine Comma-Separated Values (CSV)
+Datei welche dem RFC 4180 Standard folgt.
+
+Diese Sendemeldung enthält unter anderem folgende Angaben:
+
+- Titel des Musikwerks
+- Name des Komponisten
+- Name des bzw. der Hauptinterpreten
+- Label
+- ISRC
+- vom Sender der Aufnahme selbst zugewiesene Identifikationsnummer
+- Sendezeit
+- Sendedauer
+
+Die Datei folgt nach bestem Wissen und Gewissen und wo dies technisch möglich
+ist der Vorlage in "Gemeinsamer Tarif S 2020 - 2023" Anhang 1.
+
+Das Feld ISRC ist dabei mindestens in Fällen wo der ISRC zusammen mit der Aufnahme
+vom Lieferanten der Aufnahme in irgendeiner Form mitgeteilt bzw. mitgeliefert
+wurde angegeben. Wir ergänzen diese Angaben wo möglich aus unseren eigenen
+Datenbeständen und arbeiten zu diesem Zweck auch mit externen Partnern zusammen.
+Nachmeldungen und Korrekturen von ISRC werden wir selbstverständlich sofort
+verarbeiten und ihnen mitteilen.
+
+Wir bitten sie höflich uns den Erhalt wie auch die erfolgreiche, automatisierte
+Verarbeitung dieser Sendemeldung zu bestätigen. Bitte kontaktieren sie uns
+dringlich und unverzüglich falls diese Sendemeldung Mängel wie Inkorrektheit
+oder andere Missstände wie Fehler oder Lücken aufweist. Beanstandungen zu dieser
+Sendemeldung lassen sie uns bitte in den nächsten drei Monaten vor dem $in_three_months
+zukommen. Im Falle einer Beanstandung streben wir an etwaige Mängel raschmöglichst
+innerhalb der Nachfrist von 45 Tagen zu beheben.
+
+Diese Email wurde automatisch generiert. Bei vertraglichen Fragen erreichen
+sie uns an besten zu Bürozeiten unter $responsible_phone. Technische Anliegen
+im Zusammenhang mit der Sendemeldung melden sie bitte ebenda oder bevorzugt
+direkt per Email an $responsible_email.
+
+Freundliche Grüsse,
+$station_name
+"""
 
 
 def validate_arguments(parser, args):
@@ -91,6 +146,18 @@ def get_arguments(parser: ArgumentParser):  # pragma: no cover
         required=True,
     )
     parser.add_argument(
+        "--station-name",
+        env_var="STATION_NAME",
+        help="Station name, used in Output and Emails",
+        default="Radio Bern RaBe",
+    )
+    parser.add_argument(
+        "--station-name-short",
+        env_var="STATION_NAME_SHORT",
+        help="Shortname for station as used in Filenames (locally and in attachment)",
+        default="rabe",
+    )
+    parser.add_argument(
         "--csv", env_var="CSV", help="create a csv file", action="store_true"
     )
     parser.add_argument(
@@ -128,7 +195,24 @@ def get_arguments(parser: ArgumentParser):  # pragma: no cover
         default="SUISA Sendemeldung",
     )
     parser.add_argument(
-        "--email_text", env_var="EMAIL_TEXT", help="the text of the email", default=""
+        "--email_text",
+        env_var="EMAIL_TEXT",
+        help="""
+        A template for the Email text, placeholders are $station_name, $month, $year, $previous_year, $responsible_email, and $resonsible_phone.
+        """,
+        default=_EMAIL_TEMPLATE,
+    )
+    parser.add_argument(
+        "--responsible-email",
+        env_var="RESPONSIBLE_EMAIL",
+        help="Used to hint whom to contact in the emails text.",
+        required=True,
+    )
+    parser.add_argument(
+        "--responsible-phone",
+        env_var="RESPONSIBLE_PHONE",
+        help="Used to hint whom to contact if you like phones in the emails text.",
+        required=True,
     )
     parser.add_argument(
         "--start_date",
@@ -156,7 +240,9 @@ def get_arguments(parser: ArgumentParser):  # pragma: no cover
     parser.add_argument(
         "--filename",
         env_var="FILENAME",
-        help="file to write to (default: <script_name>_<start_date>.csv)",
+        help="""
+        file to write to (default: <station_name_short>_<year>_<month>.csv when reporting last month, <station_name_short>_<start_date>.csv else)
+        """,
     )
     parser.add_argument(
         "--stdout", env_var="STDOUT", help="also print to stdout", action="store_true"
@@ -211,9 +297,10 @@ def parse_filename(args, start_date):
         filename = args.filename
     # depending on date args either append the month or the start_date
     elif args.last_month:
-        filename = __file__.replace(".py", "_{}.csv").format(start_date.strftime("%B"))
+        date_part = f"{start_date.strftime('%Y')}_{start_date.strftime('%m')}"
+        filename = f"{args.station_name_short}_{date_part}.csv"
     else:
-        filename = __file__.replace(".py", "_{}.csv").format(start_date)
+        filename = f"{args.station_name_short}_{start_date}.csv"
     return filename
 
 
@@ -269,6 +356,21 @@ def merge_duplicates(data):
     return data
 
 
+def funge_release_date(release_date):
+    """Make a release_date from ACR conform to what seems to be the spec."""
+
+    if release_date != "" and len(release_date) == 10:
+        # we can make it look like what suisa has in their examples if it's the right length
+        release_date = datetime.strptime(release_date, "%Y-%m-%d").strftime("%Y%m%d")
+    elif len(release_date) != 4:
+        # we discard other records since there is no way to convert records like a plain
+        # year into dd/mm/yyyy properly without further guidance from whomever ingests
+        # the data, unless they are exactly 4 chars and we blindly assume the record to
+        # be just a plain year :shrug:
+        release_date = ""
+    return release_date
+
+
 def get_artist(music):
     """Get artist from a given dict.
 
@@ -302,7 +404,7 @@ def get_artist(music):
 def get_isrc(music):
     """Get a valid ISRC from the music record or return an empty string."""
     isrc = ""
-    if music.get("external_ids") and len(music.get("external_ids")) > 0:
+    if music.get("external_ids", {}).get("isrc"):
         isrc = music.get("external_ids").get("isrc")
     elif music.get("isrc"):
         isrc = music.get("isrc")
@@ -326,7 +428,7 @@ def get_isrc(music):
 
 # all local vars are required, eight are already used for the csv entries
 # pylint: disable-msg=too-many-locals
-def get_csv(data):
+def get_csv(data, station_name=""):
     """Create SUISA compatible csv data.
 
     Arguments:
@@ -336,18 +438,33 @@ def get_csv(data):
         csv: The converted data
     """
     header = [
-        "Sendedatum",
-        "Sendezeit",
-        "Sendedauer",
         "Titel",
-        "Künstler",
         "Komponist",
+        "Interpret",
+        "Interpreten-Info",
+        "Sender",
+        "Sendedatum",
+        "Sendedauer",
+        "Sendezeit",
+        "Werkverzeichnisangaben",
         "ISRC",
         "Label",
+        "CD ID / Katalog-Nummer",
+        "Aufnahmedatum",
+        "Aufnahmeland",
+        "Erstveröffentlichungsdatum",
+        "Titel des Tonträgers (Albumtitel)",
+        "Autor Text",
+        "Track Nummer",
+        "Genre",
+        "Programm",
+        "Bestellnummer",
+        "Marke",
+        "Label Code",
+        "EAN/GTIN",
+        "Identifikationsnummer",
     ]
     csv = StringIO()
-    csv.write("sep=,\n")
-
     csv_writer = writer(csv, dialect="excel")
     csv_writer.writerow(header)
 
@@ -356,7 +473,7 @@ def get_csv(data):
         # parse timestamp
         timestamp = datetime.strptime(metadata.get("timestamp_local"), ACRClient.TS_FMT)
 
-        ts_date = timestamp.strftime("%d/%m/%y")
+        ts_date = timestamp.strftime("%Y%m%d")
         ts_time = timestamp.strftime("%H:%M:%S")
         duration = timedelta(seconds=metadata.get("played_duration"))
 
@@ -368,16 +485,53 @@ def get_csv(data):
 
         artist = get_artist(music)
 
-        if music.get("contributors") and music.get("contributors").get("composers"):
-            composer = ", ".join(music.get("contributors").get("composers"))
-        else:
-            composer = artist
+        composer = ", ".join(music.get("contributors", {}).get("composers", ""))
 
         isrc = get_isrc(music)
         label = music.get("label")
 
+        # load some "best-effort" fields
+        album = music.get("album", {}).get("name", "")
+        upc = music.get("external_ids", {}).get("upc", "")
+        release_date = funge_release_date(music.get("release_date", ""))
+
+        # cridlib only supports timezone-aware datetime values, so we convert one
+        timestamp_utc = pytz.utc.localize(
+            datetime.strptime(metadata.get("timestamp_utc"), ACRClient.TS_FMT)
+        )
+        # we include the acrid in our CRID so we know about the data's provenience
+        # in case any questions about the data we delivered are asked
+        acrid = music.get("acrid")
+        local_id = cridlib.get(timestamp=timestamp_utc, fragment=f"acrid={acrid}")
+
         csv_writer.writerow(
-            [ts_date, ts_time, duration, title, artist, composer, isrc, label]
+            [
+                title,
+                composer,
+                artist,
+                "",  # Interpreten-Info
+                station_name,
+                ts_date,
+                duration,
+                ts_time,
+                "",  # Werkverzeichnisangaben
+                isrc,
+                label,
+                "",  # CD ID / Katalog-Nummer
+                "",  # Aufnahmedatum
+                "",  # Aufnahmeland
+                release_date,
+                album,
+                "",  # Autor Text
+                "",  # Track Nummer
+                "",  # Genre
+                "",  # Programm
+                "",  # Bestellnummer
+                "",  # Marke
+                "",  # Label Code
+                upc,
+                local_id,
+            ]
         )
     return csv.getvalue()
 
@@ -470,16 +624,28 @@ def main():  # pragma: no cover
     data = client.get_interval_data(
         args.project_id, args.stream_id, start_date, end_date, timezone=args.timezone
     )
-    csv = get_csv(merge_duplicates(data))
+    csv = get_csv(merge_duplicates(data), station_name=args.station_name)
     if args.email:
         email_subject = start_date.strftime(args.email_subject)
-        email_text = start_date.strftime(args.email_text)
-        email_text = email_text.replace("\\n", "\n")
+        # generate body
+        text = Template(args.email_text).substitute(
+            {
+                "station_name": args.station_name,
+                "month": start_date.strftime("%B"),
+                "year": start_date.strftime("%Y"),
+                "previous_year": (start_date - timedelta(days=365)).strftime("%Y"),
+                "in_three_months": (end_date + relativedelta(months=+3)).strftime(
+                    "%d. %B %Y"
+                ),
+                "responsible_email": args.responsible_email,
+                "responsible_phone": args.responsible_phone,
+            }
+        )
         msg = create_message(
             args.email_from,
             args.email_to,
             email_subject,
-            email_text,
+            text,
             filename,
             csv,
             cc=args.email_cc,
