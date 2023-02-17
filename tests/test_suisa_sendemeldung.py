@@ -43,7 +43,7 @@ def test_validate_arguments():
         suisa_sendemeldung.validate_arguments(mock, args)
         mock.error.assert_called_once_with(
             "\n"
-            "- wrong format on access_key, expected 32 characters but got 31\n"
+            "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"
             "- wrong format on stream_id, expected 9 characters but got 12\n"
             "- xlsx cannot be printed to stdout, please set --filetype to csv\n"
             "- argument --last_month not allowed with --start_date or --end_date"
