@@ -33,7 +33,7 @@ Hallo SUISA
 Im Anhang finden Sie die Sendemeldung von $station_name für den $month $year.
 
 Diese Sendemeldung erfolgt gemäss den Bestimmungen "Gemeinsamer Tarif S 2020 - 2024" [1] unter
-Einhaltung der Einreichefirst für den Monat $month gemäss Ziffer 45 des Tarifs.
+Einhaltung der Einreichefrist für den Monat $month gemäss Ziffer 45 des Tarifs.
 
 In der Sendungsmeldung enthalten sind die unter Buchstaben G (Verzeichnisse) des Tarifs
 genannten Programmangaben, in elektronischer Form. Die Angaben richten sich nach dem
@@ -63,7 +63,7 @@ Tarifbestimmungen als eingehalten.
 Korrekt und termingerecht gemeldete Beanstandungen werden unter Berücksichtigung der
 Nachfrist von 45 Tagen, gemäss Ziffer 46, bearbeitet.
 
-Diese Email und Sendmeldung wurde automatisch generiert.
+Diese Email und Sendemeldung wurde automatisch generiert.
 
 Freundliche Grüsse,
 $station_name
