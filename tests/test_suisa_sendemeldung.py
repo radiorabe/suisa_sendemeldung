@@ -1,8 +1,7 @@
 """Test the suisa_sendemeldung.suisa_sendemeldung module."""
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from email.message import Message
-from os.path import dirname
-from unittest.mock import patch
+from unittest.mock import call, patch
 
 from configargparse import ArgumentParser
 from freezegun import freeze_time
@@ -84,29 +83,28 @@ def test_parse_filename():
     # pass filename from cli
     args = ArgumentParser()
     args.filename = "/foo/bar"
+    args.station_name_short = "test"
     filename = suisa_sendemeldung.parse_filename(args, None)
     assert filename == "/foo/bar"
 
     # last_month mode
     args = ArgumentParser()
     args.filename = None
+    args.station_name_short = "test"
     args.last_month = True
     with freeze_time("1996-03-01"):
         filename = suisa_sendemeldung.parse_filename(args, datetime.now())
-    assert (
-        filename
-        == f"{dirname(suisa_sendemeldung.__file__)}/suisa_sendemeldung_March.csv"
-    )
+    assert filename == "test_1996_03.csv"
 
     # start date mode
     args = ArgumentParser()
     args.filename = None
     args.last_month = False
     args.start_date = "1996-03-01"
+    args.station_name_short = "test"
     with freeze_time("1996-03-01"):
         filename = suisa_sendemeldung.parse_filename(args, datetime.now())
-    expected_name = "suisa_sendemeldung_1996-03-01 00:00:00.csv"
-    assert filename == f"{dirname(suisa_sendemeldung.__file__)}/{expected_name}"
+    assert filename == "test_1996-03-01 00:00:00.csv"
 
 
 def test_check_duplicate():
@@ -165,32 +163,40 @@ def test_merge_duplicates():
     assert results[0]["metadata"]["played_duration"] == 20
 
 
-def test_get_csv():
+@patch("cridlib.get")
+def test_get_csv(mock_cridlib_get):
     """Test get_csv."""
+    mock_cridlib_get.return_value = "crid://rabe.ch/v1/test"
 
     # empty data
     data = []
     csv = suisa_sendemeldung.get_csv(data)
+    # pylint: disable=line-too-long
     assert csv == (
-        "sep=,\n"
-        "Sendedatum,Sendezeit,Sendedauer,Titel,Künstler,Komponist,ISRC,Label\r\n"
+        "Titel,Komponist,Interpret,Interpreten-Info,Sender,Sendedatum,Sendedauer,Sendezeit,Werkverzeichnisangaben,ISRC,Label,CD ID / Katalog-Nummer,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Titel des Tonträgers (Albumtitel),Autor Text,Track Nummer,Genre,Programm,Bestellnummer,Marke,Label Code,EAN/GTIN,Identifikationsnummer\r\n"
     )
+    # pylint: enable=line-too-long
+    mock_cridlib_get.assert_not_called()
 
     # bunch of data
+    mock_cridlib_get.reset_mock()
     data = [
         {
             "metadata": {
                 "timestamp_local": "1993-03-01 13:12:00",
+                "timestamp_utc": "1993-03-01 13:12:00",
                 "played_duration": 60,
-                "music": [{"title": "Uhrenvergleich"}],
+                "music": [{"title": "Uhrenvergleich", "acrid": "a1"}],
             }
         },
         {
             "metadata": {
                 "timestamp_local": "1993-03-01 13:37:00",
+                "timestamp_utc": "1993-03-01 13:37:00",
                 "played_duration": 60,
                 "custom_files": [
                     {
+                        "acrid": "a2",
                         "title": "Meme Dub",
                         "artist": "Da Gang",
                         "contributors": {
@@ -198,6 +204,7 @@ def test_get_csv():
                                 "Da Composah",
                             ]
                         },
+                        "release_date": "2023",
                         "external_ids": {"isrc": "AA6Q72000047"},
                     }
                 ],
@@ -206,10 +213,16 @@ def test_get_csv():
         {
             "metadata": {
                 "timestamp_local": "1993-03-01 16:20:00",
+                "timestamp_utc": "1993-03-01 16:20:00",
                 "played_duration": 60,
                 "music": [
                     {
+                        "acrid": "a3",
                         "title": "Bubbles",
+                        "album": {
+                            "name": "Da Alboom",
+                        },
+                        "release_date": "2022-12-13",
                         "artists": [
                             {
                                 "name": "Mary's Surprise Act",
@@ -220,6 +233,9 @@ def test_get_csv():
                         ],
                         "isrc": "AA6Q72000047",
                         "label": "Jane Records",
+                        "external_ids": {
+                            "upc": "greedy-capitalist-number",
+                        },
                     }
                 ],
             }
@@ -227,6 +243,7 @@ def test_get_csv():
         {
             "metadata": {
                 "timestamp_local": "1993-03-01 17:17:17",
+                "timestamp_utc": "1993-03-01 17:17:17",
                 "played_duration": 60,
                 "custom_files": [
                     {
@@ -236,17 +253,32 @@ def test_get_csv():
             }
         },
     ]
-    csv = suisa_sendemeldung.get_csv(data)
+    csv = suisa_sendemeldung.get_csv(data, station_name="Station Name")
     # pylint: disable=line-too-long
     assert csv == (
-        "sep=,\n"
-        "Sendedatum,Sendezeit,Sendedauer,Titel,Künstler,Komponist,ISRC,Label\r\n"
-        "01/03/93,13:12:00,0:01:00,Uhrenvergleich,,,,\r\n"
-        "01/03/93,13:37:00,0:01:00,Meme Dub,Da Gang,Da Composah,AA6Q72000047,\r\n"
-        '01/03/93,16:20:00,0:01:00,Bubbles,"Mary\'s Surprise Act, Climmy Jiff","Mary\'s Surprise Act, Climmy Jiff",AA6Q72000047,Jane Records\r\n'
-        "01/03/93,17:17:17,0:01:00,,Artists as string not list,Artists as string not list,,\r\n"
+        "Titel,Komponist,Interpret,Interpreten-Info,Sender,Sendedatum,Sendedauer,Sendezeit,Werkverzeichnisangaben,ISRC,Label,CD ID / Katalog-Nummer,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Titel des Tonträgers (Albumtitel),Autor Text,Track Nummer,Genre,Programm,Bestellnummer,Marke,Label Code,EAN/GTIN,Identifikationsnummer\r\n"
+        "Uhrenvergleich,,,,Station Name,19930301,0:01:00,13:12:00,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
+        "Meme Dub,Da Composah,Da Gang,,Station Name,19930301,0:01:00,13:37:00,,AA6Q72000047,,,,,2023,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
+        'Bubbles,,"Mary\'s Surprise Act, Climmy Jiff",,Station Name,19930301,0:01:00,16:20:00,,AA6Q72000047,Jane Records,,,,20221213,Da Alboom,,,,,,,,greedy-capitalist-number,crid://rabe.ch/v1/test\r\n'
+        ",,Artists as string not list,,Station Name,19930301,0:01:00,17:17:17,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
     )
     # pylint: enable=line-too-long
+    mock_cridlib_get.assert_has_calls(
+        [
+            call(
+                timestamp=datetime(1993, 3, 1, 13, 12, tzinfo=timezone.utc),
+                fragment="acrid=a1",
+            ),
+            call(
+                timestamp=datetime(1993, 3, 1, 13, 37, tzinfo=timezone.utc),
+                fragment="acrid=a2",
+            ),
+            call(
+                timestamp=datetime(1993, 3, 1, 16, 20, tzinfo=timezone.utc),
+                fragment="acrid=a3",
+            ),
+        ]
+    )
 
 
 def test_create_message():
