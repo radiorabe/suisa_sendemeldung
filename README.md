@@ -34,23 +34,23 @@ docker pull ghcr.io/radiorabe/suisasendemeldung:master
 
 This is the output of `suisa_sendemeldung -h`.
 ```
-usage: suisa_sendemeldung.py [-h] --access_key ACCESS_KEY --stream_id STREAM_ID [--csv] [--email] [--email_from EMAIL_FROM] [--email_to EMAIL_TO]
-                             [--email_cc EMAIL_CC] [--email_bcc EMAIL_BCC] [--email_server EMAIL_SERVER] [--email_login EMAIL_LOGIN]
-                             [--email_pass EMAIL_PASS] [--email_subject EMAIL_SUBJECT] [--email_text EMAIL_TEXT] [--start_date START_DATE]
-                             [--end_date END_DATE] [--last_month] [--timezone TIMEZONE] [--filename FILENAME] [--stdout]
+usage: suisa_sendemeldung.py [-h] --access_key ACCESS_KEY --stream_id STREAM_ID [--station-name STATION_NAME] [--station-name-short STATION_NAME_SHORT] [--file] [--filetype {xlsx,csv}] [--email] [--email_from EMAIL_FROM] [--email_to EMAIL_TO] [--email_cc EMAIL_CC] [--email_bcc EMAIL_BCC] [--email_server EMAIL_SERVER] [--email_login EMAIL_LOGIN] [--email_pass EMAIL_PASS] [--email_subject EMAIL_SUBJECT] [--email_text EMAIL_TEXT] --responsible-email RESPONSIBLE_EMAIL --responsible-phone RESPONSIBLE_PHONE [--start_date START_DATE] [--end_date END_DATE] [--last_month] [--timezone TIMEZONE] [--filename FILENAME] [--stdout]
 
-ACRCloud client for SUISA reporting @ RaBe. Args that start with '--' (eg. --access_key) can also be set in a config file
-(/etc/suisa_sendemeldung.conf or /home/jonas/suisa_sendemeldung.conf or suisa_sendemeldung.conf). Config file syntax allows: key=value, flag=true,
-stuff=[a,b,c] (for details, see syntax at https://goo.gl/R74nmi). If an arg is specified in more than one place, then commandline values override
-environment variables which override config file values which override defaults.
+ACRCloud client for SUISA reporting @ RaBe.
 
-optional arguments:
+options:
   -h, --help            show this help message and exit
   --access_key ACCESS_KEY
                         the access key for ACRCloud (required) [env var: ACCESS_KEY]
   --stream_id STREAM_ID
                         the id of the stream at ACRCloud (required) [env var: STREAM_ID]
-  --csv                 create a csv file [env var: CSV]
+  --station-name STATION_NAME
+                        Station name, used in Output and Emails [env var: STATION_NAME]
+  --station-name-short STATION_NAME_SHORT
+                        Shortname for station as used in Filenames (locally and in attachment) [env var: STATION_NAME_SHORT]
+  --file                create file [env var: FILE]
+  --filetype {xlsx,csv}
+                        filetype to attach to email or write to file [env var: FILETYPE]
   --email               send an email [env var: EMAIL]
   --email_from EMAIL_FROM
                         the sender of the email [env var: EMAIL_FROM]
@@ -67,15 +67,21 @@ optional arguments:
   --email_subject EMAIL_SUBJECT
                         the subject of the email [env var: EMAIL_SUBJECT]
   --email_text EMAIL_TEXT
-                        the text of the email [env var: EMAIL_TEXT]
+                        A template for the Email text, placeholders are $station_name, $month, $year, $previous_year, $responsible_email, and $resonsible_phone. [env var: EMAIL_TEXT]
+  --responsible-email RESPONSIBLE_EMAIL
+                        Used to hint whom to contact in the emails text. [env var: RESPONSIBLE_EMAIL]
+  --responsible-phone RESPONSIBLE_PHONE
+                        Used to hint whom to contact if you like phones in the emails text. [env var: RESPONSIBLE_PHONE]
   --start_date START_DATE
                         the start date of the interval in format YYYY-MM-DD (default: 30 days before end_date) [env var: START_DATE]
   --end_date END_DATE   the end date of the interval in format YYYY-MM-DD (default: today) [env var: END_DATE]
   --last_month          download data of whole last month [env var: LAST_MONTH]
   --timezone TIMEZONE   set the timezone for localization [env var: TIMEZONE]
-  --filename FILENAME   file to write to (default: <script_name>_<start_date>.csv) [env var: FILENAME]
+  --filename FILENAME   file to write to (default: <station_name_short>_<year>_<month>.csv when reporting last month, <station_name_short>_<start_date>.csv else) [env var: FILENAME]
   --stdout              also print to stdout [env var: STDOUT]
-  ```
+
+Args that start with '--' (eg. --access_key) can also be set in a config file (/etc/suisa_sendemeldung.conf or $HOME/suisa_sendemeldung.conf or suisa_sendemeldung.conf). Config file syntax allows: key=value, flag=true, stuff=[a,b,c] (for details, see syntax at https://goo.gl/R74nmi). If an arg is specified in more than one place, then commandline values override environment variables which override config file values which override defaults.
+```
 
 ## Configuration
 
