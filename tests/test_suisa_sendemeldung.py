@@ -1,10 +1,12 @@
 """Test the suisa_sendemeldung.suisa_sendemeldung module."""
 from datetime import date, datetime, timezone
 from email.message import Message
+from io import BytesIO
 from unittest.mock import call, patch
 
 from configargparse import ArgumentParser
 from freezegun import freeze_time
+from openpyxl import load_workbook
 from pytest import mark
 
 from suisa_sendemeldung import suisa_sendemeldung
@@ -19,7 +21,7 @@ def test_validate_arguments():
     # check length of stream_id
     args.stream_id = "iamnot9chars"
     # one output option has to be set (but none is)
-    args.csv = False
+    args.file = False
     args.email = False
     args.stdout = False
     # last_month is in conflict with start_date and end_date
@@ -31,7 +33,19 @@ def test_validate_arguments():
             "\n"
             "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"
             "- wrong format on stream_id, expected 9 characters but got 12\n"
-            "- no output option has been set, specify one of --csv, --email or --stdout\n"
+            "- no output option has been set, specify one of --file, --email or --stdout\n"
+            "- argument --last_month not allowed with --start_date or --end_date"
+        )
+
+    args.stdout = True
+    args.filetype = "xlsx"
+    with patch("suisa_sendemeldung.suisa_sendemeldung.ArgumentParser") as mock:
+        suisa_sendemeldung.validate_arguments(mock, args)
+        mock.error.assert_called_once_with(
+            "\n"
+            "- wrong format on access_key, expected 32 characters but got 31\n"
+            "- wrong format on stream_id, expected 9 characters but got 12\n"
+            "- xlsx cannot be printed to stdout, please set --filetype to csv\n"
             "- argument --last_month not allowed with --start_date or --end_date"
         )
 
@@ -92,19 +106,21 @@ def test_parse_filename():
     args.filename = None
     args.station_name_short = "test"
     args.last_month = True
+    args.filetype = "xlsx"
     with freeze_time("1996-03-01"):
         filename = suisa_sendemeldung.parse_filename(args, datetime.now())
-    assert filename == "test_1996_03.csv"
+    assert filename == "test_1996_03.xlsx"
 
     # start date mode
     args = ArgumentParser()
     args.filename = None
     args.last_month = False
     args.start_date = "1996-03-01"
+    args.filetype = "xlsx"
     args.station_name_short = "test"
     with freeze_time("1996-03-01"):
         filename = suisa_sendemeldung.parse_filename(args, datetime.now())
-    assert filename == "test_1996-03-01 00:00:00.csv"
+    assert filename == "test_1996-03-01.xlsx"
 
 
 def test_check_duplicate():
@@ -281,6 +297,64 @@ def test_get_csv(mock_cridlib_get):
     )
 
 
+def test_get_xlsx():
+    """Test get_xlsx."""
+
+    # empty data
+    data = []
+    xlsx = suisa_sendemeldung.get_xlsx(data)
+    workbook = load_workbook(xlsx)
+    worksheet = workbook.active
+    # pylint: disable=duplicate-code
+    assert list(worksheet.values) == [
+        (
+            "Titel",
+            "Komponist",
+            "Interpret",
+            "Interpreten-Info",
+            "Sender",
+            "Sendedatum",
+            "Sendedauer",
+            "Sendezeit",
+            "Werkverzeichnisangaben",
+            "ISRC",
+            "Label",
+            "CD ID / Katalog-Nummer",
+            "Aufnahmedatum",
+            "Aufnahmeland",
+            "Erstveröffentlichungsdatum",
+            "Titel des Tonträgers (Albumtitel)",
+            "Autor Text",
+            "Track Nummer",
+            "Genre",
+            "Programm",
+            "Bestellnummer",
+            "Marke",
+            "Label Code",
+            "EAN/GTIN",
+            "Identifikationsnummer",
+        )
+    ]
+    # pylint: enable=duplicate-code
+
+
+def test_get_email_attachment():
+    """Test get_email_attachment."""
+    filename = "test.xlsx"
+    filetype = "xlsx"
+    data = BytesIO()
+    part = suisa_sendemeldung.get_email_attachment(filename, filetype, data)
+    assert part.get_filename() == "test.xlsx"
+    assert part.get_content_type() == "application/vnd.ms-excel"
+
+    filename = "test.csv"
+    filetype = "csv"
+    data = "data"
+    part = suisa_sendemeldung.get_email_attachment(filename, filetype, data)
+    assert part.get_filename() == "test.csv"
+    assert part.get_content_type() == "text/csv"
+
+
 def test_create_message():
     """Test create_message."""
     sender = "from@example.org"
@@ -288,12 +362,13 @@ def test_create_message():
     subject = "subject"
     text = "text"
     filename = "/tmp/filename"
-    csv = "csv"
+    filetype = "csv"
+    data = "data"
     carbon_copy = "cc@example.org"
     bcc = "bcc@example.org"
 
     msg = suisa_sendemeldung.create_message(
-        sender, recipient, subject, text, filename, csv, carbon_copy, bcc
+        sender, recipient, subject, text, filename, filetype, data, carbon_copy, bcc
     )
     assert msg.get("From") == sender
     assert msg.get("To") == recipient

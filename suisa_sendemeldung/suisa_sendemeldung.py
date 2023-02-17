@@ -6,14 +6,14 @@ Fetches data on our playout history and formats them in a CSV file format
 containing the data (like Track, Title and ISRC) requested by SUISA. Also takes care of sending
 the report to SUISA via email for hands-off operations.
 """
-from csv import writer
+from csv import reader, writer
 from datetime import date, datetime, timedelta
 from email.encoders import encode_base64
 from email.mime.base import MIMEBase
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
-from io import StringIO
+from io import BytesIO, StringIO
 from os.path import basename, expanduser
 from smtplib import SMTP
 from string import Template
@@ -23,6 +23,7 @@ import pytz
 from configargparse import ArgumentParser
 from dateutil.relativedelta import relativedelta
 from iso3901 import ISRC
+from openpyxl import Workbook
 
 from .acrclient import ACRClient
 
@@ -104,10 +105,13 @@ def validate_arguments(parser, args):
             f"wrong format on stream_id, expected 9 characters but got {len(args.stream_id)}"
         )
     # one output option has to be set
-    if not (args.csv or args.email or args.stdout):
+    if not (args.file or args.email or args.stdout):
         msgs.append(
-            "no output option has been set, specify one of --csv, --email or --stdout"
+            "no output option has been set, specify one of --file, --email or --stdout"
         )
+    # xlsx cannot be printed to stdout
+    if args.stdout and args.filetype == "xlsx":
+        msgs.append("xlsx cannot be printed to stdout, please set --filetype to csv")
     # last_month is in conflict with start_date and end_date
     if args.last_month and (args.start_date or args.end_date):
         msgs.append("argument --last_month not allowed with --start_date or --end_date")
@@ -158,7 +162,14 @@ def get_arguments(parser: ArgumentParser):  # pragma: no cover
         default="rabe",
     )
     parser.add_argument(
-        "--csv", env_var="CSV", help="create a csv file", action="store_true"
+        "--file", env_var="FILE", help="create file", action="store_true"
+    )
+    parser.add_argument(
+        "--filetype",
+        env_var="FILETYPE",
+        help="filetype to attach to email or write to file",
+        choices=("xlsx", "csv"),
+        default="xlsx",
     )
     parser.add_argument(
         "--email", env_var="EMAIL", help="send an email", action="store_true"
@@ -298,9 +309,9 @@ def parse_filename(args, start_date):
     # depending on date args either append the month or the start_date
     elif args.last_month:
         date_part = f"{start_date.strftime('%Y')}_{start_date.strftime('%m')}"
-        filename = f"{args.station_name_short}_{date_part}.csv"
+        filename = f"{args.station_name_short}_{date_part}.{args.filetype}"
     else:
-        filename = f"{args.station_name_short}_{start_date}.csv"
+        filename = f"{args.station_name_short}_{start_date.strftime('%Y-%m-%d')}.{args.filetype}"
     return filename
 
 
@@ -536,6 +547,29 @@ def get_csv(data, station_name=""):
     return csv.getvalue()
 
 
+def get_xlsx(data, station_name=""):
+    """Create SUISA compatible xlsx data.
+
+    Arguments:
+        data: The data to create xlsx from
+
+    Returns:
+        xlsx: The converted data as BytesIO object
+    """
+    csv = get_csv(data, station_name=station_name)
+    csv_reader = reader(StringIO(csv))
+
+    xlsx = BytesIO()
+    workbook = Workbook()
+    worksheet = workbook.active
+
+    for row in csv_reader:
+        worksheet.append(row)
+
+    workbook.save(xlsx)
+    return xlsx
+
+
 def write_csv(filename, csv):  # pragma: no cover
     """Write contents of `csv` to file.
 
@@ -547,9 +581,44 @@ def write_csv(filename, csv):  # pragma: no cover
         csvfile.write(csv)
 
 
+def write_xlsx(filename, xlsx):  # pragma: no cover
+    """Write contents of `xlsx` to file.
+
+    Arguments:
+        filename: The file to write to.
+        xlsx: The data to write to `filename`.
+    """
+    with open(filename, mode="wb") as xlsxfile:
+        xlsxfile.write(xlsx.getvalue())
+
+
+def get_email_attachment(filename, filetype, data):
+    """Create attachment based on required filetype and data.
+
+    Arguments:
+        filename: The filename of the attachment
+        filetype: The filetype of the attachment
+        data: The attachment data
+    """
+    part = None
+    if filetype == "xlsx":
+        part = MIMEBase("application", "vnd.ms-excel")
+        part.set_payload(data.getvalue())
+        encode_base64(part)
+    elif filetype == "csv":
+        # attach csv
+        part = MIMEBase("text", "csv")
+        part.set_payload(data.encode("utf-8"))
+        encode_base64(part)
+    part.add_header("Content-Disposition", f"attachment; filename={basename(filename)}")
+    return part
+
+
 # reducing the arguments even more does not seem practical
 # pylint: disable-msg=too-many-arguments,invalid-name
-def create_message(sender, recipient, subject, text, filename, csv, cc=None, bcc=None):
+def create_message(
+    sender, recipient, subject, text, filename, filetype, data, cc=None, bcc=None
+):
     """Create email message.
 
     Arguments:
@@ -557,8 +626,9 @@ def create_message(sender, recipient, subject, text, filename, csv, cc=None, bcc
         recipient: The recipient of the email. Can be a list.
         subject: The subject of the email.
         text: The body of the email.
-        filename: The filename to attach `csv` by.
-        csv: The attachment data.
+        filename: The filename of the attachment
+        filetype: The filetype of the attachment
+        data: The attachment data.
     """
     msg = MIMEMultipart()
     msg["From"] = sender
@@ -571,14 +641,7 @@ def create_message(sender, recipient, subject, text, filename, csv, cc=None, bcc
     msg["Subject"] = subject
     # set body
     msg.attach(MIMEText(text))
-    # attach csv
-    part = MIMEBase("text", "csv")
-    part.set_payload(csv.encode("utf-8"))
-    encode_base64(part)
-    part.add_header(
-        "Content-Disposition", f'attachment; filename="{basename(filename)}'
-    )
-    msg.attach(part)
+    msg.attach(get_email_attachment(filename, filetype, data))
 
     return msg
 
@@ -624,7 +687,11 @@ def main():  # pragma: no cover
     data = client.get_interval_data(
         args.project_id, args.stream_id, start_date, end_date, timezone=args.timezone
     )
-    csv = get_csv(merge_duplicates(data), station_name=args.station_name)
+    data = merge_duplicates(data)
+    if args.filetype == "xlsx":
+        data = get_xlsx(data, station_name=args.station_name)
+    elif args.filetype == "csv":
+        data = get_csv(data, station_name=args.station_name)
     if args.email:
         email_subject = start_date.strftime(args.email_subject)
         # generate body
@@ -647,7 +714,8 @@ def main():  # pragma: no cover
             email_subject,
             text,
             filename,
-            csv,
+            args.filetype,
+            data,
             cc=args.email_cc,
             bcc=args.email_bcc,
         )
@@ -657,10 +725,12 @@ def main():  # pragma: no cover
             login=args.email_login,
             password=args.email_pass,
         )
-    if args.csv:
-        write_csv(filename, csv)
-    if args.stdout:
-        print(csv)
+    if args.file and args.filetype == "xlsx":
+        write_xlsx(filename, data)
+    elif args.file and args.filetype == "csv":
+        write_csv(filename, data)
+    if args.stdout and args.filetype == "csv":
+        print(data)
 
 
 if __name__ == "__main__":  # pragma: no cover
