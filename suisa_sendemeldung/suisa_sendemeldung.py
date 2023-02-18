@@ -502,7 +502,10 @@ def get_csv(data, station_name=""):
         label = music.get("label")
 
         # load some "best-effort" fields
-        album = music.get("album", {}).get("name", "")
+        album = music.get("album", "")
+        # it's a dict if it's from the ACRCloud bucket, a string if from a custom bucket
+        if isinstance(album, dict):
+            album = album.get("name", "")
         upc = music.get("external_ids", {}).get("upc", "")
         release_date = funge_release_date(music.get("release_date", ""))
 
