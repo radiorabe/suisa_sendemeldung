@@ -367,10 +367,10 @@ def merge_duplicates(data):
     return data
 
 
-def funge_release_date(release_date):
+def funge_release_date(release_date: str = ""):
     """Make a release_date from ACR conform to what seems to be the spec."""
 
-    if release_date != "" and len(release_date) == 10:
+    if len(release_date) == 10:
         # we can make it look like what suisa has in their examples if it's the right length
         release_date = datetime.strptime(release_date, "%Y-%m-%d").strftime("%Y%m%d")
     elif len(release_date) != 4:
