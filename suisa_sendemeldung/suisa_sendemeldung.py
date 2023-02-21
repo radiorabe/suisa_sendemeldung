@@ -359,14 +359,12 @@ def funge_release_date(release_date):
 
     if release_date != "" and len(release_date) == 10:
         # we can make it look like what suisa has in their examples if it's the right length
-        release_date = datetime.strptime(release_date, "%Y-%m-%d").strftime("%Y%m%d")
-    elif len(release_date) != 4:
-        # we discard other records since there is no way to convert records like a plain
-        # year into dd/mm/yyyy properly without further guidance from whomever ingests
-        # the data, unless they are exactly 4 chars and we blindly assume the record to
-        # be just a plain year :shrug:
-        release_date = ""
-    return release_date
+        return datetime.strptime(release_date, "%Y-%m-%d").strftime("%Y%m%d")
+    # we discard other records since there is no way to convert records like a plain
+    # year into dd/mm/yyyy properly without further guidance from whomever ingests
+    # the data, in some cases this means we discard data that only contain a year
+    # since they dont have that amount of precision.
+    return ""
 
 
 def get_artist(music):
