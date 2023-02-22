@@ -1,11 +1,13 @@
 """Test the suisa_sendemeldung.suisa_sendemeldung module."""
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from email.message import Message
-from os.path import dirname
-from unittest.mock import patch
+from io import BytesIO
+from unittest.mock import call, patch
 
 from configargparse import ArgumentParser
 from freezegun import freeze_time
+from openpyxl import load_workbook
+from pytest import mark
 
 from suisa_sendemeldung import suisa_sendemeldung
 
@@ -14,12 +16,12 @@ def test_validate_arguments():
     """Test validate_arguments."""
 
     args = ArgumentParser()
-    # length of access_key should be 32
-    args.access_key = "iamclearlynotthritytwocharslong"
+    # length of bearer_token should be 32 or more chars long
+    args.bearer_token = "iamclearlynotthirtytwocharslong"
     # check length of stream_id
     args.stream_id = "iamnot9chars"
     # one output option has to be set (but none is)
-    args.csv = False
+    args.file = False
     args.email = False
     args.stdout = False
     # last_month is in conflict with start_date and end_date
@@ -29,9 +31,21 @@ def test_validate_arguments():
         suisa_sendemeldung.validate_arguments(mock, args)
         mock.error.assert_called_once_with(
             "\n"
-            "- wrong format on access_key, expected 32 characters but got 31\n"
+            "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"
             "- wrong format on stream_id, expected 9 characters but got 12\n"
-            "- no output option has been set, specify one of --csv, --email or --stdout\n"
+            "- no output option has been set, specify one of --file, --email or --stdout\n"
+            "- argument --last_month not allowed with --start_date or --end_date"
+        )
+
+    args.stdout = True
+    args.filetype = "xlsx"
+    with patch("suisa_sendemeldung.suisa_sendemeldung.ArgumentParser") as mock:
+        suisa_sendemeldung.validate_arguments(mock, args)
+        mock.error.assert_called_once_with(
+            "\n"
+            "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"
+            "- wrong format on stream_id, expected 9 characters but got 12\n"
+            "- xlsx cannot be printed to stdout, please set --filetype to csv\n"
             "- argument --last_month not allowed with --start_date or --end_date"
         )
 
@@ -83,29 +97,30 @@ def test_parse_filename():
     # pass filename from cli
     args = ArgumentParser()
     args.filename = "/foo/bar"
+    args.station_name_short = "test"
     filename = suisa_sendemeldung.parse_filename(args, None)
     assert filename == "/foo/bar"
 
     # last_month mode
     args = ArgumentParser()
     args.filename = None
+    args.station_name_short = "test"
     args.last_month = True
+    args.filetype = "xlsx"
     with freeze_time("1996-03-01"):
         filename = suisa_sendemeldung.parse_filename(args, datetime.now())
-    assert (
-        filename
-        == f"{dirname(suisa_sendemeldung.__file__)}/suisa_sendemeldung_March.csv"
-    )
+    assert filename == "test_1996_03.xlsx"
 
     # start date mode
     args = ArgumentParser()
     args.filename = None
     args.last_month = False
     args.start_date = "1996-03-01"
+    args.filetype = "xlsx"
+    args.station_name_short = "test"
     with freeze_time("1996-03-01"):
         filename = suisa_sendemeldung.parse_filename(args, datetime.now())
-    expected_name = "suisa_sendemeldung_1996-03-01 00:00:00.csv"
-    assert filename == f"{dirname(suisa_sendemeldung.__file__)}/{expected_name}"
+    assert filename == "test_1996-03-01.xlsx"
 
 
 def test_check_duplicate():
@@ -164,42 +179,50 @@ def test_merge_duplicates():
     assert results[0]["metadata"]["played_duration"] == 20
 
 
-def test_get_csv():
+@patch("cridlib.get")
+def test_get_csv(mock_cridlib_get):
     """Test get_csv."""
+    mock_cridlib_get.return_value = "crid://rabe.ch/v1/test"
 
     # empty data
     data = []
     csv = suisa_sendemeldung.get_csv(data)
+    # pylint: disable=line-too-long
     assert csv == (
-        "sep=,\n"
-        "Sendedatum,Sendezeit,Sendedauer,Titel,Künstler,Komponist,ISRC,Label\r\n"
+        "Titel,Komponist,Interpret,Interpreten-Info,Sender,Sendedatum,Sendedauer,Sendezeit,Werkverzeichnisangaben,ISRC,Label,CD ID / Katalog-Nummer,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Titel des Tonträgers (Albumtitel),Autor Text,Track Nummer,Genre,Programm,Bestellnummer,Marke,Label Code,EAN/GTIN,Identifikationsnummer\r\n"
     )
+    # pylint: enable=line-too-long
+    mock_cridlib_get.assert_not_called()
 
     # bunch of data
+    mock_cridlib_get.reset_mock()
     data = [
         {
             "metadata": {
                 "timestamp_local": "1993-03-01 13:12:00",
+                "timestamp_utc": "1993-03-01 13:12:00",
                 "played_duration": 60,
-                "music": [{"title": "Uhrenvergleich"}],
+                "music": [{"title": "Uhrenvergleich", "acrid": "a1"}],
             }
         },
         {
             "metadata": {
                 "timestamp_local": "1993-03-01 13:37:00",
+                "timestamp_utc": "1993-03-01 13:37:00",
                 "played_duration": 60,
                 "custom_files": [
                     {
+                        "acrid": "a2",
                         "title": "Meme Dub",
                         "artist": "Da Gang",
+                        "album": "album, but string",
                         "contributors": {
                             "composers": [
                                 "Da Composah",
                             ]
                         },
-                        "external_ids": {
-                            "isrc": "id-from-well-published-isrc-database"
-                        },
+                        "release_date": "2023",
+                        "external_ids": {"isrc": "AA6Q72000047"},
                     }
                 ],
             }
@@ -207,10 +230,16 @@ def test_get_csv():
         {
             "metadata": {
                 "timestamp_local": "1993-03-01 16:20:00",
+                "timestamp_utc": "1993-03-01 16:20:00",
                 "played_duration": 60,
                 "music": [
                     {
+                        "acrid": "a3",
                         "title": "Bubbles",
+                        "album": {
+                            "name": "Da Alboom",
+                        },
+                        "release_date": "2022-12-13",
                         "artists": [
                             {
                                 "name": "Mary's Surprise Act",
@@ -219,23 +248,112 @@ def test_get_csv():
                                 "name": "Climmy Jiff",
                             },
                         ],
-                        "isrc": "important-globally-well-managed-id",
+                        "isrc": "AA6Q72000047",
                         "label": "Jane Records",
+                        "external_ids": {
+                            "upc": "greedy-capitalist-number",
+                        },
+                    }
+                ],
+            }
+        },
+        {
+            "metadata": {
+                "timestamp_local": "1993-03-01 17:17:17",
+                "timestamp_utc": "1993-03-01 17:17:17",
+                "played_duration": 60,
+                "custom_files": [
+                    {
+                        "artists": "Artists as string not list",
                     }
                 ],
             }
         },
     ]
-    csv = suisa_sendemeldung.get_csv(data)
+    csv = suisa_sendemeldung.get_csv(data, station_name="Station Name")
     # pylint: disable=line-too-long
     assert csv == (
-        "sep=,\n"
-        "Sendedatum,Sendezeit,Sendedauer,Titel,Künstler,Komponist,ISRC,Label\r\n"
-        "01/03/93,13:12:00,0:01:00,Uhrenvergleich,,,,\r\n"
-        "01/03/93,13:37:00,0:01:00,Meme Dub,Da Gang,Da Composah,id-from-well-published-isrc-database,\r\n"
-        '01/03/93,16:20:00,0:01:00,Bubbles,"Mary\'s Surprise Act, Climmy Jiff","Mary\'s Surprise Act, Climmy Jiff",important-globally-well-managed-id,Jane Records\r\n'
+        "Titel,Komponist,Interpret,Interpreten-Info,Sender,Sendedatum,Sendedauer,Sendezeit,Werkverzeichnisangaben,ISRC,Label,CD ID / Katalog-Nummer,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Titel des Tonträgers (Albumtitel),Autor Text,Track Nummer,Genre,Programm,Bestellnummer,Marke,Label Code,EAN/GTIN,Identifikationsnummer\r\n"
+        "Uhrenvergleich,,,,Station Name,19930301,0:01:00,13:12:00,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
+        'Meme Dub,Da Composah,Da Gang,,Station Name,19930301,0:01:00,13:37:00,,AA6Q72000047,,,,,,"album, but string",,,,,,,,,crid://rabe.ch/v1/test\r\n'
+        'Bubbles,,"Mary\'s Surprise Act, Climmy Jiff",,Station Name,19930301,0:01:00,16:20:00,,AA6Q72000047,Jane Records,,,,20221213,Da Alboom,,,,,,,,greedy-capitalist-number,crid://rabe.ch/v1/test\r\n'
+        ",,Artists as string not list,,Station Name,19930301,0:01:00,17:17:17,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
     )
     # pylint: enable=line-too-long
+    mock_cridlib_get.assert_has_calls(
+        [
+            call(
+                timestamp=datetime(1993, 3, 1, 13, 12, tzinfo=timezone.utc),
+                fragment="acrid=a1",
+            ),
+            call(
+                timestamp=datetime(1993, 3, 1, 13, 37, tzinfo=timezone.utc),
+                fragment="acrid=a2",
+            ),
+            call(
+                timestamp=datetime(1993, 3, 1, 16, 20, tzinfo=timezone.utc),
+                fragment="acrid=a3",
+            ),
+        ]
+    )
+
+
+def test_get_xlsx():
+    """Test get_xlsx."""
+
+    # empty data
+    data = []
+    xlsx = suisa_sendemeldung.get_xlsx(data)
+    workbook = load_workbook(xlsx)
+    worksheet = workbook.active
+    # pylint: disable=duplicate-code
+    assert list(worksheet.values) == [
+        (
+            "Titel",
+            "Komponist",
+            "Interpret",
+            "Interpreten-Info",
+            "Sender",
+            "Sendedatum",
+            "Sendedauer",
+            "Sendezeit",
+            "Werkverzeichnisangaben",
+            "ISRC",
+            "Label",
+            "CD ID / Katalog-Nummer",
+            "Aufnahmedatum",
+            "Aufnahmeland",
+            "Erstveröffentlichungsdatum",
+            "Titel des Tonträgers (Albumtitel)",
+            "Autor Text",
+            "Track Nummer",
+            "Genre",
+            "Programm",
+            "Bestellnummer",
+            "Marke",
+            "Label Code",
+            "EAN/GTIN",
+            "Identifikationsnummer",
+        )
+    ]
+    # pylint: enable=duplicate-code
+
+
+def test_get_email_attachment():
+    """Test get_email_attachment."""
+    filename = "test.xlsx"
+    filetype = "xlsx"
+    data = BytesIO()
+    part = suisa_sendemeldung.get_email_attachment(filename, filetype, data)
+    assert part.get_filename() == "test.xlsx"
+    assert part.get_content_type() == "application/vnd.ms-excel"
+
+    filename = "test.csv"
+    filetype = "csv"
+    data = "data"
+    part = suisa_sendemeldung.get_email_attachment(filename, filetype, data)
+    assert part.get_filename() == "test.csv"
+    assert part.get_content_type() == "text/csv"
 
 
 def test_create_message():
@@ -245,12 +363,13 @@ def test_create_message():
     subject = "subject"
     text = "text"
     filename = "/tmp/filename"
-    csv = "csv"
+    filetype = "csv"
+    data = "data"
     carbon_copy = "cc@example.org"
     bcc = "bcc@example.org"
 
     msg = suisa_sendemeldung.create_message(
-        sender, recipient, subject, text, filename, csv, carbon_copy, bcc
+        sender, recipient, subject, text, filename, filetype, data, carbon_copy, bcc
     )
     assert msg.get("From") == sender
     assert msg.get("To") == recipient
@@ -287,3 +406,25 @@ def test_send_message():
         ctx = mock.return_value.__enter__.return_value
         ctx.starttls.assert_called_once()
         ctx.login.assert_called_once_with("test@example.org", "password")
+
+
+@mark.parametrize(
+    "test_music,expected",
+    [
+        ({"external_ids": {"isrc": "AA6Q72000047"}}, "AA6Q72000047"),
+        ({"external_ids": {"isrc": ["AA6Q72000047"]}}, "AA6Q72000047"),
+        ({"external_ids": {"isrc": "AA 6Q7 20 00047"}}, "AA6Q72000047"),
+        ({"external_ids": {"isrc": "ISRCAA6Q72000047"}}, "AA6Q72000047"),
+        ({"external_ids": {"isrc": "123456789-1"}}, ""),
+        ({"isrc": "AA6Q72000047"}, "AA6Q72000047"),
+        ({"isrc": ["AA6Q72000047"]}, "AA6Q72000047"),
+        ({"isrc": "ISRCAA6Q72000047"}, "AA6Q72000047"),
+        ({"isrc": "AA 6Q7 20 00047"}, "AA6Q72000047"),
+        ({"isrc": "123456789-1"}, ""),
+    ],
+)
+def test_get_isrc(test_music, expected):
+    """Test get_isrc."""
+
+    isrc = suisa_sendemeldung.get_isrc(test_music)
+    assert isrc == expected
