@@ -16,8 +16,8 @@ def test_validate_arguments():
     """Test validate_arguments."""
 
     args = ArgumentParser()
-    # length of access_key should be 32
-    args.access_key = "iamclearlynotthritytwocharslong"
+    # length of bearer_token should be 32 or more chars long
+    args.bearer_token = "iamclearlynotthirtytwocharslong"
     # check length of stream_id
     args.stream_id = "iamnot9chars"
     # one output option has to be set (but none is)
@@ -31,7 +31,7 @@ def test_validate_arguments():
         suisa_sendemeldung.validate_arguments(mock, args)
         mock.error.assert_called_once_with(
             "\n"
-            "- wrong format on access_key, expected 32 characters but got 31\n"
+            "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"
             "- wrong format on stream_id, expected 9 characters but got 12\n"
             "- no output option has been set, specify one of --file, --email or --stdout\n"
             "- argument --last_month not allowed with --start_date or --end_date"
@@ -43,7 +43,7 @@ def test_validate_arguments():
         suisa_sendemeldung.validate_arguments(mock, args)
         mock.error.assert_called_once_with(
             "\n"
-            "- wrong format on access_key, expected 32 characters but got 31\n"
+            "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"
             "- wrong format on stream_id, expected 9 characters but got 12\n"
             "- xlsx cannot be printed to stdout, please set --filetype to csv\n"
             "- argument --last_month not allowed with --start_date or --end_date"
