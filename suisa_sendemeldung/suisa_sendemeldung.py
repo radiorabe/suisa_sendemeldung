@@ -567,6 +567,17 @@ def get_xlsx(data, station_name=""):
     for row in csv_reader:
         worksheet.append(row)
 
+    # POST PROCESSING
+    dims = {}
+    for row in worksheet.rows:
+        for cell in row:
+            if cell.value:
+                dims[cell.column_letter] = max(
+                    (dims.get(cell.column_letter, 0), len(str(cell.value)))
+                )
+    for col, value in dims.items():
+        worksheet.column_dimensions[col].width = value + 3
+
     workbook.save(xlsx)
     return xlsx
 
