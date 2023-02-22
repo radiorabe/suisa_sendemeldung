@@ -68,11 +68,11 @@ Diese Email und Sendemeldung wurde automatisch generiert.
 Freundliche Grüsse,
 $station_name
 
---
-$email_footer
-
 [1] <https://www.suisa.ch/dam/jcr:1d82128b-8cc7-4cf0-b0ef-1890ae9d434d/GTS_2020-2024_GER.pdf>
 [2] <https://www.suisa.ch/dam/jcr:6934be98-4319-4565-8936-05007d83fd35/Vorlage_fuer_Sendemeldungen__GTS__2020-2022.xlsx>
+
+--
+$email_footer
 """
 
 
