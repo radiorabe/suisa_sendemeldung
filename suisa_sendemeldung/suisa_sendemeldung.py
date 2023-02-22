@@ -493,6 +493,8 @@ def get_csv(data, station_name=""):
         artist = get_artist(music)
 
         composer = ", ".join(music.get("contributors", {}).get("composers", ""))
+        if not composer:
+            composer = artist
 
         isrc = get_isrc(music)
         label = music.get("label")
