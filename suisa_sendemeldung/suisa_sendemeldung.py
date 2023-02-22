@@ -69,11 +69,11 @@ Diese Email und Sendemeldung wurde automatisch generiert.
 Freundliche Grüsse,
 $station_name
 
---
-$email_footer
-
 [1] <https://www.suisa.ch/dam/jcr:1d82128b-8cc7-4cf0-b0ef-1890ae9d434d/GTS_2020-2024_GER.pdf>
 [2] <https://www.suisa.ch/dam/jcr:6934be98-4319-4565-8936-05007d83fd35/Vorlage_fuer_Sendemeldungen__GTS__2020-2022.xlsx>
+
+--
+$email_footer
 """
 
 
@@ -494,6 +494,8 @@ def get_csv(data, station_name=""):
         artist = get_artist(music)
 
         composer = ", ".join(music.get("contributors", {}).get("composers", ""))
+        if not composer:
+            composer = artist
 
         isrc = get_isrc(music)
         label = music.get("label")
@@ -577,6 +579,17 @@ def get_xlsx(data, station_name=""):
         cell.border = border
         if cell.column_letter in required:
             cell.fill = fill
+
+    # POST PROCESSING
+    dims = {}
+    for row in worksheet.rows:
+        for cell in row:
+            if cell.value:
+                dims[cell.column_letter] = max(
+                    (dims.get(cell.column_letter, 0), len(str(cell.value)))
+                )
+    for col, value in dims.items():
+        worksheet.column_dimensions[col].width = value + 3
 
     workbook.save(xlsx)
     return xlsx
