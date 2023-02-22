@@ -9,19 +9,19 @@ You can build a Docker image using the included [Dockerfile](Dockerfile):
 ```bash
 git clone https://github.com/radiorabe/suisa_sendemeldung
 cd suisa_sendemeldung
-sudo docker build -t suisa_sendemeldung .
+podman build -t suisa_sendemeldung .
 ```
 
 Then you can run it by passing in command line switches:
 
 ```bash
-sudo docker run --rm suisa_sendemeldung --access_key abcdefghijklmnopqrstuvwxyzabcdef --stream_id a-bcdefgh --stdout
+podman run --rm suisa_sendemeldung --bearer-token abcdefghijklmnopqrstuvwxyzabcdef --stream_id a-bcdefgh --stdout
 ```
 
 Or by setting environment variables:
 
 ```bash
-sudo docker run --rm --env ACCESS_KEY=abcdefghijklmnopqrstuvwxyzabcdef --env STREAM_ID=a-bcdefgh --env STDOUT=True suisa_sendemeldung
+podman run --rm --env BEARER_TOKEN=abcdefghijklmnopqrstuvwxyzabcdef --env STREAM_ID=a-bcdefgh --env STDOUT=True suisa_sendemeldung
 ```
 
 A prebuilt image is available from the GitHub Package Registry:
@@ -34,14 +34,14 @@ docker pull ghcr.io/radiorabe/suisasendemeldung:master
 
 This is the output of `suisa_sendemeldung -h`.
 ```
-usage: suisa_sendemeldung.py [-h] --access_key ACCESS_KEY --stream_id STREAM_ID [--station-name STATION_NAME] [--station-name-short STATION_NAME_SHORT] [--file] [--filetype {xlsx,csv}] [--email] [--email_from EMAIL_FROM] [--email_to EMAIL_TO] [--email_cc EMAIL_CC] [--email_bcc EMAIL_BCC] [--email_server EMAIL_SERVER] [--email_login EMAIL_LOGIN] [--email_pass EMAIL_PASS] [--email_subject EMAIL_SUBJECT] [--email_text EMAIL_TEXT] --responsible-email RESPONSIBLE_EMAIL --responsible-phone RESPONSIBLE_PHONE [--start_date START_DATE] [--end_date END_DATE] [--last_month] [--timezone TIMEZONE] [--filename FILENAME] [--stdout]
+usage: suisa_sendemeldung.py [-h] --bearer-token BEARER_TOKEN --stream_id STREAM_ID [--station-name STATION_NAME] [--station-name-short STATION_NAME_SHORT] [--file] [--filetype {xlsx,csv}] [--email] [--email_from EMAIL_FROM] [--email_to EMAIL_TO] [--email_cc EMAIL_CC] [--email_bcc EMAIL_BCC] [--email_server EMAIL_SERVER] [--email_login EMAIL_LOGIN] [--email_pass EMAIL_PASS] [--email_subject EMAIL_SUBJECT] [--email_text EMAIL_TEXT] --responsible-email RESPONSIBLE_EMAIL --responsible-phone RESPONSIBLE_PHONE [--start_date START_DATE] [--end_date END_DATE] [--last_month] [--timezone TIMEZONE] [--filename FILENAME] [--stdout]
 
 ACRCloud client for SUISA reporting @ RaBe.
 
 options:
   -h, --help            show this help message and exit
-  --access_key ACCESS_KEY
-                        the access key for ACRCloud (required) [env var: ACCESS_KEY]
+  --bearer-token BEARER_TOKEN
+                        the bearer token for ACRCloud (required) [env var: BEARER_TOKEN]
   --stream_id STREAM_ID
                         the id of the stream at ACRCloud (required) [env var: STREAM_ID]
   --station-name STATION_NAME
@@ -104,7 +104,7 @@ For details on how to set configuration values, have a look at [suisa_sendemeldu
 Environment variables can also be passed as options. The relevant variables are listed in the [Usage](#Usage) part of this document. For example run the script as follows:
 
 ```bash
-ACCESS_KEY=abcdefghijklmnopqrstuvwxyzabcdef STREAM_ID=a-bcdefgh STDOUT=True ./suisa_sendemeldung.py
+BEARER_TOKEN=abcdefghijklmnopqrstuvwxyzabcdef STREAM_ID=a-bcdefgh STDOUT=True ./suisa_sendemeldung.py
 ```
 
 ### Command line switches
@@ -112,5 +112,5 @@ ACCESS_KEY=abcdefghijklmnopqrstuvwxyzabcdef STREAM_ID=a-bcdefgh STDOUT=True ./su
 As documented in [Usage](#Usage), you can also pass in options on the command line as arguments. Simply run the script as follows:
 
 ```bash
-./suisa_sendemeldung.py --access_key=abcdefghijklmnopqrstuvwxyzabcdef --stream_id=a-bcdefgh --stdout
+./suisa_sendemeldung.py --bearer-token=abcdefghijklmnopqrstuvwxyzabcdef --stream_id=a-bcdefgh --stdout
 ```
