@@ -24,6 +24,7 @@ from configargparse import ArgumentParser
 from dateutil.relativedelta import relativedelta
 from iso3901 import ISRC
 from openpyxl import Workbook
+from openpyxl.styles import Border, Font, PatternFill, Side
 
 from .acrclient import ACRClient
 
@@ -566,6 +567,18 @@ def get_xlsx(data, station_name=""):
 
     for row in csv_reader:
         worksheet.append(row)
+
+    # the columns that should be styled as required (grey background)
+    required = ["A", "B", "C", "F", "G", "H", "I", "K", "W", "Y"]
+    font = Font(name="Calibri", bold=True, size=12)
+    side = Side(border_style="thick", color="000000")
+    border = Border(top=side, left=side, right=side, bottom=side)
+    fill = PatternFill("solid", bgColor="d9d9d9", fgColor="d9d9d9")
+    for cell in worksheet[1]:  # xlsx is 1-indexed
+        cell.font = font
+        cell.border = border
+        if cell.column_letter in required:
+            cell.fill = fill
 
     # POST PROCESSING
     dims = {}
