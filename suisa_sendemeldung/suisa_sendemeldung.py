@@ -89,10 +89,15 @@ def validate_arguments(parser, args):
         args: the arguments to validate
     """
     msgs = []
-    # check length of access_key
-    if not len(args.access_key) == 32:
+    # check length of bearer_token
+    if not len(args.bearer_token) >= 32:
         msgs.append(
-            f"wrong format on access_key, expected 32 characters but got {len(args.access_key)}"
+            "".join(
+                (
+                    "wrong format on bearer_token, ",
+                    f"expected larger than 32 characters but got {len(args.bearer_token)}",
+                )
+            )
         )
     # check length of stream_id
     if not len(args.stream_id) == 9:
@@ -125,9 +130,17 @@ def get_arguments(parser: ArgumentParser):  # pragma: no cover
         args: the parsed args from the parser
     """
     parser.add_argument(
-        "--access_key",
-        env_var="ACCESS_KEY",
-        help="the access key for ACRCloud (required)",
+        "--bearer-token",
+        dest="bearer_token",
+        env_var="BEARER_TOKEN",
+        help="the bearer token for ACRCloud (required)",
+        required=True,
+    )
+    parser.add_argument(
+        "--project-id",
+        dest="project_id",
+        env_var="PROJECT_ID",
+        help="the id of the project at ACRCloud (required)",
         required=True,
     )
     parser.add_argument(
@@ -354,10 +367,10 @@ def merge_duplicates(data):
     return data
 
 
-def funge_release_date(release_date):
+def funge_release_date(release_date: str = ""):
     """Make a release_date from ACR conform to what seems to be the spec."""
 
-    if release_date != "" and len(release_date) == 10:
+    if len(release_date) == 10:
         # we can make it look like what suisa has in their examples if it's the right length
         return datetime.strptime(release_date, "%Y-%m-%d").strftime("%Y%m%d")
     # we discard other records since there is no way to convert records like a plain
@@ -487,7 +500,10 @@ def get_csv(data, station_name=""):
         label = music.get("label")
 
         # load some "best-effort" fields
-        album = music.get("album", {}).get("name", "")
+        album = music.get("album", "")
+        # it's a dict if it's from the ACRCloud bucket, a string if from a custom bucket
+        if isinstance(album, dict):
+            album = album.get("name", "")
         upc = music.get("external_ids", {}).get("upc", "")
         release_date = funge_release_date(music.get("release_date", ""))
 
@@ -668,9 +684,9 @@ def main():  # pragma: no cover
     start_date, end_date = parse_date(args)
     filename = parse_filename(args, start_date)
 
-    client = ACRClient(args.access_key)
+    client = ACRClient(bearer_token=args.bearer_token)
     data = client.get_interval_data(
-        args.stream_id, start_date, end_date, timezone=args.timezone
+        args.project_id, args.stream_id, start_date, end_date, timezone=args.timezone
     )
     data = merge_duplicates(data)
     if args.filetype == "xlsx":

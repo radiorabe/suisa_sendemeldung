@@ -16,8 +16,8 @@ def test_validate_arguments():
     """Test validate_arguments."""
 
     args = ArgumentParser()
-    # length of access_key should be 32
-    args.access_key = "iamclearlynotthritytwocharslong"
+    # length of bearer_token should be 32 or more chars long
+    args.bearer_token = "iamclearlynotthirtytwocharslong"
     # check length of stream_id
     args.stream_id = "iamnot9chars"
     # one output option has to be set (but none is)
@@ -31,7 +31,7 @@ def test_validate_arguments():
         suisa_sendemeldung.validate_arguments(mock, args)
         mock.error.assert_called_once_with(
             "\n"
-            "- wrong format on access_key, expected 32 characters but got 31\n"
+            "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"
             "- wrong format on stream_id, expected 9 characters but got 12\n"
             "- no output option has been set, specify one of --file, --email or --stdout\n"
             "- argument --last_month not allowed with --start_date or --end_date"
@@ -43,7 +43,7 @@ def test_validate_arguments():
         suisa_sendemeldung.validate_arguments(mock, args)
         mock.error.assert_called_once_with(
             "\n"
-            "- wrong format on access_key, expected 32 characters but got 31\n"
+            "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"
             "- wrong format on stream_id, expected 9 characters but got 12\n"
             "- xlsx cannot be printed to stdout, please set --filetype to csv\n"
             "- argument --last_month not allowed with --start_date or --end_date"
@@ -215,6 +215,7 @@ def test_get_csv(mock_cridlib_get):
                         "acrid": "a2",
                         "title": "Meme Dub",
                         "artist": "Da Gang",
+                        "album": "album, but string",
                         "contributors": {
                             "composers": [
                                 "Da Composah",
@@ -274,7 +275,7 @@ def test_get_csv(mock_cridlib_get):
     assert csv == (
         "Titel,Komponist,Interpret,Interpreten-Info,Sender,Sendedatum,Sendedauer,Sendezeit,Werkverzeichnisangaben,ISRC,Label,CD ID / Katalog-Nummer,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Titel des Tonträgers (Albumtitel),Autor Text,Track Nummer,Genre,Programm,Bestellnummer,Marke,Label Code,EAN/GTIN,Identifikationsnummer\r\n"
         "Uhrenvergleich,,,,Station Name,19930301,0:01:00,13:12:00,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
-        "Meme Dub,Da Composah,Da Gang,,Station Name,19930301,0:01:00,13:37:00,,AA6Q72000047,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
+        "Meme Dub,Da Composah,Da Gang,,Station Name,19930301,0:01:00,13:37:00,,AA6Q72000047,,,,,,"album, but string",,,,,,,,,crid://rabe.ch/v1/test\r\n"
         'Bubbles,,"Mary\'s Surprise Act, Climmy Jiff",,Station Name,19930301,0:01:00,16:20:00,,AA6Q72000047,Jane Records,,,,20221213,Da Alboom,,,,,,,,greedy-capitalist-number,crid://rabe.ch/v1/test\r\n'
         ",,Artists as string not list,,Station Name,19930301,0:01:00,17:17:17,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
     )
