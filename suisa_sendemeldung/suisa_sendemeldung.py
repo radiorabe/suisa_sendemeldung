@@ -25,6 +25,7 @@ from dateutil.relativedelta import relativedelta
 from iso3901 import ISRC
 from openpyxl import Workbook
 from openpyxl.styles import Border, Font, PatternFill, Side
+from tqdm import tqdm
 
 from .acrclient import ACRClient
 
@@ -476,7 +477,7 @@ def get_csv(data, station_name=""):
     csv_writer = writer(csv, dialect="excel")
     csv_writer.writerow(header)
 
-    for entry in data:
+    for entry in tqdm(data, desc="preparing tracks for report"):
         metadata = entry.get("metadata")
         # parse timestamp
         timestamp = datetime.strptime(metadata.get("timestamp_local"), ACRClient.TS_FMT)
