@@ -580,7 +580,7 @@ def get_xlsx(data, station_name=""):
         worksheet.append(row)
 
     # the columns that should be styled as required (grey background)
-    required = ["A", "B", "C", "F", "G", "H", "I", "K", "W", "Y"]
+    required = ["A", "B", "C", "F", "G", "H", "J", "K", "W", "Y"]
     font = Font(name="Calibri", bold=True, size=12)
     side = Side(border_style="thick", color="000000")
     border = Border(top=side, left=side, right=side, bottom=side)
