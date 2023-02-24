@@ -39,7 +39,7 @@ Einhaltung der Einreichefrist für den Monat $month gemäss Ziffer 45 des Tarifs
 In der Sendungsmeldung enthalten sind die unter Buchstaben G (Verzeichnisse) des Tarifs
 genannten Programmangaben, in elektronischer Form. Die Angaben richten sich nach dem
 standardisierten Format gemäss der "Vorlage für Sendemeldungen: Gemeinsamer Tarif S" [2]
-sowie der Abstimmung zwischen SUSIA und $station_name.
+sowie der Abstimmung zwischen SUISA und $station_name.
 
 
 Diese Sendemeldung enthält unter anderem die unter Ziffer 34 geforderten Angaben:
