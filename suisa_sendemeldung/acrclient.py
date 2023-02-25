@@ -95,7 +95,9 @@ class ACRClient(Client):
             dates.append(ptr)
             ptr += timedelta(days=1)
         data = []
-        for ptr in tqdm(dates, desc="load ACRCloud data".ljust(27)):
+        # make the prefix longer by this amount so tqdm lines up with the one in the main code
+        ljust_amount: int = 27
+        for ptr in tqdm(dates, desc="load ACRCloud data".ljust(ljust_amount)):
             data += self.get_data(
                 project_id, stream_id, requested_date=ptr, timezone=timezone
             )
