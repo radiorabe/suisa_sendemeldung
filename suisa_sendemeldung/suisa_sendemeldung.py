@@ -20,6 +20,7 @@ from string import Template
 
 import cridlib
 import pytz
+from babel.dates import format_date
 from configargparse import ArgumentParser
 from dateutil.relativedelta import relativedelta
 from iso3901 import ISRC
@@ -246,6 +247,12 @@ def get_arguments(parser: ArgumentParser):  # pragma: no cover
         env_var="TIMEZONE",
         help="set the timezone for localization",
         default="UTC",
+    )
+    parser.add_argument(
+        "--locale",
+        env_var="LOCALE",
+        help="set locale for date and time formatting",
+        default="de_CH",
     )
     parser.add_argument(
         "--filename",
@@ -723,11 +730,15 @@ def main():  # pragma: no cover
         text = Template(args.email_text).substitute(
             {
                 "station_name": args.station_name,
-                "month": start_date.strftime("%B"),
-                "year": start_date.strftime("%Y"),
-                "previous_year": (start_date - timedelta(days=365)).strftime("%Y"),
-                "in_three_months": (end_date + relativedelta(months=+3)).strftime(
-                    "%d. %B %Y"
+                "month": format_date(start_date, format="MMMM", locale=args.locale),
+                "year": format_date(start_date, format="YYYY", locale=args.locale),
+                "previous_year": format_date(
+                    start_date - timedelta(days=365), format="YYYY", locale=args.locale
+                ),
+                "in_three_months": format_date(
+                    end_date + relativedelta(months=+3),
+                    format="long",
+                    locale=args.locale,
                 ),
                 "responsible_email": args.responsible_email,
                 "email_footer": args.email_footer,
