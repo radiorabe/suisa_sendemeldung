@@ -731,9 +731,9 @@ def main():  # pragma: no cover
             {
                 "station_name": args.station_name,
                 "month": format_date(start_date, format="MMMM", locale=args.locale),
-                "year": format_date(start_date, format="YYYY", locale=args.locale),
+                "year": format_date(start_date, format="yyyy", locale=args.locale),
                 "previous_year": format_date(
-                    start_date - timedelta(days=365), format="YYYY", locale=args.locale
+                    start_date - timedelta(days=365), format="yyyy", locale=args.locale
                 ),
                 "in_three_months": format_date(
                     end_date + relativedelta(months=+3),
