@@ -3,6 +3,7 @@ from datetime import date, datetime, timedelta
 
 import pytz
 from acrclient import Client
+from tqdm import tqdm
 
 
 class ACRClient(Client):
@@ -88,13 +89,18 @@ class ACRClient(Client):
             computed_start = start
             computed_end = end
 
-        data = []
+        dates = []
         ptr = computed_start
         while ptr <= computed_end:
+            dates.append(ptr)
+            ptr += timedelta(days=1)
+        data = []
+        # make the prefix longer by this amount so tqdm lines up with the one in the main code
+        ljust_amount: int = 27
+        for ptr in tqdm(dates, desc="load ACRCloud data".ljust(ljust_amount)):
             data += self.get_data(
                 project_id, stream_id, requested_date=ptr, timezone=timezone
             )
-            ptr += timedelta(days=1)
 
         # if timestamps are localized we will have to removed the unneeded entries.
         if trim:
