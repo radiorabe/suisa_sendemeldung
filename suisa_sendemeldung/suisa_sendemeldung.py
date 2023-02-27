@@ -741,7 +741,7 @@ def main():  # pragma: no cover
                     locale=args.locale,
                 ),
                 "responsible_email": args.responsible_email,
-                "email_footer": args.email_footer,
+                "email_footer": args.email_footer.replace("\\n", "\n"),
             }
         )
         msg = create_message(
