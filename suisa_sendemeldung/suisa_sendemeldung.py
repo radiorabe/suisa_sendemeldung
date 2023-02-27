@@ -59,7 +59,7 @@ Allf채llige Beanstandungen oder technische R체ckfragen zu dieser Sendemeldung m�
 schriftlicher, elektronischer Form an $responsible_email gerichtet werden.
 
 Beanstandungen m체ssen, gem채ss Ziffer 46, bis sp채testens in drei Monaten vor dem $in_three_months
-erfolgen. Anschliessend gilt die Sendemeldung f체r $month als akzeptiert und die
+erfolgen. Anschliessend gilt die Sendemeldung f체r $month $year als akzeptiert und die
 Tarifbestimmungen als eingehalten.
 
 Korrekt und termingerecht gemeldete Beanstandungen werden unter Ber체cksichtigung der
