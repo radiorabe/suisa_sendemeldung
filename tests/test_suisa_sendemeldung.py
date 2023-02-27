@@ -274,10 +274,10 @@ def test_get_csv(mock_cridlib_get):
     # pylint: disable=line-too-long
     assert csv == (
         "Titel,Komponist,Interpret,Interpreten-Info,Sender,Sendedatum,Sendedauer,Sendezeit,Werkverzeichnisangaben,ISRC,Label,CD ID / Katalog-Nummer,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Titel des Tonträgers (Albumtitel),Autor Text,Track Nummer,Genre,Programm,Bestellnummer,Marke,Label Code,EAN/GTIN,Identifikationsnummer\r\n"
-        "Uhrenvergleich,,,,Station Name,19930301,0:01:00,13:12:00,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
-        'Meme Dub,Da Composah,Da Gang,,Station Name,19930301,0:01:00,13:37:00,,AA6Q72000047,,,,,,"album, but string",,,,,,,,,crid://rabe.ch/v1/test\r\n'
-        'Bubbles,"Mary\'s Surprise Act, Climmy Jiff","Mary\'s Surprise Act, Climmy Jiff",,Station Name,19930301,0:01:00,16:20:00,,AA6Q72000047,Jane Records,,,,20221213,Da Alboom,,,,,,,,greedy-capitalist-number,crid://rabe.ch/v1/test\r\n'
-        ",Artists as string not list,Artists as string not list,,Station Name,19930301,0:01:00,17:17:17,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
+        "Uhrenvergleich,,,,Station Name,19930301,00:01.00,13:12:00,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
+        'Meme Dub,Da Composah,Da Gang,,Station Name,19930301,00:01.00,13:37:00,,AA6Q72000047,,,,,,"album, but string",,,,,,,,,crid://rabe.ch/v1/test\r\n'
+        'Bubbles,"Mary\'s Surprise Act, Climmy Jiff","Mary\'s Surprise Act, Climmy Jiff",,Station Name,19930301,00:01.00,16:20:00,,AA6Q72000047,Jane Records,,,,20221213,Da Alboom,,,,,,,,greedy-capitalist-number,crid://rabe.ch/v1/test\r\n'
+        ",Artists as string not list,Artists as string not list,,Station Name,19930301,00:01.00,17:17:17,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
     )
     # pylint: enable=line-too-long
     mock_cridlib_get.assert_has_calls(

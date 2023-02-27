@@ -491,7 +491,10 @@ def get_csv(data, station_name=""):
 
         ts_date = timestamp.strftime("%Y%m%d")
         ts_time = timestamp.strftime("%H:%M:%S")
-        duration = timedelta(seconds=metadata.get("played_duration"))
+        hours, remainder = divmod(metadata.get("played_duration"), 60 * 60)
+        minutes, seconds = divmod(remainder, 60)
+        # required format of duration field: hh:mm.ss
+        duration = f"{hours:02}:{minutes:02}.{seconds:02}"
 
         try:
             music = metadata.get("music")[0]
