@@ -264,9 +264,18 @@ def test_get_csv(mock_cridlib_get):
                 "played_duration": 60,
                 "custom_files": [
                     {
+                        "acrid": "a4",
                         "artists": "Artists as string not list",
                     }
                 ],
+            }
+        },
+        {
+            "metadata": {
+                "timestamp_local": "1993-03-01 18:18:18",
+                "timestamp_utc": "1993-03-01 18:18:18",
+                "played_duration": 71337,
+                "music": [{"title": "Long Playing", "acrid": "a5"}],
             }
         },
     ]
@@ -278,6 +287,7 @@ def test_get_csv(mock_cridlib_get):
         'Meme Dub,Da Composah,Da Gang,,Station Name,19930301,00:01.00,13:37:00,,AA6Q72000047,,,,,,"album, but string",,,,,,,,,crid://rabe.ch/v1/test\r\n'
         'Bubbles,"Mary\'s Surprise Act, Climmy Jiff","Mary\'s Surprise Act, Climmy Jiff",,Station Name,19930301,00:01.00,16:20:00,,AA6Q72000047,Jane Records,,,,20221213,Da Alboom,,,,,,,,greedy-capitalist-number,crid://rabe.ch/v1/test\r\n'
         ",Artists as string not list,Artists as string not list,,Station Name,19930301,00:01.00,17:17:17,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
+        "Long Playing,,,,Station Name,19930301,19:48.57,18:18:18,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
     )
     # pylint: enable=line-too-long
     mock_cridlib_get.assert_has_calls(
@@ -293,6 +303,14 @@ def test_get_csv(mock_cridlib_get):
             call(
                 timestamp=datetime(1993, 3, 1, 16, 20, tzinfo=timezone.utc),
                 fragment="acrid=a3",
+            ),
+            call(
+                timestamp=datetime(1993, 3, 1, 17, 17, 17, tzinfo=timezone.utc),
+                fragment="acrid=a4",
+            ),
+            call(
+                timestamp=datetime(1993, 3, 1, 18, 18, 18, tzinfo=timezone.utc),
+                fragment="acrid=a5",
             ),
         ]
     )
