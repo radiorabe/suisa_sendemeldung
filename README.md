@@ -41,7 +41,7 @@ usage: suisa_sendemeldung.py [-h] --bearer-token BEARER_TOKEN --project-id PROJE
                              [--email_login EMAIL_LOGIN] [--email_pass EMAIL_PASS] [--email_subject EMAIL_SUBJECT]
                              [--email_text EMAIL_TEXT] [--email-footer EMAIL_FOOTER] --responsible-email
                              RESPONSIBLE_EMAIL [--start_date START_DATE] [--end_date END_DATE] [--last_month]
-                             [--timezone TIMEZONE] [--locale LOCALE] [--filename FILENAME] [--stdout]
+                             --timezone TIMEZONE [--locale LOCALE] [--filename FILENAME] [--stdout]
 
 ACRCloud client for SUISA reporting @ RaBe.
 

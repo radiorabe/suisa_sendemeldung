@@ -247,6 +247,7 @@ def get_arguments(parser: ArgumentParser):  # pragma: no cover
         "--timezone",
         env_var="TIMEZONE",
         help="set the timezone for localization",
+        required=True,
         default="UTC",
     )
     parser.add_argument(
