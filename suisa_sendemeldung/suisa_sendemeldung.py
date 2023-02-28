@@ -580,7 +580,18 @@ def get_xlsx(data, station_name=""):
         worksheet.append(row)
 
     # the columns that should be styled as required (grey background)
-    required = ["A", "B", "C", "F", "G", "H", "I", "K", "W", "Y"]
+    required_columns = [
+        "Titel",
+        "Komponist",
+        "Interpret",
+        "Sendedatum",
+        "Sendedauer",
+        "Sendezeit",
+        "ISRC",
+        "Label",
+        "Label Code",
+        "Identifikationsnummer",
+    ]
     font = Font(name="Calibri", bold=True, size=12)
     side = Side(border_style="thick", color="000000")
     border = Border(top=side, left=side, right=side, bottom=side)
@@ -588,10 +599,10 @@ def get_xlsx(data, station_name=""):
     for cell in worksheet[1]:  # xlsx is 1-indexed
         cell.font = font
         cell.border = border
-        if cell.column_letter in required:
+        if cell.value in required_columns:
             cell.fill = fill
 
-    # POST PROCESSING
+    # Try to approximate the required width by finding the longest values per column
     dims = {}
     for row in worksheet.rows:
         for cell in row:
@@ -599,8 +610,10 @@ def get_xlsx(data, station_name=""):
                 dims[cell.column_letter] = max(
                     (dims.get(cell.column_letter, 0), len(str(cell.value)))
                 )
+    # apply estimated width to each column
+    padding = 3
     for col, value in dims.items():
-        worksheet.column_dimensions[col].width = value + 3
+        worksheet.column_dimensions[col].width = value + padding
 
     workbook.save(xlsx)
     return xlsx
