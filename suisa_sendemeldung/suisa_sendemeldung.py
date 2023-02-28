@@ -760,7 +760,7 @@ def main():  # pragma: no cover
                     start_date - timedelta(days=365), format="yyyy", locale=args.locale
                 ),
                 "in_three_months": format_date(
-                    end_date + relativedelta(months=+3),
+                    datetime.now() + relativedelta(months=+3),
                     format="long",
                     locale=args.locale,
                 ),
