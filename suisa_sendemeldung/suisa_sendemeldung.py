@@ -202,8 +202,8 @@ def get_arguments(parser: ArgumentParser):  # pragma: no cover
     parser.add_argument(
         "--email_subject",
         env_var="EMAIL_SUBJECT",
-        help="the subject of the email",
-        default="SUISA Sendemeldung",
+        help="The subject of the email, placeholders are $station_name, $year and $month",
+        default="SUISA Sendemeldung von $station_name für $year-$month",
     )
     parser.add_argument(
         "--email_text",
@@ -729,7 +729,13 @@ def main():  # pragma: no cover
     elif args.filetype == "csv":
         data = get_csv(data, station_name=args.station_name)
     if args.email:
-        email_subject = start_date.strftime(args.email_subject)
+        email_subject = Template(args.email_subject).substitute(
+            {
+                "station_name": args.station_name,
+                "year": format_date(start_date, format="yyyy", locale=args.locale),
+                "month": format_date(start_date, format="MM", locale=args.locale),
+            }
+        )
         # generate body
         text = Template(args.email_text).substitute(
             {
