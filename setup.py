@@ -13,6 +13,8 @@ setup(
     author="RaBe IT-Reaktion",
     author_email="it@rabe.ch",
     license="MIT",
+    setup_requires=["setuptools_scm"],
+    use_scm_version=True,
     install_requires=requirements,
     packages=["suisa_sendemeldung"],
     entry_points={
