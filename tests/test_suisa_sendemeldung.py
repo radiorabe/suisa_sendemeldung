@@ -222,7 +222,7 @@ def test_get_csv(mock_cridlib_get):
                             ]
                         },
                         "release_date": "2023",
-                        "external_ids": {"isrc": "AA6Q72000047"},
+                        "external_ids": {"isrc": "DEZ650710376"},
                     }
                 ],
             }
@@ -248,7 +248,7 @@ def test_get_csv(mock_cridlib_get):
                                 "name": "Climmy Jiff",
                             },
                         ],
-                        "isrc": "AA6Q72000047",
+                        "isrc": "DEZ650710376",
                         "label": "Jane Records",
                         "external_ids": {
                             "upc": "greedy-capitalist-number",
@@ -284,8 +284,8 @@ def test_get_csv(mock_cridlib_get):
     assert csv == (
         "Titel,Komponist,Interpret,Interpreten-Info,Sender,Sendedatum,Sendedauer,Sendezeit,Werkverzeichnisangaben,ISRC,Label,CD ID / Katalog-Nummer,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Titel des Tonträgers (Albumtitel),Autor Text,Track Nummer,Genre,Programm,Bestellnummer,Marke,Label Code,EAN/GTIN,Identifikationsnummer\r\n"
         "Uhrenvergleich,,,,Station Name,19930301,00:01:00,13:12:00,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
-        'Meme Dub,Da Composah,Da Gang,,Station Name,19930301,00:01:00,13:37:00,,AA6Q72000047,,,,,,"album, but string",,,,,,,,,crid://rabe.ch/v1/test\r\n'
-        'Bubbles,"Mary\'s Surprise Act, Climmy Jiff","Mary\'s Surprise Act, Climmy Jiff",,Station Name,19930301,00:01:00,16:20:00,,AA6Q72000047,Jane Records,,,,20221213,Da Alboom,,,,,,,,greedy-capitalist-number,crid://rabe.ch/v1/test\r\n'
+        'Meme Dub,Da Composah,Da Gang,,Station Name,19930301,00:01:00,13:37:00,,DEZ650710376,,,,,,"album, but string",,,,,,,,,crid://rabe.ch/v1/test\r\n'
+        'Bubbles,"Mary\'s Surprise Act, Climmy Jiff","Mary\'s Surprise Act, Climmy Jiff",,Station Name,19930301,00:01:00,16:20:00,,DEZ650710376,Jane Records,,,,20221213,Da Alboom,,,,,,,,greedy-capitalist-number,crid://rabe.ch/v1/test\r\n'
         ",Artists as string not list,Artists as string not list,,Station Name,19930301,00:01:00,17:17:17,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
         "Long Playing,,,,Station Name,19930301,19:48:57,18:18:18,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
     )
@@ -429,15 +429,15 @@ def test_send_message():
 @mark.parametrize(
     "test_music,expected",
     [
-        ({"external_ids": {"isrc": "AA6Q72000047"}}, "AA6Q72000047"),
-        ({"external_ids": {"isrc": ["AA6Q72000047"]}}, "AA6Q72000047"),
-        ({"external_ids": {"isrc": "AA 6Q7 20 00047"}}, "AA6Q72000047"),
-        ({"external_ids": {"isrc": "ISRCAA6Q72000047"}}, "AA6Q72000047"),
+        ({"external_ids": {"isrc": "DEZ650710376"}}, "DEZ650710376"),
+        ({"external_ids": {"isrc": ["DEZ650710376"]}}, "DEZ650710376"),
+        ({"external_ids": {"isrc": "DE Z65 07 10376"}}, "DEZ650710376"),
+        ({"external_ids": {"isrc": "ISRCDEZ650710376"}}, "DEZ650710376"),
         ({"external_ids": {"isrc": "123456789-1"}}, ""),
-        ({"isrc": "AA6Q72000047"}, "AA6Q72000047"),
-        ({"isrc": ["AA6Q72000047"]}, "AA6Q72000047"),
-        ({"isrc": "ISRCAA6Q72000047"}, "AA6Q72000047"),
-        ({"isrc": "AA 6Q7 20 00047"}, "AA6Q72000047"),
+        ({"isrc": "DEZ650710376"}, "DEZ650710376"),
+        ({"isrc": ["DEZ650710376"]}, "DEZ650710376"),
+        ({"isrc": "ISRCDEZ650710376"}, "DEZ650710376"),
+        ({"isrc": "DE Z65 07 10376"}, "DEZ650710376"),
         ({"isrc": "123456789-1"}, ""),
     ],
 )
