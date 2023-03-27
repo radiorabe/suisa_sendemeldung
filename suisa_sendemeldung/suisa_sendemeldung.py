@@ -503,7 +503,13 @@ def get_csv(data, station_name=""):
 
         composer = ", ".join(music.get("contributors", {}).get("composers", ""))
         if not composer:
-            composer = artist
+            creators = []
+            for work in music.get("works", []):
+                for creator in work.get("creators", []):
+                    name = creator.get("name", "")
+                    if name:
+                        creators.append(name)
+            composer = ", ".join(creators)
 
         isrc = get_isrc(music)
         label = music.get("label")
