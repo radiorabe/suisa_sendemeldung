@@ -3,6 +3,7 @@ from datetime import date, datetime, timedelta
 
 import pytz
 from acrclient import Client
+from requests.exceptions import HTTPError
 from tqdm import tqdm
 
 
@@ -112,3 +113,22 @@ class ACRClient(Client):
                     data.remove(entry)
 
         return data
+
+    # FIXME: naming of the function is debatable
+    # FIXME: servers sometimes responds with 500 while it works a few minutes later
+    def get_external_metadata(self, acrid):
+        params = {"acr_id": acrid, "include_works": 1}
+        response = {}
+        try:
+            response = self.json(path="/api/external-metadata/tracks", params=params)
+        except HTTPError as e:
+            print(f"1: {e.request.url}")
+            try:
+                response = self.json(
+                    path="/api/external-metadata/tracks", params=params
+                )
+            except HTTPError as e:
+                print(f"2: {e.request.url}")
+                pass
+
+        return response
