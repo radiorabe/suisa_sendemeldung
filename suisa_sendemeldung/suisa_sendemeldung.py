@@ -376,7 +376,10 @@ def funge_release_date(release_date: str = ""):
 
     if len(release_date) == 10:
         # we can make it look like what suisa has in their examples if it's the right length
-        return datetime.strptime(release_date, "%Y-%m-%d").strftime("%Y%m%d")
+        try:
+            return datetime.strptime(release_date, "%Y-%m-%d").strftime("%Y%m%d")
+        except ValueError:
+            return ""
     # we discard other records since there is no way to convert records like a plain
     # year into dd/mm/yyyy properly without further guidance from whomever ingests
     # the data, in some cases this means we discard data that only contain a year
@@ -437,6 +440,25 @@ def get_isrc(music):
     if not ISRC.validate(isrc):
         isrc = ""
     return isrc
+
+
+def get_composer(acrid):
+    composers = []
+    external_metadata = client.get_external_metadata(acrid=acrid)
+    for data in external_metadata.get("data", []):
+        for work in data.get("works", []):
+            for contributor in work.get("contributors", []):
+                if "Composer" in contributor.get("roles", []):
+                    c = contributor.get("name")
+                    c = f"{c} (Composer)"
+                    if c not in composers:
+                        composers.append(c)
+                elif "Writer" in contributor.get("roles", []):
+                    w = contributor.get("name")
+                    w = f"{w} (Writer)"
+                    if w not in composers:
+                        composers.append(w)
+    return ", ".join(composers)
 
 
 # all local vars are required, eight are already used for the csv entries
@@ -501,9 +523,7 @@ def get_csv(data, station_name=""):
 
         artist = get_artist(music)
 
-        composer = ", ".join(music.get("contributors", {}).get("composers", ""))
-        if not composer:
-            composer = artist
+        composer = get_composer(music["acrid"])
 
         isrc = get_isrc(music)
         label = music.get("label")
@@ -729,6 +749,7 @@ def main():  # pragma: no cover
     start_date, end_date = parse_date(args)
     filename = parse_filename(args, start_date)
 
+    global client
     client = ACRClient(bearer_token=args.bearer_token)
     data = client.get_interval_data(
         args.project_id, args.stream_id, start_date, end_date, timezone=args.timezone
