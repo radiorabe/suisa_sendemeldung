@@ -4,7 +4,7 @@ iso3901==0.3.0.post1
 openpyxl==3.1.2
 pytz==2022.7.1
 requests==2.28.2
-rabe-cridlib==0.6.0
+rabe-cridlib==0.7.0
 dateutils==0.6.12
 tqdm==4.65.0
 Babel==2.12.1
