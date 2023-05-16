@@ -376,7 +376,10 @@ def funge_release_date(release_date: str = ""):
 
     if len(release_date) == 10:
         # we can make it look like what suisa has in their examples if it's the right length
-        return datetime.strptime(release_date, "%Y-%m-%d").strftime("%Y%m%d")
+        try:
+            return datetime.strptime(release_date, "%Y-%m-%d").strftime("%Y%m%d")
+        except ValueError:
+            return ""
     # we discard other records since there is no way to convert records like a plain
     # year into dd/mm/yyyy properly without further guidance from whomever ingests
     # the data, in some cases this means we discard data that only contain a year
