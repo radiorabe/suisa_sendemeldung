@@ -15,5 +15,5 @@ pytest-env==0.8.1
 pytest-pylint==0.19.0
 requests-mock==1.10.0
 twine==4.0.2
-types-requests==2.29.0.0
+types-requests==2.30.0.0
 wheel==0.40.0
