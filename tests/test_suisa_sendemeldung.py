@@ -179,6 +179,19 @@ def test_merge_duplicates():
     assert results[0]["metadata"]["played_duration"] == 20
 
 
+@mark.parametrize(
+    "test_date,expected",
+    [
+        ("0000-00-00", ""),
+    ],
+)
+def test_funge_release_date(test_date, expected):
+    """Test funge_release_date."""
+
+    results = suisa_sendemeldung.funge_release_date(test_date)
+    assert results == expected
+
+
 @patch("cridlib.get")
 def test_get_csv(mock_cridlib_get):
     """Test get_csv."""
