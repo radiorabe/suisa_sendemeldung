@@ -291,6 +291,38 @@ def test_get_csv(mock_cridlib_get):
                 "music": [{"title": "Long Playing", "acrid": "a5"}],
             }
         },
+        {
+            "metadata": {
+                "timestamp_local": "1993-03-01 18:18:18",
+                "timestamp_utc": "1993-03-01 18:18:18",
+                "played_duration": 71337,
+                "music": [
+                    {
+                        "title": "composer in works",
+                        "acrid": "a6",
+                        "works": [{"creators": [{"name": "Worker", "role": "W"}]}],
+                    }
+                ],
+            }
+        },
+        {
+            "metadata": {
+                "timestamp_local": "1993-03-01 18:18:18",
+                "timestamp_utc": "1993-03-01 18:18:18",
+                "played_duration": 71337,
+                "music": [
+                    {
+                        "title": "composer better in works",
+                        "artists": [{"name": "same"}],
+                        "contributors": {
+                            "composers": ["same"],
+                        },
+                        "acrid": "a6",
+                        "works": [{"creators": [{"name": "composer", "role": "C"}]}],
+                    }
+                ],
+            }
+        },
     ]
     csv = suisa_sendemeldung.get_csv(data, station_name="Station Name")
     # pylint: disable=line-too-long
@@ -298,9 +330,11 @@ def test_get_csv(mock_cridlib_get):
         "Titel,Komponist,Interpret,Interpreten-Info,Sender,Sendedatum,Sendedauer,Sendezeit,Werkverzeichnisangaben,ISRC,Label,CD ID / Katalog-Nummer,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Titel des Tonträgers (Albumtitel),Autor Text,Track Nummer,Genre,Programm,Bestellnummer,Marke,Label Code,EAN/GTIN,Identifikationsnummer\r\n"
         "Uhrenvergleich,,,,Station Name,19930301,00:01:00,13:12:00,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
         'Meme Dub,Da Composah,Da Gang,,Station Name,19930301,00:01:00,13:37:00,,DEZ650710376,,,,,,"album, but string",,,,,,,,,crid://rabe.ch/v1/test\r\n'
-        'Bubbles,"Mary\'s Surprise Act, Climmy Jiff","Mary\'s Surprise Act, Climmy Jiff",,Station Name,19930301,00:01:00,16:20:00,,DEZ650710376,Jane Records,,,,20221213,Da Alboom,,,,,,,,greedy-capitalist-number,crid://rabe.ch/v1/test\r\n'
-        ",Artists as string not list,Artists as string not list,,Station Name,19930301,00:01:00,17:17:17,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
+        'Bubbles,,"Mary\'s Surprise Act, Climmy Jiff",,Station Name,19930301,00:01:00,16:20:00,,DEZ650710376,Jane Records,,,,20221213,Da Alboom,,,,,,,,greedy-capitalist-number,crid://rabe.ch/v1/test\r\n'
+        ",,Artists as string not list,,Station Name,19930301,00:01:00,17:17:17,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
         "Long Playing,,,,Station Name,19930301,19:48:57,18:18:18,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
+        "composer in works,Worker,,,Station Name,19930301,19:48:57,18:18:18,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
+        "composer better in works,composer,same,,Station Name,19930301,19:48:57,18:18:18,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
     )
     # pylint: enable=line-too-long
     mock_cridlib_get.assert_has_calls(
