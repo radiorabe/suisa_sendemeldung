@@ -2,8 +2,11 @@
 from datetime import date, datetime, timezone
 from email.message import Message
 from io import BytesIO
+from pathlib import Path
 from unittest.mock import call, patch
+from urllib.parse import urlparse
 
+import requests_mock
 from configargparse import ArgumentParser
 from freezegun import freeze_time
 from openpyxl import load_workbook
@@ -16,10 +19,6 @@ def test_validate_arguments():
     """Test validate_arguments."""
 
     args = ArgumentParser()
-    # length of bearer_token should be 32 or more chars long
-    args.bearer_token = "iamclearlynotthirtytwocharslong"
-    # check length of stream_id
-    args.stream_id = "iamnot9chars"
     # one output option has to be set (but none is)
     args.file = False
     args.email = False
@@ -31,8 +30,6 @@ def test_validate_arguments():
         suisa_sendemeldung.validate_arguments(mock, args)
         mock.error.assert_called_once_with(
             "\n"
-            "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"
-            "- wrong format on stream_id, expected 9 characters but got 12\n"
             "- no output option has been set, specify one of --file, --email or --stdout\n"
             "- argument --last_month not allowed with --start_date or --end_date"
         )
@@ -43,8 +40,6 @@ def test_validate_arguments():
         suisa_sendemeldung.validate_arguments(mock, args)
         mock.error.assert_called_once_with(
             "\n"
-            "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"
-            "- wrong format on stream_id, expected 9 characters but got 12\n"
             "- xlsx cannot be printed to stdout, please set --filetype to csv\n"
             "- argument --last_month not allowed with --start_date or --end_date"
         )
@@ -199,7 +194,11 @@ def test_get_csv(mock_cridlib_get):
 
     # empty data
     data = []
-    csv = suisa_sendemeldung.get_csv(data)
+    with requests_mock.Mocker() as mock:
+        mock.get(requests_mock.ANY, json={})
+        csv = suisa_sendemeldung.get_csv(
+            data, minio_url="http://minio.example.org/acrcloud.music/"
+        )
     # pylint: disable=line-too-long
     assert csv == (
         "Titel,Komponist,Interpret,Interpreten-Info,Sender,Sendedatum,Sendedauer,Sendezeit,Werkverzeichnisangaben,ISRC,Label,CD ID / Katalog-Nummer,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Titel des Tonträgers (Albumtitel),Autor Text,Track Nummer,Genre,Programm,Bestellnummer,Marke,Label Code,EAN/GTIN,Identifikationsnummer\r\n"
@@ -209,13 +208,69 @@ def test_get_csv(mock_cridlib_get):
 
     # bunch of data
     mock_cridlib_get.reset_mock()
+    musics = {
+        "a1": {"title": "Uhrenvergleich", "acrid": "a1"},
+        "a2": {
+            "acrid": "a2",
+            "title": "Meme Dub",
+            "artist": "Da Gang",
+            "album": "album, but string",
+            "contributors": {
+                "composers": [
+                    "Da Composah",
+                ]
+            },
+            "release_date": "2023",
+            "external_ids": {"isrc": "DEZ650710376"},
+        },
+        "a3": {
+            "acrid": "a3",
+            "title": "Bubbles",
+            "album": {
+                "name": "Da Alboom",
+            },
+            "release_date": "2022-12-13",
+            "artists": [
+                {
+                    "name": "Mary's Surprise Act",
+                },
+                {
+                    "name": "Climmy Jiff",
+                },
+            ],
+            "isrc": "DEZ650710376",
+            "label": "Jane Records",
+            "external_ids": {
+                "upc": "greedy-capitalist-number",
+            },
+        },
+        "a4": {
+            "acrid": "a4",
+            "artists": "Artists as string not list",
+        },
+        "a5": {"title": "Long Playing", "acrid": "a5"},
+        "a6": {
+            "title": "composer in works",
+            "acrid": "a6",
+            "works": [{"creators": [{"name": "Worker", "role": "W"}]}],
+        },
+        "a7": {
+            "title": "composer better in works",
+            "artists": [{"name": "same"}],
+            "contributors": {
+                "composers": ["same"],
+            },
+            "acrid": "a7",
+            "works": [{"creators": [{"name": "composer", "role": "C"}]}],
+        },
+    }
     data = [
         {
             "metadata": {
                 "timestamp_local": "1993-03-01 13:12:00",
                 "timestamp_utc": "1993-03-01 13:12:00",
                 "played_duration": 60,
-                "music": [{"title": "Uhrenvergleich", "acrid": "a1"}],
+                "music": [musics.get("a1")],
             }
         },
         {
@@ -223,21 +278,7 @@ def test_get_csv(mock_cridlib_get):
                 "timestamp_local": "1993-03-01 13:37:00",
                 "timestamp_utc": "1993-03-01 13:37:00",
                 "played_duration": 60,
-                "custom_files": [
-                    {
-                        "acrid": "a2",
-                        "title": "Meme Dub",
-                        "artist": "Da Gang",
-                        "album": "album, but string",
-                        "contributors": {
-                            "composers": [
-                                "Da Composah",
-                            ]
-                        },
-                        "release_date": "2023",
-                        "external_ids": {"isrc": "DEZ650710376"},
-                    }
-                ],
+                "custom_files": [musics.get("a2")],
             }
         },
         {
@@ -245,29 +286,7 @@ def test_get_csv(mock_cridlib_get):
                 "timestamp_local": "1993-03-01 16:20:00",
                 "timestamp_utc": "1993-03-01 16:20:00",
                 "played_duration": 60,
-                "music": [
-                    {
-                        "acrid": "a3",
-                        "title": "Bubbles",
-                        "album": {
-                            "name": "Da Alboom",
-                        },
-                        "release_date": "2022-12-13",
-                        "artists": [
-                            {
-                                "name": "Mary's Surprise Act",
-                            },
-                            {
-                                "name": "Climmy Jiff",
-                            },
-                        ],
-                        "isrc": "DEZ650710376",
-                        "label": "Jane Records",
-                        "external_ids": {
-                            "upc": "greedy-capitalist-number",
-                        },
-                    }
-                ],
+                "music": [musics.get("a3")],
             }
         },
         {
@@ -275,12 +294,7 @@ def test_get_csv(mock_cridlib_get):
                 "timestamp_local": "1993-03-01 17:17:17",
                 "timestamp_utc": "1993-03-01 17:17:17",
                 "played_duration": 60,
-                "custom_files": [
-                    {
-                        "acrid": "a4",
-                        "artists": "Artists as string not list",
-                    }
-                ],
+                "custom_files": [musics.get("a4")],
             }
         },
         {
@@ -288,7 +302,7 @@ def test_get_csv(mock_cridlib_get):
                 "timestamp_local": "1993-03-01 18:18:18",
                 "timestamp_utc": "1993-03-01 18:18:18",
                 "played_duration": 71337,
-                "music": [{"title": "Long Playing", "acrid": "a5"}],
+                "music": [musics.get("a5")],
             }
         },
         {
@@ -296,13 +310,7 @@ def test_get_csv(mock_cridlib_get):
                 "timestamp_local": "1993-03-01 18:18:18",
                 "timestamp_utc": "1993-03-01 18:18:18",
                 "played_duration": 71337,
-                "music": [
-                    {
-                        "title": "composer in works",
-                        "acrid": "a6",
-                        "works": [{"creators": [{"name": "Worker", "role": "W"}]}],
-                    }
-                ],
+                "music": [musics.get("a6")],
             }
         },
         {
@@ -310,21 +318,20 @@ def test_get_csv(mock_cridlib_get):
                 "timestamp_local": "1993-03-01 18:18:18",
                 "timestamp_utc": "1993-03-01 18:18:18",
                 "played_duration": 71337,
-                "music": [
-                    {
-                        "title": "composer better in works",
-                        "artists": [{"name": "same"}],
-                        "contributors": {
-                            "composers": ["same"],
-                        },
-                        "acrid": "a6",
-                        "works": [{"creators": [{"name": "composer", "role": "C"}]}],
-                    }
-                ],
+                "music": [musics.get("a7")],
             }
         },
     ]
-    csv = suisa_sendemeldung.get_csv(data, station_name="Station Name")
+    with requests_mock.Mocker() as mock:
+        mock.get(
+            requests_mock.ANY,
+            json=lambda req, _: musics.get(Path(urlparse(req.url).path).stem, {}),
+        )
+        csv = suisa_sendemeldung.get_csv(
+            data,
+            station_name="Station Name",
+            minio_url="http://minio.example.org/acrcloud.music/",
+        )
     # pylint: disable=line-too-long
     assert csv == (
         "Titel,Komponist,Interpret,Interpreten-Info,Sender,Sendedatum,Sendedauer,Sendezeit,Werkverzeichnisangaben,ISRC,Label,CD ID / Katalog-Nummer,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Titel des Tonträgers (Albumtitel),Autor Text,Track Nummer,Genre,Programm,Bestellnummer,Marke,Label Code,EAN/GTIN,Identifikationsnummer\r\n"

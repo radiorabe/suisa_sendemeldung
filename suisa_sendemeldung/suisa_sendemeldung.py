@@ -20,6 +20,7 @@ from string import Template
 
 import cridlib
 import pytz
+import requests
 from babel.dates import format_date
 from configargparse import ArgumentParser
 from dateutil.relativedelta import relativedelta
@@ -89,21 +90,6 @@ def validate_arguments(parser, args):
         args: the arguments to validate
     """
     msgs = []
-    # check length of bearer_token
-    if not len(args.bearer_token) >= 32:
-        msgs.append(
-            "".join(
-                (
-                    "wrong format on bearer_token, ",
-                    f"expected larger than 32 characters but got {len(args.bearer_token)}",
-                )
-            )
-        )
-    # check length of stream_id
-    if not len(args.stream_id) == 9:
-        msgs.append(
-            f"wrong format on stream_id, expected 9 characters but got {len(args.stream_id)}"
-        )
     # one output option has to be set
     if not (args.file or args.email or args.stdout):
         msgs.append(
@@ -130,22 +116,25 @@ def get_arguments(parser: ArgumentParser):  # pragma: no cover
         args: the parsed args from the parser
     """
     parser.add_argument(
-        "--bearer-token",
-        env_var="BEARER_TOKEN",
-        help="the bearer token for ACRCloud (required)",
-        required=True,
+        "--minio",
+        dest="minio",
+        env_var="MINIO",
+        help="URL to MinIO",
+        default="https://minio.service.int.rabe.ch:9000",
     )
     parser.add_argument(
-        "--project-id",
-        env_var="PROJECT_ID",
-        help="the id of the project at ACRCloud (required)",
-        required=True,
+        "--minio-raw-bucket",
+        dest="minio_raw",
+        env_var="MINIO_RAW_BUCKET",
+        help="world readable bucket with daily data exports from ACRCloud",
+        default="acrcloud.raw",
     )
     parser.add_argument(
-        "--stream-id",
-        env_var="STREAM_ID",
-        help="the id of the stream at ACRCloud (required)",
-        required=True,
+        "--minio-music-bucket",
+        dest="minio_music",
+        env_var="MINIO_MUSIC_BUCKET",
+        help="world readable bucket with deduplicated music info",
+        default="acrcloud.music",
     )
     parser.add_argument(
         "--station-name",
@@ -444,7 +433,7 @@ def get_isrc(music):
 
 # all local vars are required, eight are already used for the csv entries
 # pylint: disable-msg=too-many-locals
-def get_csv(data, station_name=""):
+def get_csv(data, station_name="", minio_url=""):
     """Create SUISA compatible csv data.
 
     Arguments:
@@ -498,6 +487,12 @@ def get_csv(data, station_name=""):
 
         try:
             music = metadata.get("music")[0]
+            url = f"{minio_url}{music.get('acrid')}"
+            resp = requests.get(url, timeout=10)
+            if resp.ok:
+                music = resp.json()
+            else:  # pragma: no cover
+                raise RuntimeError(f"💀 failed to load data from {url}")
         except TypeError:
             music = metadata.get("custom_files")[0]
         title = music.get("title")
@@ -574,7 +569,7 @@ def get_csv(data, station_name=""):
     return csv.getvalue()
 
 
-def get_xlsx(data, station_name=""):
+def get_xlsx(data, station_name="", minio_url=""):
     """Create SUISA compatible xlsx data.
 
     Arguments:
@@ -583,7 +578,7 @@ def get_xlsx(data, station_name=""):
     Returns:
         xlsx: The converted data as BytesIO object
     """
-    csv = get_csv(data, station_name=station_name)
+    csv = get_csv(data, station_name=station_name, minio_url=minio_url)
     csv_reader = reader(StringIO(csv))
 
     xlsx = BytesIO()
@@ -745,16 +740,16 @@ def main():  # pragma: no cover
 
     start_date, end_date = parse_date(args)
     filename = parse_filename(args, start_date)
+    minio_raw_url = f"{args.minio}/{args.minio_raw}/"
+    minio_music_url = f"{args.minio}/{args.minio_music}/"
 
-    client = ACRClient(bearer_token=args.bearer_token)
-    data = client.get_interval_data(
-        args.project_id, args.stream_id, start_date, end_date, timezone=args.timezone
-    )
+    client = ACRClient(minio_url=minio_raw_url, timezone=args.timezone)
+    data = client.get_interval_data(start_date, end_date)
     data = merge_duplicates(data)
     if args.filetype == "xlsx":
-        data = get_xlsx(data, station_name=args.station_name)
+        data = get_xlsx(data, station_name=args.station_name, minio_url=minio_music_url)
     elif args.filetype == "csv":
-        data = get_csv(data, station_name=args.station_name)
+        data = get_csv(data, station_name=args.station_name, minio_url=minio_music_url)
     if args.email:
         email_subject = Template(args.email_subject).substitute(
             {
