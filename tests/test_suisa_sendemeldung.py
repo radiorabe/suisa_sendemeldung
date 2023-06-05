@@ -425,14 +425,14 @@ def test_get_email_attachment():
 def test_create_message():
     """Test create_message."""
     sender = "from@example.org"
-    recipient = "long-arm-of-music-industry@example.com"
+    recipient = ["long-arm-of-music-industry@example.com"]
     subject = "subject"
     text = "text"
     filename = "/tmp/filename"
     filetype = "csv"
     data = "data"
-    carbon_copy = "cc@example.org"
-    bcc = "bcc@example.org"
+    carbon_copy = ["cc@example.org"]
+    bcc = ["bcc@example.org", "bcc@example.net"]
 
     msg = suisa_sendemeldung.create_message(
         sender,
@@ -446,10 +446,10 @@ def test_create_message():
         bcc,
     )
     assert msg.get("From") == sender
-    assert msg.get("To") == recipient
+    assert msg.get("To") == recipient[0]
     assert msg.get("Subject") == subject
-    assert msg.get("Cc") == carbon_copy
-    assert msg.get("Bcc") == bcc
+    assert msg.get("Cc") == carbon_copy[0]
+    assert msg.get("Bcc") == "bcc@example.org, bcc@example.net"
 
 
 def test_send_message():
