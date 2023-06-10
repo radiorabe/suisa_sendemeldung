@@ -3,7 +3,7 @@ ConfigArgParse==1.5.3
 iso3901==0.3.0.post1
 openpyxl==3.1.2
 pytz==2023.3
-requests==2.30.0
+requests==2.31.0
 rabe-cridlib==0.7.0
 dateutils==0.6.12
 tqdm==4.65.0
