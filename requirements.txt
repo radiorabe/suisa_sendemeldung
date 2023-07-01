@@ -1,4 +1,4 @@
-acrclient==0.3.0
+acrclient==0.4.1
 ConfigArgParse==1.5.5
 iso3901==0.3.0.post1
 openpyxl==3.1.2
