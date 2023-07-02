@@ -2,5 +2,5 @@
 Dockerfile
 .gitignore
 LICENSE
-README.md
 suisa_sendemeldung.conf
+venv
