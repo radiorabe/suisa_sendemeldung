@@ -4,10 +4,10 @@ on:
   pull_request:
   push:
     branches: [main]
+    tags:
+      - '*'
   release:
     types: [created]
-  tags:
-    - '*'
 
 jobs:
   release-container:
