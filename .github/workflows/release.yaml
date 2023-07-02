@@ -6,6 +6,8 @@ on:
     branches: [main]
   release:
     types: [created]
+  tags:
+    - '*'
 
 jobs:
   release-container:
