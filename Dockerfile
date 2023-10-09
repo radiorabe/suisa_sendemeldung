@@ -5,7 +5,7 @@ COPY --chown=1001:0 ./ /opt/app-root/src/
 RUN python3.11 -m build .
 
 
-FROM ghcr.io/radiorabe/python-minimal:2.0.2 AS app
+FROM ghcr.io/radiorabe/python-minimal:2.0.3 AS app
 
 COPY --from=build /opt/app-root/src/dist/*.whl /tmp/dist/
 
