@@ -490,20 +490,20 @@ files = [
 
 [[package]]
 name = "iso3901"
-version = "0.3.0.post1"
+version = "0.3.1"
 description = "Structured parsing of ISRC (International Standard Recording Code), as defined in ISO 3901:2019"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "iso3901-0.3.0.post1-py3-none-any.whl", hash = "sha256:6f7a6923066c52b2c4e8ae1d64a70ee8881fab445621091d40fbb8dd7e2fc7a3"},
-    {file = "iso3901-0.3.0.post1.tar.gz", hash = "sha256:e1d7345ce5e513e5f670bfb083901576c4cc1f76752df1f5ee9673e2ef459bf9"},
+    {file = "iso3901-0.3.1-py3-none-any.whl", hash = "sha256:a660ed2f6f22c50b153acca20b8b1d373236d9eab990f5d602430ccde6b67257"},
+    {file = "iso3901-0.3.1.tar.gz", hash = "sha256:b85a842cf70eb72159a0b8cc44ba96364d8aecf3b27b6659ca2b4c927416a7d4"},
 ]
 
 [package.dependencies]
-iso3166 = "*"
+iso3166 = ">=2.0,<3.0"
 
 [package.extras]
-dev = ["mypy (>=1.0,<2.0)", "pyright", "pytest", "tox (>=4.0,<5.0)"]
+dev = ["flit (>=3.2,<4.0)", "tox (>=4.0,<5.0)"]
 
 [[package]]
 name = "isort"
