@@ -100,9 +100,9 @@ def validate_arguments(parser, args):
             )
         )
     # check length of stream_id
-    if not len(args.stream_id) == 9:
+    if len(args.stream_id) not in [9, 10]:
         msgs.append(
-            f"wrong format on stream_id, expected 9 characters but got {len(args.stream_id)}"
+            f"wrong format on stream_id, expected 9 or 10 characters but got {len(args.stream_id)}"
         )
     # one output option has to be set
     if not (args.file or args.email or args.stdout):
