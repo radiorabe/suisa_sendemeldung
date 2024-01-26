@@ -1,4 +1,5 @@
 """module containing the ACRCloud client."""
+
 from datetime import date, datetime, timedelta
 
 import pytz
