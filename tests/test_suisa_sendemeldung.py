@@ -1,4 +1,5 @@
 """Test the suisa_sendemeldung.suisa_sendemeldung module."""
+
 from datetime import date, datetime, timezone
 from email.message import Message
 from io import BytesIO

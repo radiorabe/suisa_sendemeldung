@@ -1,4 +1,5 @@
 """Tests for the ACR client module."""
+
 from datetime import date
 
 import requests_mock
