@@ -8,10 +8,12 @@ from tqdm import tqdm
 
 
 class ACRClient(Client):
-    """ACRCloud client to fetch metadata.
+    """ACRCloud client wrapper to fetch metadata.
 
-    Args:
+    Arguments:
+    ---------
         bearer_token: The bearer token for ACRCloud.
+
     """
 
     # format of timestamp in api answer
@@ -24,18 +26,25 @@ class ACRClient(Client):
         self.default_date = date.today() - timedelta(days=1)
 
     def get_data(
-        self, project_id, stream_id, requested_date=None, timezone=ACR_TIMEZONE
+        self,
+        project_id,
+        stream_id,
+        requested_date=None,
+        timezone=ACR_TIMEZONE,
     ):
         """Fetch metadata from ACRCloud for `stream_id`.
 
-        Args:
+        Arguments:
+        ---------
             project_id: The Project ID of the stream.
             stream_id: The ID of the stream.
             requested_date (optional): The date of the entries you want (default: yesterday).
             timezone (optional): The timezone to use for localization.
 
         Returns:
+        -------
             json: The ACR data from date
+
         """
         if requested_date is None:
             requested_date = self.default_date
@@ -49,7 +58,7 @@ class ACRClient(Client):
         for entry in data:
             metadata = entry.get("metadata")
             ts_utc = pytz.utc.localize(
-                datetime.strptime(metadata.get("timestamp_utc"), ACRClient.TS_FMT)
+                datetime.strptime(metadata.get("timestamp_utc"), ACRClient.TS_FMT),
             )
             ts_local = ts_utc.astimezone(pytz.timezone(timezone))
             metadata.update({"timestamp_local": ts_local.strftime(ACRClient.TS_FMT)})
@@ -57,11 +66,17 @@ class ACRClient(Client):
         return data
 
     def get_interval_data(
-        self, project_id, stream_id, start, end, timezone=ACR_TIMEZONE
+        self,
+        project_id,
+        stream_id,
+        start,
+        end,
+        timezone=ACR_TIMEZONE,
     ):  # pylint: disable-msg=too-many-locals,too-many-arguments
         """Get data specified by interval from start to end.
 
-        Args:
+        Arguments:
+        ---------
             project_id: The ID of the project.
             stream_id: The ID of the stream.
             start: The start date of the interval.
@@ -69,7 +84,9 @@ class ACRClient(Client):
             timezone (optional): will be passed to `get_data()`.
 
         Returns:
+        -------
             json: The ACR data from start to end.
+
         """
         trim = False
         # if we have to localize the timestamps we may need more data
@@ -100,7 +117,10 @@ class ACRClient(Client):
         ljust_amount: int = 27
         for ptr in tqdm(dates, desc="load ACRCloud data".ljust(ljust_amount)):
             data += self.get_data(
-                project_id, stream_id, requested_date=ptr, timezone=timezone
+                project_id,
+                stream_id,
+                requested_date=ptr,
+                timezone=timezone,
             )
 
         # if timestamps are localized we will have to removed the unneeded entries.

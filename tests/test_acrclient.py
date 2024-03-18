@@ -50,7 +50,10 @@ def test_get_interval_data():
             json=data,
         )
         acr.get_interval_data(
-            project_id, stream_id, date(1993, 3, 1), date(1993, 3, 31)
+            project_id,
+            stream_id,
+            date(1993, 3, 1),
+            date(1993, 3, 31),
         )
 
     # ahead of UTC
@@ -63,7 +66,11 @@ def test_get_interval_data():
             json=data,
         )
         acr.get_interval_data(
-            project_id, stream_id, date(1993, 3, 1), date(1993, 3, 31), "Europe/Zurich"
+            project_id,
+            stream_id,
+            date(1993, 3, 1),
+            date(1993, 3, 31),
+            "Europe/Zurich",
         )
 
     # behind UTC
@@ -75,5 +82,9 @@ def test_get_interval_data():
             json=data,
         )
         acr.get_interval_data(
-            project_id, stream_id, date(1993, 3, 1), date(1993, 3, 31), "America/Nuuk"
+            project_id,
+            stream_id,
+            date(1993, 3, 1),
+            date(1993, 3, 31),
+            "America/Nuuk",
         )

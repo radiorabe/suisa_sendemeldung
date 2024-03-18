@@ -35,7 +35,7 @@ def test_validate_arguments():
             "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"
             "- wrong format on stream_id, expected 9 or 10 characters but got 12\n"
             "- no output option has been set, specify one of --file, --email or --stdout\n"
-            "- argument --last_month not allowed with --start_date or --end_date"
+            "- argument --last_month not allowed with --start_date or --end_date",
         )
 
     args.stdout = True
@@ -47,7 +47,7 @@ def test_validate_arguments():
             "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"
             "- wrong format on stream_id, expected 9 or 10 characters but got 12\n"
             "- xlsx cannot be printed to stdout, please set --filetype to csv\n"
-            "- argument --last_month not allowed with --start_date or --end_date"
+            "- argument --last_month not allowed with --start_date or --end_date",
         )
 
 
@@ -217,7 +217,7 @@ def test_get_csv(mock_cridlib_get):
                 "timestamp_utc": "1993-03-01 13:12:00",
                 "played_duration": 60,
                 "music": [{"title": "Uhrenvergleich", "acrid": "a1"}],
-            }
+            },
         },
         {
             "metadata": {
@@ -233,13 +233,13 @@ def test_get_csv(mock_cridlib_get):
                         "contributors": {
                             "composers": [
                                 "Da Composah",
-                            ]
+                            ],
                         },
                         "release_date": "2023",
                         "external_ids": {"isrc": "DEZ650710376"},
-                    }
+                    },
                 ],
-            }
+            },
         },
         {
             "metadata": {
@@ -267,9 +267,9 @@ def test_get_csv(mock_cridlib_get):
                         "external_ids": {
                             "upc": "greedy-capitalist-number",
                         },
-                    }
+                    },
                 ],
-            }
+            },
         },
         {
             "metadata": {
@@ -280,9 +280,9 @@ def test_get_csv(mock_cridlib_get):
                     {
                         "acrid": "a4",
                         "artists": "Artists as string not list",
-                    }
+                    },
                 ],
-            }
+            },
         },
         {
             "metadata": {
@@ -290,7 +290,7 @@ def test_get_csv(mock_cridlib_get):
                 "timestamp_utc": "1993-03-01 18:18:18",
                 "played_duration": 71337,
                 "music": [{"title": "Long Playing", "acrid": "a5"}],
-            }
+            },
         },
         {
             "metadata": {
@@ -302,9 +302,9 @@ def test_get_csv(mock_cridlib_get):
                         "title": "composer in works",
                         "acrid": "a6",
                         "works": [{"creators": [{"name": "Worker", "role": "W"}]}],
-                    }
+                    },
                 ],
-            }
+            },
         },
         {
             "metadata": {
@@ -320,9 +320,9 @@ def test_get_csv(mock_cridlib_get):
                         },
                         "acrid": "a6",
                         "works": [{"creators": [{"name": "composer", "role": "C"}]}],
-                    }
+                    },
                 ],
-            }
+            },
         },
     ]
     csv = suisa_sendemeldung.get_csv(data, station_name="Station Name")
@@ -360,7 +360,7 @@ def test_get_csv(mock_cridlib_get):
                 timestamp=datetime(1993, 3, 1, 18, 18, 18, tzinfo=timezone.utc),
                 fragment="acrid=a5",
             ),
-        ]
+        ],
     )
 
 
@@ -400,7 +400,7 @@ def test_get_xlsx():
             "Label Code",
             "EAN/GTIN",
             "Identifikationsnummer",
-        )
+        ),
     ]
     # pylint: enable=duplicate-code
 
@@ -435,7 +435,15 @@ def test_create_message():
     bcc = "bcc@example.org"
 
     msg = suisa_sendemeldung.create_message(
-        sender, recipient, subject, text, filename, filetype, data, carbon_copy, bcc
+        sender,
+        recipient,
+        subject,
+        text,
+        filename,
+        filetype,
+        data,
+        carbon_copy,
+        bcc,
     )
     assert msg.get("From") == sender
     assert msg.get("To") == recipient

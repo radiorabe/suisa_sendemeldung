@@ -1,11 +1,12 @@
-#!/usr/bin/env python3
-"""
-SUISA Sendemeldung bugs SUISA with email once per month.
+"""SUISA Sendemeldung bugs SUISA with email once per month.
 
 Fetches data on our playout history and formats them in a CSV file format
 containing the data (like Track, Title and ISRC) requested by SUISA. Also takes care of sending
 the report to SUISA via email for hands-off operations.
 """
+
+from __future__ import annotations
+
 from csv import reader, writer
 from datetime import date, datetime, timedelta
 from email.encoders import encode_base64
@@ -85,8 +86,10 @@ def validate_arguments(parser, args):
     After this function we are sure that there are no conflicts in the arguments.
 
     Arguments:
+    ---------
         parser: the ArgumentParser to use for throwing errors
         args: the arguments to validate
+
     """
     msgs = []
     # check length of bearer_token
@@ -96,18 +99,18 @@ def validate_arguments(parser, args):
                 (
                     "wrong format on bearer_token, ",
                     f"expected larger than 32 characters but got {len(args.bearer_token)}",
-                )
-            )
+                ),
+            ),
         )
     # check length of stream_id
     if len(args.stream_id) not in [9, 10]:
         msgs.append(
-            f"wrong format on stream_id, expected 9 or 10 characters but got {len(args.stream_id)}"
+            f"wrong format on stream_id, expected 9 or 10 characters but got {len(args.stream_id)}",
         )
     # one output option has to be set
     if not (args.file or args.email or args.stdout):
         msgs.append(
-            "no output option has been set, specify one of --file, --email or --stdout"
+            "no output option has been set, specify one of --file, --email or --stdout",
         )
     # xlsx cannot be printed to stdout
     if args.stdout and args.filetype == "xlsx":
@@ -124,10 +127,13 @@ def get_arguments(parser: ArgumentParser):  # pragma: no cover
     """Create :class:`ArgumentParser` with arguments.
 
     Arguments:
+    ---------
         parser: the parser to add arguments
 
     Returns:
+    -------
         args: the parsed args from the parser
+
     """
     parser.add_argument(
         "--bearer-token",
@@ -160,7 +166,10 @@ def get_arguments(parser: ArgumentParser):  # pragma: no cover
         default="rabe",
     )
     parser.add_argument(
-        "--file", env_var="FILE", help="create file", action="store_true"
+        "--file",
+        env_var="FILE",
+        help="create file",
+        action="store_true",
     )
     parser.add_argument(
         "--filetype",
@@ -170,19 +179,30 @@ def get_arguments(parser: ArgumentParser):  # pragma: no cover
         default="xlsx",
     )
     parser.add_argument(
-        "--email", env_var="EMAIL", help="send an email", action="store_true"
+        "--email",
+        env_var="EMAIL",
+        help="send an email",
+        action="store_true",
     )
     parser.add_argument(
-        "--email-from", env_var="EMAIL_FROM", help="the sender of the email"
+        "--email-from",
+        env_var="EMAIL_FROM",
+        help="the sender of the email",
     )
     parser.add_argument(
-        "--email-to", env_var="EMAIL_TO", help="the recipients of the email"
+        "--email-to",
+        env_var="EMAIL_TO",
+        help="the recipients of the email",
     )
     parser.add_argument(
-        "--email-cc", env_var="EMAIL_CC", help="the cc recipients of the email"
+        "--email-cc",
+        env_var="EMAIL_CC",
+        help="the cc recipients of the email",
     )
     parser.add_argument(
-        "--email-bcc", env_var="EMAIL_BCC", help="the bcc recipients of the email"
+        "--email-bcc",
+        env_var="EMAIL_BCC",
+        help="the bcc recipients of the email",
     )
     parser.add_argument(
         "--email-server",
@@ -195,7 +215,9 @@ def get_arguments(parser: ArgumentParser):  # pragma: no cover
         help="the username to logon to the smtp server (default: email_from)",
     )
     parser.add_argument(
-        "--email-pass", env_var="EMAIL_PASS", help="the password for the smtp server"
+        "--email-pass",
+        env_var="EMAIL_PASS",
+        help="the password for the smtp server",
     )
     parser.add_argument(
         "--email-subject",
@@ -260,7 +282,10 @@ def get_arguments(parser: ArgumentParser):  # pragma: no cover
         """,
     )
     parser.add_argument(
-        "--stdout", env_var="STDOUT", help="also print to stdout", action="store_true"
+        "--stdout",
+        env_var="STDOUT",
+        help="also print to stdout",
+        action="store_true",
     )
     args = parser.parse_args()
     validate_arguments(parser, args)
@@ -271,11 +296,14 @@ def parse_date(args):
     """Parse date from args.
 
     Arguments:
+    ---------
         args: the arguments provided to the script
 
     Returns:
+    -------
         start_date: the start date of the requested interval
         end_date: the end date of the requested interval
+
     """
     # date parsing logic
     if args.last_month:
@@ -303,10 +331,14 @@ def parse_filename(args, start_date):
     """Parse filename from args and start_date.
 
     Arguments:
+    ---------
         args: the arguments provided to the script
+        start_date: start of reporting period
 
     Returns:
+    -------
         filename: the filename to use for the csv data
+
     """
     if args.filename:
         filename = args.filename
@@ -323,11 +355,14 @@ def check_duplicate(entry_a, entry_b):
     """Check if two entries are duplicates by checking their acrid in all music items.
 
     Arguments:
+    ---------
         entry_a: first entry
         entry_b: second entry
 
     Returns:
+    -------
         True if the entries are duplicates, False otherwise
+
     """
     try:
         entry_a = entry_a["metadata"]["music"]
@@ -348,10 +383,13 @@ def merge_duplicates(data):
     """Merge consecutive entries into one if they are duplicates.
 
     Arguments:
+    ---------
         data: The data provided by ACRClient
 
     Returns:
+    -------
         data: The processed data
+
     """
     prev = data[0]
     mark = []
@@ -373,7 +411,6 @@ def merge_duplicates(data):
 
 def funge_release_date(release_date: str = ""):
     """Make a release_date from ACR conform to what seems to be the spec."""
-
     if len(release_date) == 10:
         # we can make it look like what suisa has in their examples if it's the right length
         try:
@@ -391,10 +428,13 @@ def get_artist(music):
     """Get artist from a given dict.
 
     Arguments:
+    ---------
         music: music dict from API
 
     Returns:
+    -------
         artist: string representing the artist
+
     """
     artist = ""
     if music.get("artists") is not None:
@@ -448,10 +488,14 @@ def get_csv(data, station_name=""):
     """Create SUISA compatible csv data.
 
     Arguments:
+    ---------
         data: To data to create csv from
+        station_name: Default station name for output
 
     Returns:
+    -------
         csv: The converted data
+
     """
     header = [
         "Titel",
@@ -514,12 +558,10 @@ def get_csv(data, station_name=""):
                     for item in sublist
                 ]
                 if c.get("role", "") in ["C", "Composer", "W", "Writer"]
-            ]
+            ],
         )
         if works_composer:
-            if not composer:
-                composer = works_composer
-            elif composer == artist:
+            if not composer or composer == artist:
                 composer = works_composer
 
         isrc = get_isrc(music)
@@ -535,7 +577,7 @@ def get_csv(data, station_name=""):
 
         # cridlib only supports timezone-aware datetime values, so we convert one
         timestamp_utc = pytz.utc.localize(
-            datetime.strptime(metadata.get("timestamp_utc"), ACRClient.TS_FMT)
+            datetime.strptime(metadata.get("timestamp_utc"), ACRClient.TS_FMT),
         )
         # we include the acrid in our CRID so we know about the data's provenience
         # in case any questions about the data we delivered are asked
@@ -569,7 +611,7 @@ def get_csv(data, station_name=""):
                 "",  # Label Code
                 upc,
                 local_id,
-            ]
+            ],
         )
     return csv.getvalue()
 
@@ -578,10 +620,14 @@ def get_xlsx(data, station_name=""):
     """Create SUISA compatible xlsx data.
 
     Arguments:
+    ---------
         data: The data to create xlsx from
+        station_name: Default station name for output
 
     Returns:
+    -------
         xlsx: The converted data as BytesIO object
+
     """
     csv = get_csv(data, station_name=station_name)
     csv_reader = reader(StringIO(csv))
@@ -622,7 +668,7 @@ def get_xlsx(data, station_name=""):
         for cell in row:
             if cell.value:
                 dims[cell.column_letter] = max(
-                    (dims.get(cell.column_letter, 0), len(str(cell.value)))
+                    (dims.get(cell.column_letter, 0), len(str(cell.value))),
                 )
     # apply estimated width to each column
     padding = 3
@@ -637,8 +683,10 @@ def write_csv(filename, csv):  # pragma: no cover
     """Write contents of `csv` to file.
 
     Arguments:
+    ---------
         filename: The file to write to.
         csv: The data to write to `filename`.
+
     """
     with open(filename, mode="w", encoding="utf-8") as csvfile:
         csvfile.write(csv)
@@ -648,31 +696,41 @@ def write_xlsx(filename, xlsx):  # pragma: no cover
     """Write contents of `xlsx` to file.
 
     Arguments:
+    ---------
         filename: The file to write to.
         xlsx: The data to write to `filename`.
+
     """
     with open(filename, mode="wb") as xlsxfile:
         xlsxfile.write(xlsx.getvalue())
 
 
-def get_email_attachment(filename, filetype, data):
+def get_email_attachment(filename: str, filetype: str, data) -> MIMEBase:
     """Create attachment based on required filetype and data.
 
     Arguments:
+    ---------
         filename: The filename of the attachment
         filetype: The filetype of the attachment
         data: The attachment data
+
     """
-    part = None
+    maintype: str
+    subtype: str
+    payload: str
     if filetype == "xlsx":
-        part = MIMEBase("application", "vnd.ms-excel")
-        part.set_payload(data.getvalue())
-        encode_base64(part)
+        maintype = "application"
+        subtype = "vnd.ms-excel"
+        payload = data.getvalue()
     elif filetype == "csv":
-        # attach csv
+        maintype = "text"
+        subtype = "csv"
+        payload = data.encode("utf-8")
         part = MIMEBase("text", "csv")
-        part.set_payload(data.encode("utf-8"))
-        encode_base64(part)
+
+    part = MIMEBase(maintype, subtype)
+    part.set_payload(payload)
+    encode_base64(part)
     part.add_header("Content-Disposition", f"attachment; filename={basename(filename)}")
     return part
 
@@ -680,11 +738,20 @@ def get_email_attachment(filename, filetype, data):
 # reducing the arguments even more does not seem practical
 # pylint: disable-msg=too-many-arguments,invalid-name
 def create_message(
-    sender, recipient, subject, text, filename, filetype, data, cc=None, bcc=None
-):
+    sender: str,
+    recipient: str,
+    subject: str,
+    text: str,
+    filename: str,
+    filetype: str,
+    data,
+    cc: str | None = None,
+    bcc: str | None = None,
+) -> MIMEMultipart:
     """Create email message.
 
     Arguments:
+    ---------
         sender: The sender of the email. Login will be made with this user.
         recipient: The recipient of the email. Can be a list.
         subject: The subject of the email.
@@ -692,6 +759,9 @@ def create_message(
         filename: The filename of the attachment
         filetype: The filetype of the attachment
         data: The attachment data.
+        cc: cc recipient
+        bcc: bcc recipient
+
     """
     msg = MIMEMultipart()
     msg["From"] = sender
@@ -709,13 +779,21 @@ def create_message(
     return msg
 
 
-def send_message(msg, server="127.0.0.1", login=None, password=None):
+def send_message(
+    msg: MIMEMultipart,
+    server: str = "127.0.0.1",
+    login: str | None = None,
+    password: str | None = None,
+) -> None:
     """Send email.
 
     Arguments:
+    ---------
         msg: The message to send (an email.messag.Message object)
         server: The SMTP server to use to send the email.
+        login: The username for `sender`@`server`.
         password: The password for `sender`@`server`.
+
     """
     with SMTP(server) as smtp:
         smtp.starttls()
@@ -727,7 +805,7 @@ def send_message(msg, server="127.0.0.1", login=None, password=None):
         smtp.send_message(msg)
 
 
-def main():  # pragma: no cover
+def main() -> None:  # pragma: no cover
     """Entrypoint for SUISA Sendemeldung ."""
     default_config_file = basename(__file__).replace(".py", ".conf")
     # config file in /etc gets overriden by the one in $HOME which gets overriden by the one in the
@@ -748,7 +826,11 @@ def main():  # pragma: no cover
 
     client = ACRClient(bearer_token=args.bearer_token)
     data = client.get_interval_data(
-        args.project_id, args.stream_id, start_date, end_date, timezone=args.timezone
+        args.project_id,
+        args.stream_id,
+        start_date,
+        end_date,
+        timezone=args.timezone,
     )
     data = merge_duplicates(data)
     if args.filetype == "xlsx":
@@ -761,7 +843,7 @@ def main():  # pragma: no cover
                 "station_name": args.station_name,
                 "year": format_date(start_date, format="yyyy", locale=args.locale),
                 "month": format_date(start_date, format="MM", locale=args.locale),
-            }
+            },
         )
         # generate body
         text = Template(args.email_text).substitute(
@@ -770,7 +852,9 @@ def main():  # pragma: no cover
                 "month": format_date(start_date, format="MMMM", locale=args.locale),
                 "year": format_date(start_date, format="yyyy", locale=args.locale),
                 "previous_year": format_date(
-                    start_date - timedelta(days=365), format="yyyy", locale=args.locale
+                    start_date - timedelta(days=365),
+                    format="yyyy",
+                    locale=args.locale,
                 ),
                 "in_three_months": format_date(
                     datetime.now() + relativedelta(months=+3),
@@ -779,7 +863,7 @@ def main():  # pragma: no cover
                 ),
                 "responsible_email": args.responsible_email,
                 "email_footer": args.email_footer,
-            }
+            },
         )
         msg = create_message(
             args.email_from,
