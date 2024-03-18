@@ -7,6 +7,7 @@ the report to SUISA via email for hands-off operations.
 
 from __future__ import annotations
 
+from argparse import Namespace as ArgparseNamespace
 from csv import reader, writer
 from datetime import date, datetime, timedelta
 from email.encoders import encode_base64
@@ -18,15 +19,17 @@ from io import BytesIO, StringIO
 from os.path import basename, expanduser
 from smtplib import SMTP
 from string import Template
+from typing import Any
 
 import cridlib
 import pytz
 from babel.dates import format_date
-from configargparse import ArgumentParser
+from configargparse import ArgumentParser  # type: ignore[import-untyped]
 from dateutil.relativedelta import relativedelta
 from iso3901 import ISRC
 from openpyxl import Workbook
 from openpyxl.styles import Border, Font, PatternFill, Side
+from openpyxl.worksheet.worksheet import Worksheet
 from tqdm import tqdm
 
 from .acrclient import ACRClient
@@ -80,7 +83,7 @@ $email_footer
 """
 
 
-def validate_arguments(parser, args):
+def validate_arguments(parser: ArgumentParser, args: ArgparseNamespace) -> None:
     """Validate the arguments provided to the script.
 
     After this function we are sure that there are no conflicts in the arguments.
@@ -123,7 +126,7 @@ def validate_arguments(parser, args):
         parser.error("\n- " + "\n- ".join(msgs))
 
 
-def get_arguments(parser: ArgumentParser):  # pragma: no cover
+def get_arguments(parser: ArgumentParser) -> ArgparseNamespace:  # pragma: no cover
     """Create :class:`ArgumentParser` with arguments.
 
     Arguments:
@@ -292,7 +295,7 @@ def get_arguments(parser: ArgumentParser):  # pragma: no cover
     return args
 
 
-def parse_date(args):
+def parse_date(args: ArgparseNamespace) -> tuple[date, date]:
     """Parse date from args.
 
     Arguments:
@@ -327,7 +330,7 @@ def parse_date(args):
     return start_date, end_date
 
 
-def parse_filename(args, start_date):
+def parse_filename(args: ArgparseNamespace, start_date: date) -> str:
     """Parse filename from args and start_date.
 
     Arguments:
@@ -351,7 +354,7 @@ def parse_filename(args, start_date):
     return filename
 
 
-def check_duplicate(entry_a, entry_b):
+def check_duplicate(entry_a: Any, entry_b: Any) -> bool:
     """Check if two entries are duplicates by checking their acrid in all music items.
 
     Arguments:
@@ -379,7 +382,7 @@ def check_duplicate(entry_a, entry_b):
     return False
 
 
-def merge_duplicates(data):
+def merge_duplicates(data: Any) -> Any:
     """Merge consecutive entries into one if they are duplicates.
 
     Arguments:
@@ -409,7 +412,7 @@ def merge_duplicates(data):
     return data
 
 
-def funge_release_date(release_date: str = ""):
+def funge_release_date(release_date: str = "") -> str:
     """Make a release_date from ACR conform to what seems to be the spec."""
     if len(release_date) == 10:
         # we can make it look like what suisa has in their examples if it's the right length
@@ -424,7 +427,7 @@ def funge_release_date(release_date: str = ""):
     return ""
 
 
-def get_artist(music):
+def get_artist(music: Any) -> str:
     """Get artist from a given dict.
 
     Arguments:
@@ -457,7 +460,7 @@ def get_artist(music):
     return artist
 
 
-def get_isrc(music):
+def get_isrc(music: Any) -> str:
     """Get a valid ISRC from the music record or return an empty string."""
     isrc = ""
     if music.get("external_ids", {}).get("isrc"):
@@ -484,7 +487,7 @@ def get_isrc(music):
 
 # all local vars are required, eight are already used for the csv entries
 # pylint: disable-msg=too-many-locals
-def get_csv(data, station_name=""):
+def get_csv(data: dict, station_name: str = "") -> str:
     """Create SUISA compatible csv data.
 
     Arguments:
@@ -616,7 +619,7 @@ def get_csv(data, station_name=""):
     return csv.getvalue()
 
 
-def get_xlsx(data, station_name=""):
+def get_xlsx(data: Any, station_name: str = "") -> BytesIO:
     """Create SUISA compatible xlsx data.
 
     Arguments:
@@ -633,8 +636,10 @@ def get_xlsx(data, station_name=""):
     csv_reader = reader(StringIO(csv))
 
     xlsx = BytesIO()
-    workbook = Workbook()
-    worksheet = workbook.active
+    workbook: Workbook = Workbook()
+    if not workbook.active:  # pragma: no cover
+        raise RuntimeError
+    worksheet: Worksheet = workbook.active  # type: ignore[assignment]
 
     for row in csv_reader:
         worksheet.append(row)
@@ -663,9 +668,9 @@ def get_xlsx(data, station_name=""):
             cell.fill = fill
 
     # Try to approximate the required width by finding the longest values per column
-    dims = {}
-    for row in worksheet.rows:
-        for cell in row:
+    dims: dict[str, int] = {}
+    for row in worksheet.rows:  # type: ignore[assignment]
+        for cell in row:  # type: ignore[assignment]
             if cell.value:
                 dims[cell.column_letter] = max(
                     (dims.get(cell.column_letter, 0), len(str(cell.value))),
@@ -679,7 +684,7 @@ def get_xlsx(data, station_name=""):
     return xlsx
 
 
-def write_csv(filename, csv):  # pragma: no cover
+def write_csv(filename: str, csv: str) -> None:  # pragma: no cover
     """Write contents of `csv` to file.
 
     Arguments:
@@ -692,7 +697,7 @@ def write_csv(filename, csv):  # pragma: no cover
         csvfile.write(csv)
 
 
-def write_xlsx(filename, xlsx):  # pragma: no cover
+def write_xlsx(filename: str, xlsx: BytesIO) -> None:  # pragma: no cover
     """Write contents of `xlsx` to file.
 
     Arguments:
@@ -705,7 +710,7 @@ def write_xlsx(filename, xlsx):  # pragma: no cover
         xlsxfile.write(xlsx.getvalue())
 
 
-def get_email_attachment(filename: str, filetype: str, data) -> MIMEBase:
+def get_email_attachment(filename: str, filetype: str, data: Any) -> MIMEBase:
     """Create attachment based on required filetype and data.
 
     Arguments:
@@ -744,7 +749,7 @@ def create_message(
     text: str,
     filename: str,
     filetype: str,
-    data,
+    data: Any,
     cc: str | None = None,
     bcc: str | None = None,
 ) -> MIMEMultipart:
