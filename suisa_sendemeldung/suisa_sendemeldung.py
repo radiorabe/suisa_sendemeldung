@@ -18,6 +18,7 @@ from io import BytesIO, StringIO
 from os.path import basename, expanduser
 from smtplib import SMTP
 from string import Template
+from typing import Optional
 
 import cridlib
 import pytz
@@ -192,16 +193,19 @@ def get_arguments(parser: ArgumentParser):  # pragma: no cover
     parser.add_argument(
         "--email-to",
         env_var="EMAIL_TO",
+        nargs="+",
         help="the recipients of the email",
     )
     parser.add_argument(
         "--email-cc",
         env_var="EMAIL_CC",
+        nargs="+",
         help="the cc recipients of the email",
     )
     parser.add_argument(
         "--email-bcc",
         env_var="EMAIL_BCC",
+        nargs="+",
         help="the bcc recipients of the email",
     )
     parser.add_argument(
@@ -739,14 +743,14 @@ def get_email_attachment(filename: str, filetype: str, data) -> MIMEBase:
 # pylint: disable-msg=too-many-arguments,invalid-name
 def create_message(
     sender: str,
-    recipient: str,
+    recipient: list[str],
     subject: str,
     text: str,
     filename: str,
     filetype: str,
-    data,
-    cc: str | None = None,
-    bcc: str | None = None,
+    data: str,
+    cc: Optional[list[str]] = None,
+    bcc: Optional[list[str]] = None,
 ) -> MIMEMultipart:
     """Create email message.
 
@@ -765,11 +769,11 @@ def create_message(
     """
     msg = MIMEMultipart()
     msg["From"] = sender
-    msg["To"] = recipient
+    msg["To"] = ", ".join(recipient)
     if cc:
-        msg["Cc"] = cc
+        msg["Cc"] = ", ".join(cc)
     if bcc:
-        msg["Bcc"] = bcc
+        msg["Bcc"] = ", ".join(bcc)
     msg["Date"] = formatdate(localtime=True)
     msg["Subject"] = subject
     # set body
