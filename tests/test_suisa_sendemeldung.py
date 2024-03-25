@@ -5,7 +5,7 @@ from email.message import Message
 from io import BytesIO
 from unittest.mock import call, patch
 
-from configargparse import ArgumentParser
+from configargparse import ArgumentParser  # type: ignore[import-untyped]
 from freezegun import freeze_time
 from openpyxl import load_workbook
 from pytest import mark
