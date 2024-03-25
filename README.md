@@ -161,6 +161,13 @@ As documented in [Usage](#Usage), you can also pass in options on the command li
 ./suisa_sendemeldung.py --bearer-token=abcdefghijklmnopqrstuvwxyzabcdef --stream_id=a-bcdefgh --stdout
 ```
 
+## Development
+
+Snapshot testing is used to test the help output, you can update the snapshots like so:
+```
+poetry run pytest -- --snapshot-update
+```
+
 ## Release Management
 
 The CI/CD setup uses semantic commit messages following the [conventional commits standard](https://www.conventionalcommits.org/en/v1.0.0/).

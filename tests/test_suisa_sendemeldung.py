@@ -1,14 +1,15 @@
 """Test the suisa_sendemeldung.suisa_sendemeldung module."""
 
+import contextlib
 from datetime import date, datetime, timezone
 from email.message import Message
 from io import BytesIO
 from unittest.mock import call, patch
 
+import pytest
 from configargparse import ArgumentParser  # type: ignore[import-untyped]
 from freezegun import freeze_time
 from openpyxl import load_workbook
-from pytest import mark
 
 from suisa_sendemeldung import suisa_sendemeldung
 
@@ -32,9 +33,9 @@ def test_validate_arguments():
         suisa_sendemeldung.validate_arguments(mock, args)
         mock.error.assert_called_once_with(
             "\n"
-            "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"
+            "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"  # noqa: E501
             "- wrong format on stream_id, expected 9 or 10 characters but got 12\n"
-            "- no output option has been set, specify one of --file, --email or --stdout\n"
+            "- no output option has been set, specify one of --file, --email or --stdout\n"  # noqa: E501
             "- argument --last_month not allowed with --start_date or --end_date",
         )
 
@@ -44,7 +45,7 @@ def test_validate_arguments():
         suisa_sendemeldung.validate_arguments(mock, args)
         mock.error.assert_called_once_with(
             "\n"
-            "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"
+            "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"  # noqa: E501
             "- wrong format on stream_id, expected 9 or 10 characters but got 12\n"
             "- xlsx cannot be printed to stdout, please set --filetype to csv\n"
             "- argument --last_month not allowed with --start_date or --end_date",
@@ -176,12 +177,12 @@ def test_merge_duplicates():
     record_2 = {"metadata": {"music": [{"acrid": "987654321"}], "played_duration": 10}}
     raw_records = [record_1, record_1, record_2]
     results = suisa_sendemeldung.merge_duplicates(raw_records)
-    assert len(results) == 2
-    assert results[0]["metadata"]["played_duration"] == 20
+    assert len(results) == 2  # noqa: PLR2004
+    assert results[0]["metadata"]["played_duration"] == 20  # noqa: PLR2004
 
 
-@mark.parametrize(
-    "test_date,expected",
+@pytest.mark.parametrize(
+    ("test_date", "expected"),
     [
         ("0000-00-00", ""),
     ],
@@ -203,7 +204,7 @@ def test_get_csv(mock_cridlib_get):
     csv = suisa_sendemeldung.get_csv(data)
     # pylint: disable=line-too-long
     assert csv == (
-        "Titel,Komponist,Interpret,Interpreten-Info,Sender,Sendedatum,Sendedauer,Sendezeit,Werkverzeichnisangaben,ISRC,Label,CD ID / Katalog-Nummer,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Titel des Tonträgers (Albumtitel),Autor Text,Track Nummer,Genre,Programm,Bestellnummer,Marke,Label Code,EAN/GTIN,Identifikationsnummer\r\n"
+        "Titel,Komponist,Interpret,Interpreten-Info,Sender,Sendedatum,Sendedauer,Sendezeit,Werkverzeichnisangaben,ISRC,Label,CD ID / Katalog-Nummer,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Titel des Tonträgers (Albumtitel),Autor Text,Track Nummer,Genre,Programm,Bestellnummer,Marke,Label Code,EAN/GTIN,Identifikationsnummer\r\n"  # noqa: E501
     )
     # pylint: enable=line-too-long
     mock_cridlib_get.assert_not_called()
@@ -327,15 +328,18 @@ def test_get_csv(mock_cridlib_get):
     ]
     csv = suisa_sendemeldung.get_csv(data, station_name="Station Name")
     # pylint: disable=line-too-long
-    assert csv == (
-        "Titel,Komponist,Interpret,Interpreten-Info,Sender,Sendedatum,Sendedauer,Sendezeit,Werkverzeichnisangaben,ISRC,Label,CD ID / Katalog-Nummer,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Titel des Tonträgers (Albumtitel),Autor Text,Track Nummer,Genre,Programm,Bestellnummer,Marke,Label Code,EAN/GTIN,Identifikationsnummer\r\n"
-        "Uhrenvergleich,,,,Station Name,19930301,00:01:00,13:12:00,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
-        'Meme Dub,Da Composah,Da Gang,,Station Name,19930301,00:01:00,13:37:00,,DEZ650710376,,,,,,"album, but string",,,,,,,,,crid://rabe.ch/v1/test\r\n'
-        'Bubbles,,"Mary\'s Surprise Act, Climmy Jiff",,Station Name,19930301,00:01:00,16:20:00,,DEZ650710376,Jane Records,,,,20221213,Da Alboom,,,,,,,,greedy-capitalist-number,crid://rabe.ch/v1/test\r\n'
-        ",,Artists as string not list,,Station Name,19930301,00:01:00,17:17:17,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
-        "Long Playing,,,,Station Name,19930301,19:48:57,18:18:18,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
-        "composer in works,Worker,,,Station Name,19930301,19:48:57,18:18:18,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
-        "composer better in works,composer,same,,Station Name,19930301,19:48:57,18:18:18,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
+    assert (
+        csv
+        == (
+            "Titel,Komponist,Interpret,Interpreten-Info,Sender,Sendedatum,Sendedauer,Sendezeit,Werkverzeichnisangaben,ISRC,Label,CD ID / Katalog-Nummer,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Titel des Tonträgers (Albumtitel),Autor Text,Track Nummer,Genre,Programm,Bestellnummer,Marke,Label Code,EAN/GTIN,Identifikationsnummer\r\n"  # noqa: E501
+            "Uhrenvergleich,,,,Station Name,19930301,00:01:00,13:12:00,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
+            'Meme Dub,Da Composah,Da Gang,,Station Name,19930301,00:01:00,13:37:00,,DEZ650710376,,,,,,"album, but string",,,,,,,,,crid://rabe.ch/v1/test\r\n'  # noqa: E501
+            'Bubbles,,"Mary\'s Surprise Act, Climmy Jiff",,Station Name,19930301,00:01:00,16:20:00,,DEZ650710376,Jane Records,,,,20221213,Da Alboom,,,,,,,,greedy-capitalist-number,crid://rabe.ch/v1/test\r\n'  # noqa: E501
+            ",,Artists as string not list,,Station Name,19930301,00:01:00,17:17:17,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
+            "Long Playing,,,,Station Name,19930301,19:48:57,18:18:18,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
+            "composer in works,Worker,,,Station Name,19930301,19:48:57,18:18:18,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
+            "composer better in works,composer,same,,Station Name,19930301,19:48:57,18:18:18,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test\r\n"
+        )
     )
     # pylint: enable=line-too-long
     mock_cridlib_get.assert_has_calls(
@@ -482,8 +486,8 @@ def test_send_message():
         ctx.login.assert_called_once_with("test@example.org", "password")
 
 
-@mark.parametrize(
-    "test_music,expected",
+@pytest.mark.parametrize(
+    ("test_music", "expected"),
     [
         ({"external_ids": {"isrc": "DEZ650710376"}}, "DEZ650710376"),
         ({"external_ids": {"isrc": ["DEZ650710376"]}}, "DEZ650710376"),
@@ -502,3 +506,12 @@ def test_get_isrc(test_music, expected):
 
     isrc = suisa_sendemeldung.get_isrc(test_music)
     assert isrc == expected
+
+
+def test_cli_help(snapshot, capsys):
+    """Snapshot test cli output."""
+    parser = ArgumentParser()
+    with contextlib.suppress(SystemExit):
+        suisa_sendemeldung.get_arguments(parser, ["-h"])
+    captured = capsys.readouterr()
+    assert captured.out == snapshot

@@ -1,35 +1,14 @@
 repos:
-  - repo: local
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.3.4
     hooks:
-      - id: black
-        name: black
-        language: system
-        entry: black
-        types: [python]
-      - id: isort
-        name: isort
-        language: system
-        entry: isort
-        types: [python]
-      - id: flake8
-        name: flake8
-        language: system
-        entry: flake8
-        types: [python]
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.8.0
-    hooks:
-    - id: mypy
-      additional_dependencies:
-        - types-openpyxl
-        - types-pytz
-        - types-python-dateutil
-        - types-tqdm
+      - id: ruff
+      - id: ruff-format
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v3.4.0
+    rev: v4.5.0
     hooks:
       - id: trailing-whitespace
-        exclude: ^src/api/client.js$
+        exclude: ^(src/api/client.js|tests/__snapshots__/.*ambr)$
       - id: end-of-file-fixer
         exclude: ^src/api/client.js$
       - id: check-symlinks
