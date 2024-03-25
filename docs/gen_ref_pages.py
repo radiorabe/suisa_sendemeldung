@@ -28,6 +28,7 @@ for path in sorted(Path("suisa_sendemeldung").rglob("*.py")):
 with mkdocs_gen_files.open("reference/SUMMARY.md", "w") as nav_file:
     nav_file.writelines(nav.build_literate_nav())
 
-readme = Path("README.md").open("r")
-with mkdocs_gen_files.open("index.md", "w") as index_file:
+with Path("README.md").open("r") as readme, mkdocs_gen_files.open(
+    "index.md", "w"
+) as index_file:
     index_file.writelines(readme.read())
