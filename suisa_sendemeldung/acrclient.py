@@ -1,9 +1,13 @@
 """module containing the ACRCloud client."""
 
+from __future__ import annotations
+
 from datetime import date, datetime, timedelta
+from typing import Any, Self
 
 import pytz
 from acrclient import Client
+from acrclient.models import GetBmCsProjectsResultsParams
 from tqdm import tqdm
 
 
@@ -21,25 +25,28 @@ class ACRClient(Client):
     # timezone of ACRCloud
     ACR_TIMEZONE = "UTC"
 
-    def __init__(self, bearer_token, base_url="https://eu-api-v2.acrcloud.com"):
+    def __init__(
+        self: Self, bearer_token: str, base_url: str = "https://eu-api-v2.acrcloud.com"
+    ) -> None:
+        """Init subclass with default_date."""
         super().__init__(bearer_token=bearer_token, base_url=base_url)
-        self.default_date = date.today() - timedelta(days=1)
+        self.default_date: date = date.today() - timedelta(days=1)  # noqa: DTZ011
 
     def get_data(
-        self,
-        project_id,
-        stream_id,
-        requested_date=None,
-        timezone=ACR_TIMEZONE,
-    ):
+        self: Self,
+        project_id: int,
+        stream_id: str,
+        requested_date: date | None = None,
+        timezone: str = ACR_TIMEZONE,
+    ) -> Any:  # noqa: ANN401
         """Fetch metadata from ACRCloud for `stream_id`.
 
         Arguments:
         ---------
             project_id: The Project ID of the stream.
             stream_id: The ID of the stream.
-            requested_date (optional): The date of the entries you want (default: yesterday).
-            timezone (optional): The timezone to use for localization.
+            requested_date: The date of the entries you want (default: yesterday).
+            timezone: The timezone to use for localization.
 
         Returns:
         -------
@@ -51,27 +58,28 @@ class ACRClient(Client):
         data = self.get_bm_cs_projects_results(
             project_id=project_id,
             stream_id=stream_id,
-            params={
-                "date": requested_date.strftime("%Y%m%d"),
-            },
+            params=GetBmCsProjectsResultsParams(
+                type="day",
+                date=requested_date.strftime("%Y%m%d"),
+            ),
         )
         for entry in data:
             metadata = entry.get("metadata")
             ts_utc = pytz.utc.localize(
-                datetime.strptime(metadata.get("timestamp_utc"), ACRClient.TS_FMT),
+                datetime.strptime(metadata.get("timestamp_utc"), ACRClient.TS_FMT),  # noqa: DTZ007
             )
             ts_local = ts_utc.astimezone(pytz.timezone(timezone))
             metadata.update({"timestamp_local": ts_local.strftime(ACRClient.TS_FMT)})
 
         return data
 
-    def get_interval_data(
-        self,
-        project_id,
-        stream_id,
-        start,
-        end,
-        timezone=ACR_TIMEZONE,
+    def get_interval_data(  # noqa: PLR0913, ANN201
+        self: Self,
+        project_id: int,
+        stream_id: str,
+        start: date,
+        end: date,
+        timezone: str = ACR_TIMEZONE,
     ):  # pylint: disable-msg=too-many-locals,too-many-arguments
         """Get data specified by interval from start to end.
 
@@ -92,7 +100,7 @@ class ACRClient(Client):
         # if we have to localize the timestamps we may need more data
         if timezone != ACRClient.ACR_TIMEZONE:
             # compute utc offset
-            offset = pytz.timezone(timezone).utcoffset(datetime.now())
+            offset = pytz.timezone(timezone).utcoffset(datetime.now())  # noqa: DTZ005
             # decrease start by 1 day if we're ahead of utc
             if offset > timedelta(seconds=1):
                 computed_start = start - timedelta(days=1)
@@ -113,7 +121,8 @@ class ACRClient(Client):
             dates.append(ptr)
             ptr += timedelta(days=1)
         data = []
-        # make the prefix longer by this amount so tqdm lines up with the one in the main code
+        # make the prefix longer by this amount so tqdm lines up with
+        # the one in the main code
         ljust_amount: int = 27
         for ptr in tqdm(dates, desc="load ACRCloud data".ljust(ljust_amount)):
             data += self.get_data(
@@ -128,7 +137,7 @@ class ACRClient(Client):
             for entry in reversed(data):
                 metadata = entry.get("metadata")
                 timestamp = metadata.get("timestamp_local")
-                timestamp_date = datetime.strptime(timestamp, ACRClient.TS_FMT).date()
+                timestamp_date = datetime.strptime(timestamp, ACRClient.TS_FMT).date()  # noqa: DTZ007
                 if timestamp_date < start or timestamp_date > end:
                     data.remove(entry)
 
