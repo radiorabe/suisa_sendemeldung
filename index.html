@@ -361,6 +361,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#development" class="md-nav__link">
+    <span class="md-ellipsis">
+      Development
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#release-management" class="md-nav__link">
     <span class="md-ellipsis">
       Release Management
@@ -616,17 +625,21 @@
 <p>As documented in <a href="#Usage">Usage</a>, you can also pass in options on the command line as arguments. Simply run the script as follows:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>./suisa_sendemeldung.py<span class="w"> </span>--bearer-token<span class="o">=</span>abcdefghijklmnopqrstuvwxyzabcdef<span class="w"> </span>--stream_id<span class="o">=</span>a-bcdefgh<span class="w"> </span>--stdout
 </code></pre></div>
+<h2 id="development">Development</h2>
+<p>Snapshot testing is used to test the help output, you can update the snapshots like so:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>poetry run pytest -- --snapshot-update
+</code></pre></div></p>
 <h2 id="release-management">Release Management</h2>
 <p>The CI/CD setup uses semantic commit messages following the <a href="https://www.conventionalcommits.org/en/v1.0.0/">conventional commits standard</a>.
 There is a GitHub Action in <a href="./.github/workflows/semantic-release.yaml">.github/workflows/semantic-release.yaml</a>
 that uses <a href="https://go-semantic-release.xyz/">go-semantic-commit</a> to create new
 releases.</p>
 <p>The commit message should be structured as follows:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>&lt;type&gt;[optional scope]: &lt;description&gt;
-<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
-<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>[optional body]
-<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
-<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>[optional footer(s)]
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>&lt;type&gt;[optional scope]: &lt;description&gt;
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>[optional body]
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>[optional footer(s)]
 </code></pre></div>
 <p>The commit contains the following structural elements, to communicate intent to the consumers of your library:</p>
 <ol>
