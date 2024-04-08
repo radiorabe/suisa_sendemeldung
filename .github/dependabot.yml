@@ -1,26 +1,22 @@
 version: 2
 updates:
-  # Update pip dependencies
-  - package-ecosystem: "pip"
-    directory: "/"
+  - package-ecosystem: docker
+    directory: /
     schedule:
-      interval: "daily"
+      interval: daily
     commit-message:
-      prefix: "feat(deps): "
-      prefix-development: "chore(deps): "
-    open-pull-requests-limit: 20
-  # Update Dockerfile
-  - package-ecosystem: "docker"
-    directory: "/"
+      prefix: "chore: "
+    groups:
+      baseimages:
+        patterns:
+          - "*"
+  - package-ecosystem: github-actions
+    directory: /
     schedule:
-      interval: "daily"
-    commit-message:
-      prefix: "feat: "
-  # Maintain dependencies for GitHub Actions
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "daily"
+      interval: daily
     commit-message:
       prefix: "chore(ci): "
-    open-pull-requests-limit: 10
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: daily
