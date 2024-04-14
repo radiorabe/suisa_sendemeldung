@@ -2,140 +2,48 @@
 
 ACRCloud client that fetches data on our playout history and formats them in a CSV file format containing the data (like Track, Title and ISRC) requested by SUISA. Also takes care of sending the report to SUISA via email for hands-off operations.
 
-## Installation
-
-You can build a Docker image using the included [Dockerfile](Dockerfile):
-
-```bash
-git clone https://github.com/radiorabe/suisa_sendemeldung
-cd suisa_sendemeldung
-podman build -t suisa_sendemeldung .
-```
-
-Then you can run it by passing in command line switches:
-
-```bash
-podman run --rm suisa_sendemeldung --bearer-token abcdefghijklmnopqrstuvwxyzabcdef --stream_id a-bcdefgh --stdout
-```
-
-Or by setting environment variables:
-
-```bash
-podman run --rm --env BEARER_TOKEN=abcdefghijklmnopqrstuvwxyzabcdef --env STREAM_ID=a-bcdefgh --env STDOUT=True suisa_sendemeldung
-```
-
-A prebuilt image is available from the GitHub Package Registry:
-
-```bash
-docker pull ghcr.io/radiorabe/suisasendemeldung:master
-```
-
 ## Usage
 
-This is the output of `suisa_sendemeldung -h`.
-```
-usage: suisa_sendemeldung [-h] --bearer-token BEARER_TOKEN --project-id
-                          PROJECT_ID --stream-id STREAM_ID
-                          [--station-name STATION_NAME]
-                          [--station-name-short STATION_NAME_SHORT] [--file]
-                          [--filetype {xlsx,csv}] [--email]
-                          [--email-from EMAIL_FROM] [--email-to EMAIL_TO]
-                          [--email-cc EMAIL_CC] [--email-bcc EMAIL_BCC]
-                          [--email-server EMAIL_SERVER]
-                          [--email-login EMAIL_LOGIN]
-                          [--email-pass EMAIL_PASS]
-                          [--email-subject EMAIL_SUBJECT]
-                          [--email-text EMAIL_TEXT]
-                          [--email-footer EMAIL_FOOTER]
-                          [--responsible-email RESPONSIBLE_EMAIL]
-                          [--start-date START_DATE] [--end-date END_DATE]
-                          [--last-month] --timezone TIMEZONE [--locale LOCALE]
-                          [--filename FILENAME] [--stdout]
+We provide the SUISA Sendmeldung script as a container image or as a python package.
 
-ACRCloud client for SUISA reporting @ RaBe.
+These usage instructions show how to install the script and how to configure it.
+There are different ways to run it at a schedule. We recommend using
+[systemd-timers](https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html).
 
-options:
-  -h, --help            show this help message and exit
-  --bearer-token BEARER_TOKEN
-                        the bearer token for ACRCloud (required) [env var:
-                        BEARER_TOKEN]
-  --project-id PROJECT_ID
-                        the id of the project at ACRCloud (required) [env var:
-                        PROJECT_ID]
-  --stream-id STREAM_ID
-                        the id of the stream at ACRCloud (required) [env var:
-                        STREAM_ID]
-  --station-name STATION_NAME
-                        Station name, used in Output and Emails [env var:
-                        STATION_NAME]
-  --station-name-short STATION_NAME_SHORT
-                        Shortname for station as used in Filenames (locally
-                        and in attachment) [env var: STATION_NAME_SHORT]
-  --file                create file [env var: FILE]
-  --filetype {xlsx,csv}
-                        filetype to attach to email or write to file [env var:
-                        FILETYPE]
-  --email               send an email [env var: EMAIL]
-  --email-from EMAIL_FROM
-                        the sender of the email [env var: EMAIL_FROM]
-  --email-to EMAIL_TO   the recipients of the email [env var: EMAIL_TO]
-  --email-cc EMAIL_CC   the cc recipients of the email [env var: EMAIL_CC]
-  --email-bcc EMAIL_BCC
-                        the bcc recipients of the email [env var: EMAIL_BCC]
-  --email-server EMAIL_SERVER
-                        the smtp server to send the mail with [env var:
-                        EMAIL_SERVER]
-  --email-login EMAIL_LOGIN
-                        the username to logon to the smtp server (default:
-                        email_from) [env var: EMAIL_LOGIN]
-  --email-pass EMAIL_PASS
-                        the password for the smtp server [env var: EMAIL_PASS]
-  --email-subject EMAIL_SUBJECT
-                        The subject of the email, placeholders are
-                        $station_name, $year and $month [env var:
-                        EMAIL_SUBJECT]
-  --email-text EMAIL_TEXT
-                        A template for the Email text, placeholders are
-                        $station_name, $month, $year, $previous_year,
-                        $responsible_email, and $email_footer. [env var:
-                        EMAIL_TEXT]
-  --email-footer EMAIL_FOOTER
-                        Footer for the Email [env var: EMAIL_FOOTER]
-  --responsible-email RESPONSIBLE_EMAIL
-                        Used to hint whom to contact in the emails text. [env
-                        var: RESPONSIBLE_EMAIL]
-  --start-date START_DATE
-                        the start date of the interval in format YYYY-MM-DD
-                        (default: 30 days before end_date) [env var:
-                        START_DATE]
-  --end-date END_DATE   the end date of the interval in format YYYY-MM-DD
-                        (default: today) [env var: END_DATE]
-  --last-month          download data of whole last month [env var:
-                        LAST_MONTH]
-  --timezone TIMEZONE   set the timezone for localization [env var: TIMEZONE]
-  --locale LOCALE       set locale for date and time formatting [env var:
-                        LOCALE]
-  --filename FILENAME   file to write to (default:
-                        <station_name_short>_<year>_<month>.csv when reporting
-                        last month, <station_name_short>_<start_date>.csv
-                        else) [env var: FILENAME]
-  --stdout              also print to stdout [env var: STDOUT]
+To output the scripts usage information, check out it's `--help` output:
 
-Args that start with '--' (eg. --bearer-token) can also be set in a config
-file (/etc/suisa_sendemeldung.conf or /home/hairmare/suisa_sendemeldung.conf
-or suisa_sendemeldung.conf). Config file syntax allows: key=value, flag=true,
-stuff=[a,b,c] (for details, see syntax at https://goo.gl/R74nmi). If an arg is
-specified in more than one place, then commandline values override environment
-variables which override config file values which override defaults.
+```bash
+# Using Podman
+podman run --rm -ti ghcr.io/radiorabe/suisasendemeldung:latest suisa_sendemeldung --help
+
+# Using Docker
+docker run --rm -ti ghcr.io/radiorabe/suisasendemeldung:latest suisa_sendemeldung --help
 ```
 
-## Configuration
+While we recommend running the script in it's container, you can also install the script
+in any python environment using [pip](https://pip.pypa.io/).
 
-You can configure this script either with a configuration file (default is `suisa_sendemeldung.conf`), environment variables or command line arguments as shown above.
+We recommend using a dedicated [venv](https://docs.python.org/3/library/venv.html) for
+running the script hould you go down this route:
 
-Command line arguments override environment variables which themselves override settings in the configuration file.
+```bash
+python -mvenv .venv
+. venv/bin/activate
 
-### Configuration file
+pip install suisa_sendemeldung
+
+# Output usage after installation
+suisa_sendemeldung
+```
+### Configuration
+
+You can configure this script with a configuration file (default is `suisa_sendemeldung.conf`),
+environment variables, or command line arguments.
+
+Command line arguments override environment variables which themselves override settings in
+the configuration file.
+
+#### Configuration file
 
 The configuration files will be evaluated in the following order (last takes precedence over first):
 
@@ -145,20 +53,20 @@ The configuration files will be evaluated in the following order (last takes pre
 
 For details on how to set configuration values, have a look at [suisa_sendemeldung.conf](etc/suisa_sendemeldung.conf).
 
-### Environment variables
+#### Environment variables
 
 Environment variables can also be passed as options. The relevant variables are listed in the [Usage](#Usage) part of this document. For example run the script as follows:
 
 ```bash
-BEARER_TOKEN=abcdefghijklmnopqrstuvwxyzabcdef STREAM_ID=a-bcdefgh STDOUT=True ./suisa_sendemeldung.py
+podman run --rm -ti -e BEARER_TOKEN=abcdefghijklmnopqrstuvwxyzabcdef -e STREAM_ID=a-bcdefgh -e STDOUT=True ghcr.io/radiorabe/suisasendemeldung:latest suisa_sendemeldung
 ```
 
-### Command line switches
+#### Command line switches
 
 As documented in [Usage](#Usage), you can also pass in options on the command line as arguments. Simply run the script as follows:
 
 ```bash
-./suisa_sendemeldung.py --bearer-token=abcdefghijklmnopqrstuvwxyzabcdef --stream_id=a-bcdefgh --stdout
+podman run --rm -ti ghcr.io/radiorabe/suisasendemeldung:latest suisa_sendemeldung --bearer-token=abcdefghijklmnopqrstuvwxyzabcdef --stream_id=a-bcdefgh --stdout
 ```
 
 ## Development
@@ -170,10 +78,11 @@ poetry run pytest -- --snapshot-update
 
 ## Release Management
 
+At RaBe we run the script on the first and 14th of each month. Matching this we only release new versions of the script in the second half of each month.
+
 The CI/CD setup uses semantic commit messages following the [conventional commits standard](https://www.conventionalcommits.org/en/v1.0.0/).
 There is a GitHub Action in [.github/workflows/semantic-release.yaml](./.github/workflows/semantic-release.yaml)
-that uses [go-semantic-commit](https://go-semantic-release.xyz/) to create new
-releases.
+that uses [go-semantic-commit](https://go-semantic-release.xyz/) to create new releases.
 
 The commit message should be structured as follows:
 
