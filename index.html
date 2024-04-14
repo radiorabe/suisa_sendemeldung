@@ -301,24 +301,16 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#installation" class="md-nav__link">
-    <span class="md-ellipsis">
-      Installation
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#usage" class="md-nav__link">
     <span class="md-ellipsis">
       Usage
     </span>
   </a>
   
-</li>
-      
-        <li class="md-nav__item">
+    <nav class="md-nav" aria-label="Usage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#configuration" class="md-nav__link">
     <span class="md-ellipsis">
       Configuration
@@ -352,6 +344,11 @@
       Command line switches
     </span>
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
         
@@ -495,121 +492,36 @@
 
 <h1 id="suisa_sendemeldung">suisa_sendemeldung</h1>
 <p>ACRCloud client that fetches data on our playout history and formats them in a CSV file format containing the data (like Track, Title and ISRC) requested by SUISA. Also takes care of sending the report to SUISA via email for hands-off operations.</p>
-<h2 id="installation">Installation</h2>
-<p>You can build a Docker image using the included <a href="Dockerfile">Dockerfile</a>:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/radiorabe/suisa_sendemeldung
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="nb">cd</span><span class="w"> </span>suisa_sendemeldung
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>podman<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>suisa_sendemeldung<span class="w"> </span>.
-</code></pre></div>
-<p>Then you can run it by passing in command line switches:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>podman<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>suisa_sendemeldung<span class="w"> </span>--bearer-token<span class="w"> </span>abcdefghijklmnopqrstuvwxyzabcdef<span class="w"> </span>--stream_id<span class="w"> </span>a-bcdefgh<span class="w"> </span>--stdout
-</code></pre></div>
-<p>Or by setting environment variables:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>podman<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>--env<span class="w"> </span><span class="nv">BEARER_TOKEN</span><span class="o">=</span>abcdefghijklmnopqrstuvwxyzabcdef<span class="w"> </span>--env<span class="w"> </span><span class="nv">STREAM_ID</span><span class="o">=</span>a-bcdefgh<span class="w"> </span>--env<span class="w"> </span><span class="nv">STDOUT</span><span class="o">=</span>True<span class="w"> </span>suisa_sendemeldung
-</code></pre></div>
-<p>A prebuilt image is available from the GitHub Package Registry:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>docker<span class="w"> </span>pull<span class="w"> </span>ghcr.io/radiorabe/suisasendemeldung:master
-</code></pre></div>
 <h2 id="usage">Usage</h2>
-<p>This is the output of <code>suisa_sendemeldung -h</code>.
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>usage: suisa_sendemeldung [-h] --bearer-token BEARER_TOKEN --project-id
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>                          PROJECT_ID --stream-id STREAM_ID
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>                          [--station-name STATION_NAME]
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>                          [--station-name-short STATION_NAME_SHORT] [--file]
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>                          [--filetype {xlsx,csv}] [--email]
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>                          [--email-from EMAIL_FROM] [--email-to EMAIL_TO]
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>                          [--email-cc EMAIL_CC] [--email-bcc EMAIL_BCC]
-<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>                          [--email-server EMAIL_SERVER]
-<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>                          [--email-login EMAIL_LOGIN]
-<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>                          [--email-pass EMAIL_PASS]
-<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>                          [--email-subject EMAIL_SUBJECT]
-<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>                          [--email-text EMAIL_TEXT]
-<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>                          [--email-footer EMAIL_FOOTER]
-<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>                          [--responsible-email RESPONSIBLE_EMAIL]
-<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>                          [--start-date START_DATE] [--end-date END_DATE]
-<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>                          [--last-month] --timezone TIMEZONE [--locale LOCALE]
-<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>                          [--filename FILENAME] [--stdout]
-<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>
-<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>ACRCloud client for SUISA reporting @ RaBe.
-<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>
-<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>options:
-<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>  -h, --help            show this help message and exit
-<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>  --bearer-token BEARER_TOKEN
-<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>                        the bearer token for ACRCloud (required) [env var:
-<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>                        BEARER_TOKEN]
-<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>  --project-id PROJECT_ID
-<a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a>                        the id of the project at ACRCloud (required) [env var:
-<a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a>                        PROJECT_ID]
-<a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a>  --stream-id STREAM_ID
-<a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a>                        the id of the stream at ACRCloud (required) [env var:
-<a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a>                        STREAM_ID]
-<a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a>  --station-name STATION_NAME
-<a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a>                        Station name, used in Output and Emails [env var:
-<a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a>                        STATION_NAME]
-<a id="__codelineno-4-35" name="__codelineno-4-35" href="#__codelineno-4-35"></a>  --station-name-short STATION_NAME_SHORT
-<a id="__codelineno-4-36" name="__codelineno-4-36" href="#__codelineno-4-36"></a>                        Shortname for station as used in Filenames (locally
-<a id="__codelineno-4-37" name="__codelineno-4-37" href="#__codelineno-4-37"></a>                        and in attachment) [env var: STATION_NAME_SHORT]
-<a id="__codelineno-4-38" name="__codelineno-4-38" href="#__codelineno-4-38"></a>  --file                create file [env var: FILE]
-<a id="__codelineno-4-39" name="__codelineno-4-39" href="#__codelineno-4-39"></a>  --filetype {xlsx,csv}
-<a id="__codelineno-4-40" name="__codelineno-4-40" href="#__codelineno-4-40"></a>                        filetype to attach to email or write to file [env var:
-<a id="__codelineno-4-41" name="__codelineno-4-41" href="#__codelineno-4-41"></a>                        FILETYPE]
-<a id="__codelineno-4-42" name="__codelineno-4-42" href="#__codelineno-4-42"></a>  --email               send an email [env var: EMAIL]
-<a id="__codelineno-4-43" name="__codelineno-4-43" href="#__codelineno-4-43"></a>  --email-from EMAIL_FROM
-<a id="__codelineno-4-44" name="__codelineno-4-44" href="#__codelineno-4-44"></a>                        the sender of the email [env var: EMAIL_FROM]
-<a id="__codelineno-4-45" name="__codelineno-4-45" href="#__codelineno-4-45"></a>  --email-to EMAIL_TO   the recipients of the email [env var: EMAIL_TO]
-<a id="__codelineno-4-46" name="__codelineno-4-46" href="#__codelineno-4-46"></a>  --email-cc EMAIL_CC   the cc recipients of the email [env var: EMAIL_CC]
-<a id="__codelineno-4-47" name="__codelineno-4-47" href="#__codelineno-4-47"></a>  --email-bcc EMAIL_BCC
-<a id="__codelineno-4-48" name="__codelineno-4-48" href="#__codelineno-4-48"></a>                        the bcc recipients of the email [env var: EMAIL_BCC]
-<a id="__codelineno-4-49" name="__codelineno-4-49" href="#__codelineno-4-49"></a>  --email-server EMAIL_SERVER
-<a id="__codelineno-4-50" name="__codelineno-4-50" href="#__codelineno-4-50"></a>                        the smtp server to send the mail with [env var:
-<a id="__codelineno-4-51" name="__codelineno-4-51" href="#__codelineno-4-51"></a>                        EMAIL_SERVER]
-<a id="__codelineno-4-52" name="__codelineno-4-52" href="#__codelineno-4-52"></a>  --email-login EMAIL_LOGIN
-<a id="__codelineno-4-53" name="__codelineno-4-53" href="#__codelineno-4-53"></a>                        the username to logon to the smtp server (default:
-<a id="__codelineno-4-54" name="__codelineno-4-54" href="#__codelineno-4-54"></a>                        email_from) [env var: EMAIL_LOGIN]
-<a id="__codelineno-4-55" name="__codelineno-4-55" href="#__codelineno-4-55"></a>  --email-pass EMAIL_PASS
-<a id="__codelineno-4-56" name="__codelineno-4-56" href="#__codelineno-4-56"></a>                        the password for the smtp server [env var: EMAIL_PASS]
-<a id="__codelineno-4-57" name="__codelineno-4-57" href="#__codelineno-4-57"></a>  --email-subject EMAIL_SUBJECT
-<a id="__codelineno-4-58" name="__codelineno-4-58" href="#__codelineno-4-58"></a>                        The subject of the email, placeholders are
-<a id="__codelineno-4-59" name="__codelineno-4-59" href="#__codelineno-4-59"></a>                        $station_name, $year and $month [env var:
-<a id="__codelineno-4-60" name="__codelineno-4-60" href="#__codelineno-4-60"></a>                        EMAIL_SUBJECT]
-<a id="__codelineno-4-61" name="__codelineno-4-61" href="#__codelineno-4-61"></a>  --email-text EMAIL_TEXT
-<a id="__codelineno-4-62" name="__codelineno-4-62" href="#__codelineno-4-62"></a>                        A template for the Email text, placeholders are
-<a id="__codelineno-4-63" name="__codelineno-4-63" href="#__codelineno-4-63"></a>                        $station_name, $month, $year, $previous_year,
-<a id="__codelineno-4-64" name="__codelineno-4-64" href="#__codelineno-4-64"></a>                        $responsible_email, and $email_footer. [env var:
-<a id="__codelineno-4-65" name="__codelineno-4-65" href="#__codelineno-4-65"></a>                        EMAIL_TEXT]
-<a id="__codelineno-4-66" name="__codelineno-4-66" href="#__codelineno-4-66"></a>  --email-footer EMAIL_FOOTER
-<a id="__codelineno-4-67" name="__codelineno-4-67" href="#__codelineno-4-67"></a>                        Footer for the Email [env var: EMAIL_FOOTER]
-<a id="__codelineno-4-68" name="__codelineno-4-68" href="#__codelineno-4-68"></a>  --responsible-email RESPONSIBLE_EMAIL
-<a id="__codelineno-4-69" name="__codelineno-4-69" href="#__codelineno-4-69"></a>                        Used to hint whom to contact in the emails text. [env
-<a id="__codelineno-4-70" name="__codelineno-4-70" href="#__codelineno-4-70"></a>                        var: RESPONSIBLE_EMAIL]
-<a id="__codelineno-4-71" name="__codelineno-4-71" href="#__codelineno-4-71"></a>  --start-date START_DATE
-<a id="__codelineno-4-72" name="__codelineno-4-72" href="#__codelineno-4-72"></a>                        the start date of the interval in format YYYY-MM-DD
-<a id="__codelineno-4-73" name="__codelineno-4-73" href="#__codelineno-4-73"></a>                        (default: 30 days before end_date) [env var:
-<a id="__codelineno-4-74" name="__codelineno-4-74" href="#__codelineno-4-74"></a>                        START_DATE]
-<a id="__codelineno-4-75" name="__codelineno-4-75" href="#__codelineno-4-75"></a>  --end-date END_DATE   the end date of the interval in format YYYY-MM-DD
-<a id="__codelineno-4-76" name="__codelineno-4-76" href="#__codelineno-4-76"></a>                        (default: today) [env var: END_DATE]
-<a id="__codelineno-4-77" name="__codelineno-4-77" href="#__codelineno-4-77"></a>  --last-month          download data of whole last month [env var:
-<a id="__codelineno-4-78" name="__codelineno-4-78" href="#__codelineno-4-78"></a>                        LAST_MONTH]
-<a id="__codelineno-4-79" name="__codelineno-4-79" href="#__codelineno-4-79"></a>  --timezone TIMEZONE   set the timezone for localization [env var: TIMEZONE]
-<a id="__codelineno-4-80" name="__codelineno-4-80" href="#__codelineno-4-80"></a>  --locale LOCALE       set locale for date and time formatting [env var:
-<a id="__codelineno-4-81" name="__codelineno-4-81" href="#__codelineno-4-81"></a>                        LOCALE]
-<a id="__codelineno-4-82" name="__codelineno-4-82" href="#__codelineno-4-82"></a>  --filename FILENAME   file to write to (default:
-<a id="__codelineno-4-83" name="__codelineno-4-83" href="#__codelineno-4-83"></a>                        &lt;station_name_short&gt;_&lt;year&gt;_&lt;month&gt;.csv when reporting
-<a id="__codelineno-4-84" name="__codelineno-4-84" href="#__codelineno-4-84"></a>                        last month, &lt;station_name_short&gt;_&lt;start_date&gt;.csv
-<a id="__codelineno-4-85" name="__codelineno-4-85" href="#__codelineno-4-85"></a>                        else) [env var: FILENAME]
-<a id="__codelineno-4-86" name="__codelineno-4-86" href="#__codelineno-4-86"></a>  --stdout              also print to stdout [env var: STDOUT]
-<a id="__codelineno-4-87" name="__codelineno-4-87" href="#__codelineno-4-87"></a>
-<a id="__codelineno-4-88" name="__codelineno-4-88" href="#__codelineno-4-88"></a>Args that start with &#39;--&#39; (eg. --bearer-token) can also be set in a config
-<a id="__codelineno-4-89" name="__codelineno-4-89" href="#__codelineno-4-89"></a>file (/etc/suisa_sendemeldung.conf or /home/hairmare/suisa_sendemeldung.conf
-<a id="__codelineno-4-90" name="__codelineno-4-90" href="#__codelineno-4-90"></a>or suisa_sendemeldung.conf). Config file syntax allows: key=value, flag=true,
-<a id="__codelineno-4-91" name="__codelineno-4-91" href="#__codelineno-4-91"></a>stuff=[a,b,c] (for details, see syntax at https://goo.gl/R74nmi). If an arg is
-<a id="__codelineno-4-92" name="__codelineno-4-92" href="#__codelineno-4-92"></a>specified in more than one place, then commandline values override environment
-<a id="__codelineno-4-93" name="__codelineno-4-93" href="#__codelineno-4-93"></a>variables which override config file values which override defaults.
-</code></pre></div></p>
-<h2 id="configuration">Configuration</h2>
-<p>You can configure this script either with a configuration file (default is <code>suisa_sendemeldung.conf</code>), environment variables or command line arguments as shown above.</p>
-<p>Command line arguments override environment variables which themselves override settings in the configuration file.</p>
-<h3 id="configuration-file">Configuration file</h3>
+<p>We provide the SUISA Sendmeldung script as a container image or as a python package.</p>
+<p>These usage instructions show how to install the script and how to configure it.
+There are different ways to run it at a schedule. We recommend using
+<a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html">systemd-timers</a>.</p>
+<p>To output the scripts usage information, check out it's <code>--help</code> output:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Using Podman</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>podman<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-ti<span class="w"> </span>ghcr.io/radiorabe/suisasendemeldung:latest<span class="w"> </span>suisa_sendemeldung<span class="w"> </span>--help
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Using Docker</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-ti<span class="w"> </span>ghcr.io/radiorabe/suisasendemeldung:latest<span class="w"> </span>suisa_sendemeldung<span class="w"> </span>--help
+</code></pre></div>
+<p>While we recommend running the script in it's container, you can also install the script
+in any python environment using <a href="https://pip.pypa.io/">pip</a>.</p>
+<p>We recommend using a dedicated <a href="https://docs.python.org/3/library/venv.html">venv</a> for
+running the script hould you go down this route:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python<span class="w"> </span>-mvenv<span class="w"> </span>.venv
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>.<span class="w"> </span>venv/bin/activate
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>pip<span class="w"> </span>install<span class="w"> </span>suisa_sendemeldung
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="c1"># Output usage after installation</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>suisa_sendemeldung
+</code></pre></div>
+<h3 id="configuration">Configuration</h3>
+<p>You can configure this script with a configuration file (default is <code>suisa_sendemeldung.conf</code>),
+environment variables, or command line arguments.</p>
+<p>Command line arguments override environment variables which themselves override settings in
+the configuration file.</p>
+<h4 id="configuration-file">Configuration file</h4>
 <p>The configuration files will be evaluated in the following order (last takes precedence over first):</p>
 <ol>
 <li><code>/etc/suisa_sendemeldung.conf</code></li>
@@ -617,29 +529,29 @@
 <li><code>./suisa_sendemeldung.conf</code></li>
 </ol>
 <p>For details on how to set configuration values, have a look at <a href="etc/suisa_sendemeldung.conf">suisa_sendemeldung.conf</a>.</p>
-<h3 id="environment-variables">Environment variables</h3>
+<h4 id="environment-variables">Environment variables</h4>
 <p>Environment variables can also be passed as options. The relevant variables are listed in the <a href="#Usage">Usage</a> part of this document. For example run the script as follows:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="nv">BEARER_TOKEN</span><span class="o">=</span>abcdefghijklmnopqrstuvwxyzabcdef<span class="w"> </span><span class="nv">STREAM_ID</span><span class="o">=</span>a-bcdefgh<span class="w"> </span><span class="nv">STDOUT</span><span class="o">=</span>True<span class="w"> </span>./suisa_sendemeldung.py
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>podman<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-ti<span class="w"> </span>-e<span class="w"> </span><span class="nv">BEARER_TOKEN</span><span class="o">=</span>abcdefghijklmnopqrstuvwxyzabcdef<span class="w"> </span>-e<span class="w"> </span><span class="nv">STREAM_ID</span><span class="o">=</span>a-bcdefgh<span class="w"> </span>-e<span class="w"> </span><span class="nv">STDOUT</span><span class="o">=</span>True<span class="w"> </span>ghcr.io/radiorabe/suisasendemeldung:latest<span class="w"> </span>suisa_sendemeldung
 </code></pre></div>
-<h3 id="command-line-switches">Command line switches</h3>
+<h4 id="command-line-switches">Command line switches</h4>
 <p>As documented in <a href="#Usage">Usage</a>, you can also pass in options on the command line as arguments. Simply run the script as follows:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>./suisa_sendemeldung.py<span class="w"> </span>--bearer-token<span class="o">=</span>abcdefghijklmnopqrstuvwxyzabcdef<span class="w"> </span>--stream_id<span class="o">=</span>a-bcdefgh<span class="w"> </span>--stdout
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>podman<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-ti<span class="w"> </span>ghcr.io/radiorabe/suisasendemeldung:latest<span class="w"> </span>suisa_sendemeldung<span class="w"> </span>--bearer-token<span class="o">=</span>abcdefghijklmnopqrstuvwxyzabcdef<span class="w"> </span>--stream_id<span class="o">=</span>a-bcdefgh<span class="w"> </span>--stdout
 </code></pre></div>
 <h2 id="development">Development</h2>
 <p>Snapshot testing is used to test the help output, you can update the snapshots like so:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>poetry run pytest -- --snapshot-update
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>poetry run pytest -- --snapshot-update
 </code></pre></div></p>
 <h2 id="release-management">Release Management</h2>
+<p>At RaBe we run the script on the first and 14th of each month. Matching this we only release new versions of the script in the second half of each month.</p>
 <p>The CI/CD setup uses semantic commit messages following the <a href="https://www.conventionalcommits.org/en/v1.0.0/">conventional commits standard</a>.
 There is a GitHub Action in <a href="./.github/workflows/semantic-release.yaml">.github/workflows/semantic-release.yaml</a>
-that uses <a href="https://go-semantic-release.xyz/">go-semantic-commit</a> to create new
-releases.</p>
+that uses <a href="https://go-semantic-release.xyz/">go-semantic-commit</a> to create new releases.</p>
 <p>The commit message should be structured as follows:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>&lt;type&gt;[optional scope]: &lt;description&gt;
-<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>
-<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>[optional body]
-<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
-<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>[optional footer(s)]
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>&lt;type&gt;[optional scope]: &lt;description&gt;
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>[optional body]
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>[optional footer(s)]
 </code></pre></div>
 <p>The commit contains the following structural elements, to communicate intent to the consumers of your library:</p>
 <ol>
