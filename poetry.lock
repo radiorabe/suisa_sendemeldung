@@ -2,13 +2,13 @@
 
 [[package]]
 name = "acrclient"
-version = "0.4.5"
+version = "0.4.6"
 description = "API wrapper for the v2 ACRCloud API"
 optional = false
 python-versions = "<4.0,>=3.11"
 files = [
-    {file = "acrclient-0.4.5-py3-none-any.whl", hash = "sha256:02e1229949abfbd4d4824eea38a4907ff4e6d2ad97f5670b4b41e58ff9fd22ac"},
-    {file = "acrclient-0.4.5.tar.gz", hash = "sha256:5369a8215d79d5ce4b47213496dd68e6b793edbb5ec6b32125ed801ca7197cb7"},
+    {file = "acrclient-0.4.6-py3-none-any.whl", hash = "sha256:c495c37b8d76bc826aab59bfa1dfa2f6927fe4e3944b733e913a47d816eff524"},
+    {file = "acrclient-0.4.6.tar.gz", hash = "sha256:83dbdf0fa5d5048055c277cd1e926194fac054cad91d70b4272843f14242536f"},
 ]
 
 [package.dependencies]
