@@ -1512,13 +1512,13 @@ telegram = ["requests"]
 
 [[package]]
 name = "types-openpyxl"
-version = "3.1.0.20240428"
+version = "3.1.2.20240601"
 description = "Typing stubs for openpyxl"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-openpyxl-3.1.0.20240428.tar.gz", hash = "sha256:76f5d01fb6ecb495683da957ac4e15b982efbeab772f728a348c6e01ae990e9b"},
-    {file = "types_openpyxl-3.1.0.20240428-py3-none-any.whl", hash = "sha256:08b180ec49d15140e07399a3f3cb75fd25e9e09e3326319fc6be5636892480f5"},
+    {file = "types-openpyxl-3.1.2.20240601.tar.gz", hash = "sha256:3b618754e3b9af578a8fa77dc77fcaf4940bc57934a030415cdaa5081662e800"},
+    {file = "types_openpyxl-3.1.2.20240601-py3-none-any.whl", hash = "sha256:72865ebcdba77f450b4bd220a676fd5f064f9172859fe239356f2e2402ac83e7"},
 ]
 
 [[package]]
