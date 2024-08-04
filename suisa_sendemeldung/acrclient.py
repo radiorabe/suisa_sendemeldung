@@ -73,7 +73,7 @@ class ACRClient(Client):
 
         return data
 
-    def get_interval_data(  # noqa: PLR0913, ANN201
+    def get_interval_data(  # noqa: ANN201
         self: Self,
         project_id: int,
         stream_id: str,
