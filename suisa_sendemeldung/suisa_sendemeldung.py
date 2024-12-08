@@ -511,8 +511,6 @@ def get_isrc(music: Any) -> str:  # noqa: ANN401
     return isrc
 
 
-# all local vars are required, eight are already used for the csv entries
-# pylint: disable-msg=too-many-locals
 def get_csv(data: dict, station_name: str = "") -> str:
     """Create SUISA compatible csv data.
 

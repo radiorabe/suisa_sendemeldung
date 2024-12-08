@@ -80,7 +80,7 @@ class ACRClient(Client):
         start: date,
         end: date,
         timezone: str = ACR_TIMEZONE,
-    ):  # pylint: disable-msg=too-many-locals,too-many-arguments
+    ):
         """Get data specified by interval from start to end.
 
         Arguments:
