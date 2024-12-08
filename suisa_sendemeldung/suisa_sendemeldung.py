@@ -28,6 +28,7 @@ from configargparse import ArgumentParser  # type: ignore[import-untyped]
 from dateutil.relativedelta import relativedelta
 from iso3901 import ISRC
 from openpyxl import Workbook
+from openpyxl.cell.cell import Cell, MergedCell
 from openpyxl.styles import Border, Font, PatternFill, Side
 from tqdm import tqdm
 
@@ -693,9 +694,10 @@ def get_xlsx(data: Any, args: ArgparseNamespace) -> BytesIO:  # noqa: ANN401
 
     # Try to approximate the required width by finding the longest values per column
     dims: dict[str, int] = {}
-    for row in worksheet.rows:  # type: ignore[assignment]
-        for cell in row:  # type: ignore[assignment]
-            if cell.value:
+    calc_row: tuple[Cell | MergedCell, ...]
+    for calc_row in worksheet.rows:
+        for cell in calc_row:
+            if isinstance(cell, Cell) and cell.value:
                 dims[cell.column_letter] = max(
                     (dims.get(cell.column_letter, 0), len(str(cell.value))),
                 )
