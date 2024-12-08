@@ -87,3 +87,82 @@
   
   '''
 # ---
+# name: test_get_csv
+  '''
+  Titel,Komponist,Interpret,Interpreten-Info,Sender,Sendedatum,Sendedauer,Sendezeit,Werkverzeichnisangaben,ISRC,Label,CD ID / Katalog-Nummer,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Titel des Tonträgers (Albumtitel),Autor Text,Track Nummer,Genre,Programm,Bestellnummer,Marke,Label Code,EAN/GTIN,Identifikationsnummer
+  
+  '''
+# ---
+# name: test_get_csv.1
+  '''
+  Titel,Komponist,Interpret,Interpreten-Info,Sender,Sendedatum,Sendedauer,Sendezeit,Werkverzeichnisangaben,ISRC,Label,CD ID / Katalog-Nummer,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Titel des Tonträgers (Albumtitel),Autor Text,Track Nummer,Genre,Programm,Bestellnummer,Marke,Label Code,EAN/GTIN,Identifikationsnummer
+  Uhrenvergleich,,,,Station Name,19930301,00:01:00,13:12:00,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test
+  Meme Dub,Da Composah,Da Gang,,Station Name,19930301,00:01:00,13:37:00,,DEZ650710376,,,,,,"album, but string",,,,,,,,,crid://rabe.ch/v1/test
+  Bubbles,,"Mary's Surprise Act, Climmy Jiff",,Station Name,19930301,00:01:00,16:20:00,,DEZ650710376,Jane Records,,,,20221213,Da Alboom,,,,,,,,greedy-capitalist-number,crid://rabe.ch/v1/test
+  ,,Artists as string not list,,Station Name,19930301,00:01:00,17:17:17,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test
+  Long Playing,,,,Station Name,19930301,19:48:57,18:18:18,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test
+  composer in works,Worker,,,Station Name,19930301,19:48:57,18:18:18,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test
+  composer better in works,composer,same,,Station Name,19930301,19:48:57,18:18:18,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test
+  
+  '''
+# ---
+# name: test_get_xlsx
+  list([
+    tuple(
+      'Titel',
+      'Komponist',
+      'Interpret',
+      'Interpreten-Info',
+      'Sender',
+      'Sendedatum',
+      'Sendedauer',
+      'Sendezeit',
+      'Werkverzeichnisangaben',
+      'ISRC',
+      'Label',
+      'CD ID / Katalog-Nummer',
+      'Aufnahmedatum',
+      'Aufnahmeland',
+      'Erstveröffentlichungsdatum',
+      'Titel des Tonträgers (Albumtitel)',
+      'Autor Text',
+      'Track Nummer',
+      'Genre',
+      'Programm',
+      'Bestellnummer',
+      'Marke',
+      'Label Code',
+      'EAN/GTIN',
+      'Identifikationsnummer',
+    ),
+  ])
+# ---
+# name: test_get_xlsx.1
+  DimensionHolder({
+    'A': <ColumnDimension Instance, Attributes={'width': '8', 'customWidth': '1', 'min': '1', 'max': '1'}>,
+    'B': <ColumnDimension Instance, Attributes={'width': '12', 'customWidth': '1', 'min': '2', 'max': '2'}>,
+    'C': <ColumnDimension Instance, Attributes={'width': '12', 'customWidth': '1', 'min': '3', 'max': '3'}>,
+    'D': <ColumnDimension Instance, Attributes={'width': '19', 'customWidth': '1', 'min': '4', 'max': '4'}>,
+    'E': <ColumnDimension Instance, Attributes={'width': '9', 'customWidth': '1', 'min': '5', 'max': '5'}>,
+    'F': <ColumnDimension Instance, Attributes={'width': '13', 'customWidth': '1', 'min': '6', 'max': '6'}>,
+    'G': <ColumnDimension Instance, Attributes={'width': '13', 'customWidth': '1', 'min': '7', 'max': '7'}>,
+    'H': <ColumnDimension Instance, Attributes={'width': '12', 'customWidth': '1', 'min': '8', 'max': '8'}>,
+    'I': <ColumnDimension Instance, Attributes={'width': '25', 'customWidth': '1', 'min': '9', 'max': '9'}>,
+    'J': <ColumnDimension Instance, Attributes={'width': '7', 'customWidth': '1', 'min': '10', 'max': '10'}>,
+    'K': <ColumnDimension Instance, Attributes={'width': '8', 'customWidth': '1', 'min': '11', 'max': '11'}>,
+    'L': <ColumnDimension Instance, Attributes={'width': '25', 'customWidth': '1', 'min': '12', 'max': '12'}>,
+    'M': <ColumnDimension Instance, Attributes={'width': '16', 'customWidth': '1', 'min': '13', 'max': '13'}>,
+    'N': <ColumnDimension Instance, Attributes={'width': '15', 'customWidth': '1', 'min': '14', 'max': '14'}>,
+    'O': <ColumnDimension Instance, Attributes={'width': '29', 'customWidth': '1', 'min': '15', 'max': '15'}>,
+    'P': <ColumnDimension Instance, Attributes={'width': '36', 'customWidth': '1', 'min': '16', 'max': '16'}>,
+    'Q': <ColumnDimension Instance, Attributes={'width': '13', 'customWidth': '1', 'min': '17', 'max': '17'}>,
+    'R': <ColumnDimension Instance, Attributes={'width': '15', 'customWidth': '1', 'min': '18', 'max': '18'}>,
+    'S': <ColumnDimension Instance, Attributes={'width': '8', 'customWidth': '1', 'min': '19', 'max': '19'}>,
+    'T': <ColumnDimension Instance, Attributes={'width': '11', 'customWidth': '1', 'min': '20', 'max': '20'}>,
+    'U': <ColumnDimension Instance, Attributes={'width': '16', 'customWidth': '1', 'min': '21', 'max': '21'}>,
+    'V': <ColumnDimension Instance, Attributes={'width': '8', 'customWidth': '1', 'min': '22', 'max': '22'}>,
+    'W': <ColumnDimension Instance, Attributes={'width': '13', 'customWidth': '1', 'min': '23', 'max': '23'}>,
+    'X': <ColumnDimension Instance, Attributes={'width': '11', 'customWidth': '1', 'min': '24', 'max': '24'}>,
+    'Y': <ColumnDimension Instance, Attributes={'width': '24', 'customWidth': '1', 'min': '25', 'max': '25'}>,
+  })
+# ---
