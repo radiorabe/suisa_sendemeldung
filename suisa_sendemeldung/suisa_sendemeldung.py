@@ -511,19 +511,20 @@ def get_isrc(music: Any) -> str:  # noqa: ANN401
     return isrc
 
 
-def get_csv(data: dict, station_name: str = "") -> str:
+def get_csv(data: dict, args: ArgparseNamespace) -> str:
     """Create SUISA compatible csv data.
 
     Arguments:
     ---------
         data: To data to create csv from
-        station_name: Default station name for output
+        args: Parsed arguments
 
     Returns:
     -------
         csv: The converted data
 
     """
+    station_name = args.station_name
     header = [
         "Titel",
         "Komponist",
@@ -642,20 +643,20 @@ def get_csv(data: dict, station_name: str = "") -> str:
     return csv.getvalue()
 
 
-def get_xlsx(data: Any, station_name: str = "") -> BytesIO:  # noqa: ANN401
+def get_xlsx(data: Any, args: ArgparseNamespace) -> BytesIO:  # noqa: ANN401
     """Create SUISA compatible xlsx data.
 
     Arguments:
     ---------
         data: The data to create xlsx from
-        station_name: Default station name for output
+        args: Parsed arguments
 
     Returns:
     -------
         xlsx: The converted data as BytesIO object
 
     """
-    csv = get_csv(data, station_name=station_name)
+    csv = get_csv(data, args=args)
     csv_reader = reader(StringIO(csv))
 
     xlsx = BytesIO()
@@ -862,9 +863,9 @@ def main() -> None:  # pragma: no cover
     )
     data = merge_duplicates(data)
     if args.filetype == "xlsx":
-        data = get_xlsx(data, station_name=args.station_name)
+        data = get_xlsx(data, args=args)
     elif args.filetype == "csv":
-        data = get_csv(data, station_name=args.station_name)
+        data = get_csv(data, args=args)
     if args.email:
         email_subject = Template(args.email_subject).substitute(
             {

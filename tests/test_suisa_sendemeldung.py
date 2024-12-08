@@ -195,13 +195,13 @@ def test_funge_release_date(test_date, expected):
 
 
 @patch("cridlib.get")
-def test_get_csv(mock_cridlib_get, snapshot):
+def test_get_csv(mock_cridlib_get, snapshot, args):
     """Test get_csv."""
     mock_cridlib_get.return_value = "crid://rabe.ch/v1/test"
 
     # empty data
     data = []
-    csv = suisa_sendemeldung.get_csv(data)
+    csv = suisa_sendemeldung.get_csv(data, args=args)
     assert csv == snapshot
     mock_cridlib_get.assert_not_called()
 
@@ -322,7 +322,7 @@ def test_get_csv(mock_cridlib_get, snapshot):
             },
         },
     ]
-    csv = suisa_sendemeldung.get_csv(data, station_name="Station Name")
+    csv = suisa_sendemeldung.get_csv(data, args=args)
     assert csv == snapshot
     mock_cridlib_get.assert_has_calls(
         [
@@ -350,12 +350,12 @@ def test_get_csv(mock_cridlib_get, snapshot):
     )
 
 
-def test_get_xlsx(snapshot):
+def test_get_xlsx(snapshot, args):
     """Test get_xlsx."""
 
     # empty data
     data = []
-    xlsx = suisa_sendemeldung.get_xlsx(data)
+    xlsx = suisa_sendemeldung.get_xlsx(data, args=args)
     workbook = load_workbook(xlsx)
     worksheet = workbook.active
     assert list(worksheet.values) == snapshot
