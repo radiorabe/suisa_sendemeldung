@@ -29,12 +29,14 @@ def test_validate_arguments():
     # last_month is in conflict with start_date and end_date
     args.last_month = True
     args.start_date = date(1993, 3, 1)
+    args.crid_mode = "invalid"
     with patch("suisa_sendemeldung.suisa_sendemeldung.ArgumentParser") as mock:
         suisa_sendemeldung.validate_arguments(mock, args)
         mock.error.assert_called_once_with(
             "\n"
             "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"  # noqa: E501
             "- wrong format on stream_id, expected 9 or 10 characters but got 12\n"
+            "- wrong CRID mode, expected 'cridlib' or 'local'\n"
             "- no output option has been set, specify one of --file, --email or --stdout\n"  # noqa: E501
             "- argument --last_month not allowed with --start_date or --end_date",
         )
@@ -47,6 +49,7 @@ def test_validate_arguments():
             "\n"
             "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"  # noqa: E501
             "- wrong format on stream_id, expected 9 or 10 characters but got 12\n"
+            "- wrong CRID mode, expected 'cridlib' or 'local'\n"
             "- xlsx cannot be printed to stdout, please set --filetype to csv\n"
             "- argument --last_month not allowed with --start_date or --end_date",
         )
@@ -348,6 +351,13 @@ def test_get_csv(mock_cridlib_get, snapshot, args):
             ),
         ],
     )
+
+    # no cridib
+    mock_cridlib_get.reset_mock()
+    args.crid_mode = "local"
+    csv = suisa_sendemeldung.get_csv(data, args=args)
+    assert csv == snapshot
+    mock_cridlib_get.assert_not_called()
 
 
 def test_get_xlsx(snapshot, args):

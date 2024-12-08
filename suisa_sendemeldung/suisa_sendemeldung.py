@@ -121,6 +121,9 @@ def validate_arguments(parser: ArgumentParser, args: ArgparseNamespace) -> None:
                 f"expected 9 or 10 characters but got {len(args.stream_id)}"
             ),
         )
+    # crid mode can be local or cridlib
+    if args.crid_mode not in ["cridlib", "local"]:
+        msgs.append("wrong CRID mode, expected 'cridlib' or 'local'")
     # one output option has to be set
     if not (args.file or args.email or args.stdout):
         msgs.append(
@@ -312,6 +315,12 @@ def get_arguments(parser: ArgumentParser, sysargs: list[str]) -> ArgparseNamespa
         env_var="STDOUT",
         help="also print to stdout",
         action="store_true",
+    )
+    parser.add_argument(
+        "--crid-mode",
+        env_var="CRID_MODE",
+        help="Choose how to generate CRID identifiers (cridlib or local)",
+        default="cridlib",
     )
     args = parser.parse_args(sysargs)
     validate_arguments(parser, args)  # pragma: no cover
@@ -603,6 +612,7 @@ def get_csv(data: dict, args: ArgparseNamespace) -> str:
         upc = music.get("external_ids", {}).get("upc", "")
         release_date = funge_release_date(music.get("release_date", ""))
 
+        local_id: str
         # cridlib only supports timezone-aware datetime values, so we convert one
         timestamp_utc = pytz.utc.localize(
             datetime.strptime(metadata.get("timestamp_utc"), ACRClient.TS_FMT),  # noqa: DTZ007
@@ -610,7 +620,13 @@ def get_csv(data: dict, args: ArgparseNamespace) -> str:
         # we include the acrid in our CRID so we know about the data's provenience
         # in case any questions about the data we delivered are asked
         acrid = music.get("acrid")
-        local_id = cridlib.get(timestamp=timestamp_utc, fragment=f"acrid={acrid}")
+
+        if args.crid_mode == "cridlib":
+            local_id = str(
+                cridlib.get(timestamp=timestamp_utc, fragment=f"acrid={acrid}")
+            )
+        elif args.crid_mode == "local":
+            local_id = f"{timestamp_utc.isoformat()}#acrid={acrid}"
 
         csv_writer.writerow(
             [
