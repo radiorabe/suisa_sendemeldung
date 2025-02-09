@@ -63,8 +63,8 @@ def test_parse_date():
     args.last_month = True
     with freeze_time("1996-04-01"):
         (start_date, end_date) = suisa_sendemeldung.parse_date(args)
-    assert start_date == datetime(1996, 3, 1)
-    assert end_date == datetime(1996, 3, 31)
+    assert start_date == date(1996, 3, 1)
+    assert end_date == date(1996, 3, 31)
 
     # if no start_date was set, default to 30 days before end_date
     args = ArgumentParser()
