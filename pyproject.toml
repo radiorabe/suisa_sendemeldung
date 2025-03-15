@@ -15,7 +15,7 @@ suisa_sendemeldung = 'suisa_sendemeldung.suisa_sendemeldung:main'
 python = "^3.12"
 acrclient = "^0.4.4"
 ConfigArgParse = "^1.5.5"
-iso3901 = "^0.3.0.post1"
+iso3901 = ">=0.3,<1.1"
 openpyxl = "^3.1.2"
 pytz = ">=2023.3,<2026.0"
 requests = "^2.31.0"
