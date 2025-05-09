@@ -2,14 +2,14 @@
 
 [[package]]
 name = "acrclient"
-version = "0.4.6"
+version = "0.5.0"
 description = "API wrapper for the v2 ACRCloud API"
 optional = false
 python-versions = "<4.0,>=3.11"
 groups = ["main"]
 files = [
-    {file = "acrclient-0.4.6-py3-none-any.whl", hash = "sha256:c495c37b8d76bc826aab59bfa1dfa2f6927fe4e3944b733e913a47d816eff524"},
-    {file = "acrclient-0.4.6.tar.gz", hash = "sha256:83dbdf0fa5d5048055c277cd1e926194fac054cad91d70b4272843f14242536f"},
+    {file = "acrclient-0.5.0-py3-none-any.whl", hash = "sha256:abb457cd756ea8ab27eedc3fbc9bcd3aa61d7e27daba731fa17240a01dce84d4"},
+    {file = "acrclient-0.5.0.tar.gz", hash = "sha256:7ba68494fca7947454761e37139579a08fc6d1cf484da1679647fba007351763"},
 ]
 
 [package.dependencies]
@@ -1695,4 +1695,4 @@ test = ["pytest (>=6.0.0)", "setuptools (>=65)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "a9bf92cb27531d98e697df6336a2a5e0cbd057cedf49469f994f3120bd4ad468"
+content-hash = "02ef09da2f8fca537c98c741f47599c8aaa40a1c3e58a663d18f1e5bf7b454a8"
