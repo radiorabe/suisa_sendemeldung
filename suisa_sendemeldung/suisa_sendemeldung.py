@@ -496,6 +496,37 @@ def get_artist(music: Any) -> str:  # noqa: ANN401
     return artist
 
 
+def get_composer(music: Any) -> str:  # noqa: ANN401
+    """Get composer from a given dict.
+
+    Arguments:
+    ---------
+        music: music dict from API
+
+    Returns:
+    -------
+        composer: string representing the composer
+
+    """
+    # composers is usually represented as a list of strings, e.g.:
+    # 'contributors': {'composers': ['Alison Rachel Stewart', ...]}
+    composer = ""
+    contributors = music.get("contributors")
+    if contributors is not None:
+        composers = contributors.get("composers")
+        if composers is not None:
+            if isinstance(composers, list):
+                composer = ", ".join(composers)
+            else:
+                # if composers is not in the expected format, we want to know that
+                msg = (
+                    "composers not in expected format, got "
+                    f"{type(composers).__name__}, expected list music dict: {music}"
+                )
+                raise TypeError(msg)
+    return composer
+
+
 def get_isrc(music: Any) -> str:  # noqa: ANN401
     """Get a valid ISRC from the music record or return an empty string."""
     isrc = ""
@@ -585,8 +616,8 @@ def get_csv(data: dict, args: ArgparseNamespace) -> str:
         title = music.get("title")
 
         artist = get_artist(music)
+        composer = get_composer(music)
 
-        composer = ", ".join(music.get("contributors", {}).get("composers", ""))
         works_composer = ", ".join(
             [
                 c["name"]
