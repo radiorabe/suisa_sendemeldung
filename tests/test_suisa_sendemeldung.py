@@ -253,6 +253,7 @@ def test_get_csv(mock_cridlib_get, snapshot, args):
                         "album": {
                             "name": "Da Alboom",
                         },
+                        "contributors": {"composers": None},
                         "release_date": "2022-12-13",
                         "artists": [
                             {

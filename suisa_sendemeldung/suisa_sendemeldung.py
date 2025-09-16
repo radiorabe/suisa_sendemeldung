@@ -517,7 +517,7 @@ def get_composer(music: Any) -> str:  # noqa: ANN401
         if composers is not None:
             if isinstance(composers, list):
                 composer = ", ".join(composers)
-            else:
+            else:  # pragma: no cover
                 # if composers is not in the expected format, we want to know that
                 msg = (
                     "composers not in expected format, got "
