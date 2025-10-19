@@ -571,7 +571,7 @@ def get_csv(data: dict, args: ArgparseNamespace) -> str:
         # parse timestamp
         timestamp = datetime.strptime(metadata.get("timestamp_local"), ACRClient.TS_FMT)  # noqa: DTZ007
 
-        ts_date = timestamp.strftime("%Y%m%d")
+        ts_date = timestamp.strftime("%Y-%m-%d")
         ts_time = timestamp.strftime("%H:%M:%S")
         hours, remainder = divmod(metadata.get("played_duration"), 60 * 60)
         minutes, seconds = divmod(remainder, 60)
@@ -678,6 +678,7 @@ def get_xlsx(data: Any, args: ArgparseNamespace) -> BytesIO:  # noqa: ANN401
 
     xlsx = BytesIO()
     workbook: Workbook = Workbook()
+    workbook.iso_dates = True
     if not workbook.active:  # pragma: no cover
         raise RuntimeError
     worksheet: Worksheet = workbook.active  # type: ignore[assignment]
@@ -722,8 +723,24 @@ def get_xlsx(data: Any, args: ArgparseNamespace) -> BytesIO:  # noqa: ANN401
     for col, value in dims.items():
         worksheet.column_dimensions[col].width = value + padding
 
+    reformat_start_date_in_xlsx(worksheet)
+
     workbook.save(xlsx)
     return xlsx
+
+
+def reformat_start_date_in_xlsx(worksheet: Worksheet) -> None:
+    """Set date number formatting on "Sendedatum" col."""
+    for idx, row in enumerate(worksheet.rows):
+        # skip first row
+        if idx < 1:
+            continue
+        # turn the str from the CSV into a real datetime.datetime again
+        row[5].value = datetime.strptime(  # noqa: DTZ007
+            f"{row[5].value} {row[7].value}", "%Y-%m-%d %H:%M:%S"
+        ).date()
+        # adjust the formatting
+        row[5].number_format = "yyyy-mm-dd"
 
 
 def write_csv(filename: str, csv: str) -> None:  # pragma: no cover
