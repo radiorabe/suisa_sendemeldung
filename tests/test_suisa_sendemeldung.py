@@ -3,12 +3,13 @@
 from datetime import date, datetime, timezone
 from email.message import Message
 from io import BytesIO
+from typing import TYPE_CHECKING
 from unittest.mock import call, patch
 
 import pytest
 from click.testing import CliRunner
 from freezegun import freeze_time
-from openpyxl import load_workbook
+from openpyxl import Workbook, load_workbook
 from typed_settings.exceptions import InvalidValueError
 
 from suisa_sendemeldung import suisa_sendemeldung
@@ -20,6 +21,9 @@ from suisa_sendemeldung.settings import (
     Settings,
     StationSettings,
 )
+
+if TYPE_CHECKING:  # pragma: no cover
+    from openpyxl.worksheet.worksheet import Worksheet
 
 
 def test_validate_arguments():
@@ -362,6 +366,19 @@ def test_get_xlsx(snapshot, settings):
     worksheet = workbook.active
     assert list(worksheet.values) == snapshot
     assert worksheet.column_dimensions == snapshot
+
+
+def test_reformat_start_date_in_xlsx():
+    workbook: Workbook = Workbook()
+    if not workbook.active:  # pragma: no cover
+        raise RuntimeError
+    worksheet: Worksheet = workbook.active  # type: ignore[assignment]
+    worksheet.append([])
+    worksheet.append(["", "", "", "", "", "2025-01-01", "", "01:01:01"])
+    suisa_sendemeldung.reformat_start_date_in_xlsx(worksheet)
+    row = list(worksheet.rows)[1]
+    assert row[5].value == datetime(2025, 1, 1, 1, 1, 1).date()
+    assert row[5].number_format == "yyyy-mm-dd"
 
 
 def test_get_email_attachment():
