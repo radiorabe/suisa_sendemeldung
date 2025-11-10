@@ -505,14 +505,14 @@ files = [
 
 [[package]]
 name = "iso3901"
-version = "1.0.0"
+version = "1.0.1"
 description = "Structured parsing of ISRC (International Standard Recording Code), as defined in ISO 3901:2019"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "iso3901-1.0.0-py3-none-any.whl", hash = "sha256:dcced319848f50d4ef424a910017afe908c6b4d2dd193e3b4116b54467ae6072"},
-    {file = "iso3901-1.0.0.tar.gz", hash = "sha256:fe7d49e9dfdff7442037ecfcfb8e85b5dfe3f0b3182ab9675fba59964922c7fa"},
+    {file = "iso3901-1.0.1-py3-none-any.whl", hash = "sha256:09360acf73be0d84b606830623dd4ad8a14acb6392d4bdf5aa4db6fd7ee25cd2"},
+    {file = "iso3901-1.0.1.tar.gz", hash = "sha256:54bed6dc1880dae5eb7c31be6e75c8b5dc2de732eb972c460c0813b7860a443f"},
 ]
 
 [package.dependencies]
