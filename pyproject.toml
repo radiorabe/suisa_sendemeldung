@@ -50,9 +50,9 @@ types-requests = "^2.31.0.1"
 types-tqdm = "^4.66.0.20240106"
 wheel = ">=0.40,<0.46"
 
-[tool.pytest.ini_options]
-minversion = "8.1"
-addopts = "--doctest-modules --cov=suisa_sendemeldung --cov-fail-under=100 --ignore=docs/ --mypy --ruff"
+[tool.pytest]
+minversion = "9.0"
+addopts = ["--doctest-modules", "--cov=suisa_sendemeldung", "--cov-fail-under=100", "--ignore=docs/", "--mypy", "--ruff"]
 
 [build-system]
 requires = ["poetry-core"]
