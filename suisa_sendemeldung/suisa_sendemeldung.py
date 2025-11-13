@@ -510,20 +510,13 @@ def get_composer(music: Any) -> str:  # noqa: ANN401
     """
     # composers is usually represented as a list of strings, e.g.:
     # 'contributors': {'composers': ['Alison Rachel Stewart', ...]}
+    # if composers is not in the expected format, we just return an empty string
     composer = ""
     contributors = music.get("contributors")
     if contributors is not None:
         composers = contributors.get("composers")
-        if composers is not None:
-            if isinstance(composers, list):
-                composer = ", ".join(composers)
-            else:  # pragma: no cover
-                # if composers is not in the expected format, we want to know that
-                msg = (
-                    "composers not in expected format, got "
-                    f"{type(composers).__name__}, expected list music dict: {music}"
-                )
-                raise TypeError(msg)
+        if composers is not None and isinstance(composers, list):
+            composer = ", ".join(composers)
     return composer
 
 
