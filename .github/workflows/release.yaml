@@ -19,6 +19,6 @@ jobs:
       tags: rabe python suisa
 
   python-poetry:
-    uses: radiorabe/actions/.github/workflows/release-python-poetry.yaml@v0.38.1
+    uses: radiorabe/actions/.github/workflows/release-python-poetry.yaml@v0.38.3
     secrets:
       RABE_PYPI_TOKEN: ${{ secrets.RABE_PYPI_TOKEN }}
