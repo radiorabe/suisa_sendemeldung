@@ -259,6 +259,11 @@ def get_arguments(parser: ArgumentParser, sysargs: list[str]) -> ArgparseNamespa
         default=_EMAIL_TEMPLATE,
     )
     parser.add_argument(
+        "--email-text-template-file",
+        env_var="EMAIL_TEXT_TEMPLATE_FILE",
+        help="Specifify a path to an email_text template",
+    )
+    parser.add_argument(
         "--email-footer",
         env_var="EMAIL_FOOTER",
         help="Footer for the Email",
@@ -324,6 +329,9 @@ def get_arguments(parser: ArgumentParser, sysargs: list[str]) -> ArgparseNamespa
     )
     args = parser.parse_args(sysargs)
     validate_arguments(parser, args)  # pragma: no cover
+    if args.email_text_template_file:  # pragma: no cover
+        with Path(args.email_text_template_file).open("r") as template_file:
+            args.email_text = template_file.read()
     return args  # pragma: no cover
 
 

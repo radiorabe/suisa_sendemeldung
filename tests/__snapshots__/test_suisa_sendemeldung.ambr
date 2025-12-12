@@ -9,6 +9,7 @@
                 [--email-bcc EMAIL_BCC] [--email-server EMAIL_SERVER]
                 [--email-login EMAIL_LOGIN] [--email-pass EMAIL_PASS]
                 [--email-subject EMAIL_SUBJECT] [--email-text EMAIL_TEXT]
+                [--email-text-template-file EMAIL_TEXT_TEMPLATE_FILE]
                 [--email-footer EMAIL_FOOTER]
                 [--responsible-email RESPONSIBLE_EMAIL]
                 [--start-date START_DATE] [--end-date END_DATE] [--last-month]
@@ -60,6 +61,9 @@
                           $station_name, $month, $year, $previous_year,
                           $responsible_email, and $email_footer. [env var:
                           EMAIL_TEXT]
+    --email-text-template-file EMAIL_TEXT_TEMPLATE_FILE
+                          Specifify a path to an email_text template [env var:
+                          EMAIL_TEXT_TEMPLATE_FILE]
     --email-footer EMAIL_FOOTER
                           Footer for the Email [env var: EMAIL_FOOTER]
     --responsible-email RESPONSIBLE_EMAIL
