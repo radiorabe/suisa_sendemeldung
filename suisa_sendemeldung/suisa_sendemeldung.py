@@ -512,7 +512,7 @@ def reformat_start_date_in_xlsx(worksheet: Worksheet) -> None:
             f"{row[5].value} {row[7].value}", "%Y-%m-%d %H:%M:%S"
         ).date()
         # adjust the formatting
-        row[5].number_format = "yyyy-mm-dd"
+        row[5].number_format = "dd.mm.yyyy"
 
 
 def write_csv(filename: str, csv: BytesIO | str) -> None:  # pragma: no cover

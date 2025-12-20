@@ -378,7 +378,7 @@ def test_reformat_start_date_in_xlsx():
     suisa_sendemeldung.reformat_start_date_in_xlsx(worksheet)
     row = list(worksheet.rows)[1]
     assert row[5].value == datetime(2025, 1, 1, 1, 1, 1).date()
-    assert row[5].number_format == "yyyy-mm-dd"
+    assert row[5].number_format == "dd.mm.yyyy"
 
 
 def test_get_email_attachment():
