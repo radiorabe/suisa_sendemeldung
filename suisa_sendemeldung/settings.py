@@ -1,7 +1,7 @@
 """Settings for SUISA Sendemeldung."""
 
 from datetime import datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from zoneinfo import ZoneInfo
 
 import typed_settings as ts
@@ -57,7 +57,7 @@ $email_footer
 _ACRTOKEN_MAXLEN = 32
 
 
-class OutputMode(Enum):
+class OutputMode(StrEnum):
     """Output modes for the report."""
 
     file = "file"
@@ -65,14 +65,14 @@ class OutputMode(Enum):
     stdout = "stdout"
 
 
-class IdentifierMode(Enum):
+class IdentifierMode(StrEnum):
     """Modes for generating the identifier in the report."""
 
     local = "local"
     cridlib = "cridlib"
 
 
-class FileFormat(Enum):
+class FileFormat(StrEnum):
     """File formats for the report."""
 
     xslx = "xlsx"
@@ -133,7 +133,7 @@ class ACR:
     bearer_token: str = ts.secret(
         help="Bearer token for ACRCloud API access", default=""
     )
-    project_id: str = ts.option(help="Id of the project in ACRCloud", default="")
+    project_id: int = ts.option(help="Id of the project in ACRCloud", default=0)
     stream_id: str = ts.option(help="Id of the stream in ACRCloud", default="")
 
 
@@ -197,5 +197,5 @@ class Settings:
     station: StationSettings = ts.option(default=StationSettings())
     l10n: LocalizationSettings = ts.option(default=LocalizationSettings())
     acr: ACR = ts.option(default=ACR())
-    file: FileSettings|None = ts.option(default=None)
+    file: FileSettings = ts.option(default=FileSettings())
     email: EmailSettings|None = ts.option(default=None)
