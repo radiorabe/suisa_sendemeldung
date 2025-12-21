@@ -6,49 +6,57 @@
     ACRCloud client for SUISA reporting @ RaBe.
   
   Options:
-    --output [file|email|stdout]    How to output the report  [default: file]
-    --crid-mode [local|cridlib]     How to generate the identifier in the report
+    Settings for SUSIA Sendemeldung.: 
+      --output [file|email|stdout]  How to output the report  [default: file]
+      --crid-mode [local|cridlib]   How to generate the identifier in the report
                                     [default: local]
-    --last-month                    Generate report for the full last month,
+    Configure the range of the report.: 
+      --last-month                  Generate report for the full last month,
                                     overrides --date-start and --date-end
-    --date-start TEXT               The start date of the interval in format YYYY-
+      --date-start TEXT             The start date of the interval in format YYYY-
                                     MM-DD  [default: 2025-11-21]
-    --date-end TEXT                 The end date of the interval in format YYYY-
+      --date-end TEXT               The end date of the interval in format YYYY-
                                     MM-DD  [default: 2025-12-21]
-    --station-name TEXT             Station name, used in output and emails
+    Basic station information.: 
+      --station-name TEXT           Station name, used in output and emails
                                     [default: Radio Bern RaBe]
-    --station-name-short TEXT       Shortname for station as used in filenames
+      --station-name-short TEXT     Shortname for station as used in filenames
                                     (locally and in attachment)  [default: rabe]
-    --l10n-timezone TEXT            [default: UTC]
-    --l10n-locale TEXT              [default: de_CH]
-    --acr-bearer-token TEXT         Bearer token for ACRCloud API access
+    Localization configuration.: 
+      --l10n-timezone TEXT          [default: UTC]
+      --l10n-locale TEXT            [default: de_CH]
+    ACRCloud configuration.: 
+      --acr-bearer-token TEXT       Bearer token for ACRCloud API access
                                     [default: (*******)]
-    --acr-project-id INTEGER        Id of the project in ACRCloud  [default: 0]
-    --acr-stream-id TEXT            Id of the stream in ACRCloud  [default: ""]
-    --file-format [xlsx|csv]        [default: xlsx]
-    --file-path TEXT                [default: ""]
-    --email-sender TEXT             the sender of the email  [default: ""]
-    --email-to TEXT                 the recipients of the email  [default: ""]
-    --email-server TEXT             the smtp server to send the mail with
+      --acr-project-id INTEGER      Id of the project in ACRCloud  [default: 0]
+      --acr-stream-id TEXT          Id of the stream in ACRCloud  [default: ""]
+    File configuration.: 
+      --file-format [xlsx|csv]      [default: xlsx]
+      --file-path TEXT              [default: ""]
+    Email configuration.: 
+      --email-sender TEXT           the sender of the email  [default: ""]
+      --email-to TEXT               the recipients of the email  [default: ""]
+      --email-server TEXT           the smtp server to send the mail with
                                     [default: ""]
-    --email-username TEXT           the username to logon to the smtp server
+      --email-username TEXT         the username to logon to the smtp server
                                     (default: email_from)  [default: ""]
-    --email-password TEXT           the password for the smtp server  [default:
+      --email-password TEXT         the password for the smtp server  [default:
                                     (*******)]
-    --email-responsible-email TEXT  Used to hint whom to contact in the emails
+      --email-responsible-email TEXT
+                                    Used to hint whom to contact in the emails
                                     text.  [default: ""]
-    --email-cc TEXT                 the cc recipients of the email  [default: ""]
-    --email-bcc TEXT                the bcc recipients of the email  [default: ""]
-    --email-subject TEXT            Template for subject of the email.
+      --email-cc TEXT               the cc recipients of the email  [default: ""]
+      --email-bcc TEXT              the bcc recipients of the email  [default: ""]
+      --email-subject TEXT          Template for subject of the email.
                                     
                                     Placeholders are $station_name, $year and
                                     $month.
-    --email-text TEXT               Template for email text.
+      --email-text TEXT             Template for email text.
                                     
                                     Placeholders are $station_name, $month, $year,
                                     $previous_year, $responsible_email, and
                                     $email_footer.
-    --email-footer TEXT             Footer for the Email
+      --email-footer TEXT           Footer for the Email
     --help                          Show this message and exit.
   
   '''

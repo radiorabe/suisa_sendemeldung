@@ -31,6 +31,7 @@ from openpyxl import Workbook
 from openpyxl.cell.cell import Cell, MergedCell
 from openpyxl.styles import Border, Font, PatternFill, Side
 from tqdm import tqdm
+from typed_settings.cli_click import OptionGroupFactory
 from typed_settings.exceptions import InvalidValueError
 
 from suisa_sendemeldung.settings import Settings
@@ -616,7 +617,11 @@ def send_message(
 
 
 @click.command()
-@typed_settings.click_options(Settings, "SUISA Sendemeldung")
+@typed_settings.click_options(
+    Settings,
+    "SUISA Sendemeldung",
+    decorator_factory=OptionGroupFactory(),
+)
 def main(settings: Settings) -> None:  # pragma: no cover
     """ACRCloud client for SUISA reporting @ RaBe."""
     validate_arguments(settings)
