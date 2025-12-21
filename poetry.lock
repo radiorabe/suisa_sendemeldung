@@ -247,6 +247,27 @@ files = [
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
 [[package]]
+name = "click-option-group"
+version = "0.5.9"
+description = "Option groups missing in Click"
+optional = false
+python-versions = ">=3.7"
+groups = ["main"]
+files = [
+    {file = "click_option_group-0.5.9-py3-none-any.whl", hash = "sha256:ad2599248bd373e2e19bec5407967c3eec1d0d4fc4a5e77b08a0481e75991080"},
+    {file = "click_option_group-0.5.9.tar.gz", hash = "sha256:f94ed2bc4cf69052e0f29592bd1e771a1789bd7bfc482dd0bc482134aff95823"},
+]
+
+[package.dependencies]
+click = ">=7.0"
+
+[package.extras]
+dev = ["pre-commit", "pytest"]
+docs = ["m2r2", "pallets-sphinx-themes", "sphinx"]
+test = ["pytest"]
+test-cov = ["pytest", "pytest-cov"]
+
+[[package]]
 name = "colorama"
 version = "0.4.6"
 description = "Cross-platform colored terminal text."
@@ -1711,7 +1732,8 @@ files = [
 
 [package.dependencies]
 attrs = {version = ">=23.1", optional = true, markers = "extra == \"attrs\""}
-click = {version = ">=7", optional = true, markers = "extra == \"click\""}
+click = {version = ">=7", optional = true, markers = "extra == \"click\" or extra == \"option-groups\""}
+click-option-group = {version = "*", optional = true, markers = "extra == \"option-groups\""}
 
 [package.extras]
 all = ["attrs (>=23.1)", "cattrs (>=24.1)", "click (>=7)", "click-option-group", "jinja2", "pydantic (>=2) ; python_version < \"3.14\"", "pydantic (>=2.12.0a1) ; python_version >= \"3.14\""]
@@ -1892,4 +1914,4 @@ test = ["pytest (>=6.0.0)", "setuptools (>=65)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "d4902c32b888f1619f4d2bc36d76a50ea243bc727391c71ba91d3df14349470a"
+content-hash = "694f5885fe56596052a600bd1833032d58cce109c127946a70c567ee0d8fec82"
