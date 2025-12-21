@@ -6,34 +6,55 @@
     ACRCloud client for SUISA reporting @ RaBe.
   
   Options:
-    --output [file|email|stdout]  How to output the report  [default: file]
-    --crid-mode [local|cridlib]   How to generate the identifier in the report
-                                  [default: local]
-    --last-month                  Generate report for the full last month,
-                                  overrides --date-start and --date-end
-    --date-start TEXT             The start date of the interval in format YYYY-
-                                  MM-DD  [default: 2025-11-21]
-    --date-end TEXT               The end date of the interval in format YYYY-MM-
-                                  DD  [default: 2025-12-21]
-    --station-name TEXT           Station name, used in output and emails
-                                  [default: Radio Bern RaBe]
-    --station-name-short TEXT     Shortname for station as used in filenames
-                                  (locally and in attachment)  [default: rabe]
-    --l10n-timezone TEXT          [default: UTC]
-    --l10n-locale TEXT            [default: de_CH]
-    --acr-bearer-token TEXT       Bearer token for ACRCloud API access  [default:
-                                  (*******)]
-    --acr-project-id INTEGER      Id of the project in ACRCloud  [default: 0]
-    --acr-stream-id TEXT          Id of the stream in ACRCloud  [default: ""]
-    --file-format [xlsx|csv]      [default: xlsx]
-    --file-path TEXT              [default: ""]
-    --email EMAILSETTINGS
-    --help                        Show this message and exit.
+    --output [file|email|stdout]    How to output the report  [default: file]
+    --crid-mode [local|cridlib]     How to generate the identifier in the report
+                                    [default: local]
+    --last-month                    Generate report for the full last month,
+                                    overrides --date-start and --date-end
+    --date-start TEXT               The start date of the interval in format YYYY-
+                                    MM-DD  [default: 2025-11-21]
+    --date-end TEXT                 The end date of the interval in format YYYY-
+                                    MM-DD  [default: 2025-12-21]
+    --station-name TEXT             Station name, used in output and emails
+                                    [default: Radio Bern RaBe]
+    --station-name-short TEXT       Shortname for station as used in filenames
+                                    (locally and in attachment)  [default: rabe]
+    --l10n-timezone TEXT            [default: UTC]
+    --l10n-locale TEXT              [default: de_CH]
+    --acr-bearer-token TEXT         Bearer token for ACRCloud API access
+                                    [default: (*******)]
+    --acr-project-id INTEGER        Id of the project in ACRCloud  [default: 0]
+    --acr-stream-id TEXT            Id of the stream in ACRCloud  [default: ""]
+    --file-format [xlsx|csv]        [default: xlsx]
+    --file-path TEXT                [default: ""]
+    --email-sender TEXT             the sender of the email  [default: ""]
+    --email-to TEXT                 the recipients of the email  [default: ""]
+    --email-server TEXT             the smtp server to send the mail with
+                                    [default: ""]
+    --email-username TEXT           the username to logon to the smtp server
+                                    (default: email_from)  [default: ""]
+    --email-password TEXT           the password for the smtp server  [default:
+                                    (*******)]
+    --email-responsible-email TEXT  Used to hint whom to contact in the emails
+                                    text.  [default: ""]
+    --email-cc TEXT                 the cc recipients of the email  [default: ""]
+    --email-bcc TEXT                the bcc recipients of the email  [default: ""]
+    --email-subject TEXT            Template for subject of the email.
+                                    
+                                    Placeholders are $station_name, $year and
+                                    $month.
+    --email-text TEXT               Template for email text.
+                                    
+                                    Placeholders are $station_name, $month, $year,
+                                    $previous_year, $responsible_email, and
+                                    $email_footer.
+    --email-footer TEXT             Footer for the Email
+    --help                          Show this message and exit.
   
   '''
 # ---
 # name: test_get_arguments
-  Settings(output=<OutputMode.file: 'file'>, crid_mode=<IdentifierMode.local: 'local'>, date=RangeSettings(last_month=False, start='2025-11-21', end='2025-12-21'), station=StationSettings(name='Radio Bern RaBe', name_short='rabe'), l10n=LocalizationSettings(timezone='UTC', locale='de_CH'), acr=ACR(bearer_token='', project_id=0, stream_id=''), file=FileSettings(format=<FileFormat.xlsx: 'xlsx'>, path=''), email=None)
+  Settings(output=<OutputMode.file: 'file'>, crid_mode=<IdentifierMode.local: 'local'>, date=RangeSettings(last_month=False, start='2025-11-21', end='2025-12-21'), station=StationSettings(name='Radio Bern RaBe', name_short='rabe'), l10n=LocalizationSettings(timezone='UTC', locale='de_CH'), acr=ACR(bearer_token='', project_id=0, stream_id=''), file=FileSettings(format=<FileFormat.xlsx: 'xlsx'>, path=''), email=EmailSettings(sender='', to='', server='', username='', password='', responsible_email='', cc='', bcc='', subject='SUISA Sendemeldung von $station_name für $year-$month', text='\nHallo SUISA\n\nIm Anhang finden Sie die Sendemeldung von $station_name für den $month $year.\n\nDiese Sendemeldung erfolgt gemäss den Bestimmungen "Gemeinsamer Tarif S 2020 - 2024" [1] unter\nEinhaltung der Einreichefrist für den Monat $month gemäss Ziffer 45 des Tarifs.\n\nIn der Sendungsmeldung enthalten sind die unter Buchstaben G (Verzeichnisse) des Tarifs\ngenannten Programmangaben, in elektronischer Form. Die Angaben richten sich nach dem\nstandardisierten Format gemäss der "Vorlage für Sendemeldungen: Gemeinsamer Tarif S" [2]\nsowie der Abstimmung zwischen SUISA und $station_name.\n\n\nDiese Sendemeldung enthält unter anderem die unter Ziffer 34 geforderten Angaben:\n\n- Titel des Musikwerks\n- Name des Komponisten\n- Name des bzw. der Hauptinterpreten\n- Label\n- ISRC der benützten Aufnahme (sofern zusammen mit der Aufnahme vom Lieferanten der Aufnahme mitgeliefert)\n- vom Sender der Aufnahme selbst zugewiesene Identifikationsnummer\n- Sendezeit\n- Sendedauer\n\n\nAllfällige Beanstandungen oder technische Rückfragen zu dieser Sendemeldung müssen in\nschriftlicher, elektronischer Form an $responsible_email gerichtet werden.\n\nBeanstandungen müssen, gemäss Ziffer 46, bis spätestens in drei Monaten vor dem $in_three_months\nerfolgen. Anschliessend gilt die Sendemeldung für $month $year als akzeptiert und die\nTarifbestimmungen als eingehalten.\n\nKorrekt und termingerecht gemeldete Beanstandungen werden unter Berücksichtigung der\nNachfrist von 45 Tagen, gemäss Ziffer 46, bearbeitet.\n\nDiese Email und Sendemeldung wurde automatisch generiert.\n\nFreundliche Grüsse,\n$station_name\n\n[1] <https://www.suisa.ch/dam/jcr:1d82128b-8cc7-4cf0-b0ef-1890ae9d434d/GTS_2020-2024_GER.pdf>\n[2] <https://www.suisa.ch/dam/jcr:6934be98-4319-4565-8936-05007d83fd35/Vorlage_fuer_Sendemeldungen__GTS__2020-2022.xlsx>\n\n--\n$email_footer\n', footer='Email generated by <https://github.com/radiorabe/suisa_sendemeldung>'))
 # ---
 # name: test_get_csv
   '''
