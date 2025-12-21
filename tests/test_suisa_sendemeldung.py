@@ -58,39 +58,39 @@ def test_parse_date():
     """Test parse_date."""
 
     # default, "last_month" case
-    args = ArgumentParser()
-    args.last_month = True
+    settings = Settings()
+    settings.date.last_month = True
     with freeze_time("1996-04-01"):
-        (start_date, end_date) = suisa_sendemeldung.parse_date(args)
+        (start_date, end_date) = suisa_sendemeldung.parse_date(settings)
     assert start_date == date(1996, 3, 1)
     assert end_date == date(1996, 3, 31)
 
     # if no start_date was set, default to 30 days before end_date
-    args = ArgumentParser()
-    args.last_month = False
-    args.start_date = None
-    args.end_date = "1996-03-31"
-    (start_date, end_date) = suisa_sendemeldung.parse_date(args)
+    settings = Settings()
+    settings.date.last_month = False
+    settings.date.start = ""
+    settings.date.end = "1996-03-31"
+    (start_date, end_date) = suisa_sendemeldung.parse_date(settings)
     assert start_date == date(1996, 3, 1)
     assert end_date == date(1996, 3, 31)
 
     # if no end_date was set, default to today
-    args = ArgumentParser()
-    args.last_month = False
-    args.start_date = False
-    args.end_date = False
+    settings = Settings()
+    settings.date.last_month = False
+    settings.date.start = ""
+    settings.date.end = ""
     with freeze_time("1996-03-31"):
-        (start_date, end_date) = suisa_sendemeldung.parse_date(args)
+        (start_date, end_date) = suisa_sendemeldung.parse_date(settings)
     assert start_date == date(1996, 3, 1)
     assert end_date == date(1996, 3, 31)
 
     # only specify start_date, selects up to today
-    args = ArgumentParser()
-    args.last_month = False
-    args.start_date = "1996-03-01"
-    args.end_date = False
+    settings = Settings()
+    settings.date.last_month = False
+    settings.date.start = "1996-03-01"
+    settings.date.end = ""
     with freeze_time("1996-04-04"):
-        (start_date, end_date) = suisa_sendemeldung.parse_date(args)
+        (start_date, end_date) = suisa_sendemeldung.parse_date(settings)
     assert start_date == date(1996, 3, 1)
     assert end_date == date(1996, 4, 4)
 
