@@ -178,7 +178,7 @@ def check_duplicate(entry_a: Any, entry_b: Any) -> bool:  # noqa: ANN401
     return False
 
 
-def merge_duplicates(data: list[T]) -> list[T]:
+def merge_duplicates(data: list) -> list:
     """Merge consecutive entries into one if they are duplicates.
 
     Arguments:
@@ -306,7 +306,7 @@ def get_isrc(music: Any) -> str:  # noqa: ANN401
     return isrc
 
 
-def get_csv(data: dict, settings: Settings) -> str:
+def get_csv(data: list, settings: Settings) -> str:
     """Create SUISA compatible csv data.
 
     Arguments:

@@ -32,6 +32,9 @@
   
   '''
 # ---
+# name: test_get_arguments
+  Settings(output=<OutputMode.file: 'file'>, crid_mode=<IdentifierMode.local: 'local'>, date=RangeSettings(last_month=False, start='2025-11-21', end='2025-12-21'), station=StationSettings(name='Radio Bern RaBe', name_short='rabe'), l10n=LocalizationSettings(timezone='UTC', locale='de_CH'), acr=ACR(bearer_token='', project_id=0, stream_id=''), file=FileSettings(format=<FileFormat.xlsx: 'xlsx'>, path=''), email=None)
+# ---
 # name: test_get_csv
   '''
   Titel,Komponist,Interpret,Interpreten-Info,Sender,Sendedatum,Sendedauer,Sendezeit,Werkverzeichnisangaben,ISRC,Label,CD ID / Katalog-Nummer,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Titel des Tonträgers (Albumtitel),Autor Text,Track Nummer,Genre,Programm,Bestellnummer,Marke,Label Code,EAN/GTIN,Identifikationsnummer

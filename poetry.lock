@@ -237,7 +237,7 @@ version = "8.3.1"
 description = "Composable command line interface toolkit"
 optional = false
 python-versions = ">=3.10"
-groups = ["dev"]
+groups = ["main", "dev"]
 files = [
     {file = "click-8.3.1-py3-none-any.whl", hash = "sha256:981153a64e25f12d547d3426c367a4857371575ee7ad18df2a6183ab0545b2a6"},
     {file = "click-8.3.1.tar.gz", hash = "sha256:12ff4785d337a1bb490bb7e9c2b1ee5da3112e94a8622f26a6c77f5d2fc6842a"},
@@ -1711,6 +1711,7 @@ files = [
 
 [package.dependencies]
 attrs = {version = ">=23.1", optional = true, markers = "extra == \"attrs\""}
+click = {version = ">=7", optional = true, markers = "extra == \"click\""}
 
 [package.extras]
 all = ["attrs (>=23.1)", "cattrs (>=24.1)", "click (>=7)", "click-option-group", "jinja2", "pydantic (>=2) ; python_version < \"3.14\"", "pydantic (>=2.12.0a1) ; python_version >= \"3.14\""]
@@ -1891,4 +1892,4 @@ test = ["pytest (>=6.0.0)", "setuptools (>=65)"]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "055da1b38282b79bcc9b7ce6f57583a5eb28c5abc6cfa72109a584921c7c77c1"
+content-hash = "d4902c32b888f1619f4d2bc36d76a50ea243bc727391c71ba91d3df14349470a"
