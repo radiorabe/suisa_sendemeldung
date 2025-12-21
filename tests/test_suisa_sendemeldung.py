@@ -9,6 +9,7 @@ from unittest.mock import call, patch
 import pytest
 from freezegun import freeze_time
 from openpyxl import load_workbook
+from typed_settings.exceptions import InvalidValueError
 
 from suisa_sendemeldung import suisa_sendemeldung
 from suisa_sendemeldung.settings import (
@@ -25,37 +26,25 @@ def test_validate_arguments():
     """Test validate_arguments."""
 
     settings = Settings()
-    # length of bearer_token should be 32 or more chars long
-    settings.acr.bearer_token = "iamclearlynotthirtytwocharslong"
-    # check length of stream_id
-    settings.acr.stream_id = "iamnot9chars"
     # last_month is in conflict with start_date and end_date
     settings.date.last_month = True
     settings.date.start = date(1993, 3, 1).strftime("%Y-%m-%d")
 
-    with patch("suisa_sendemeldung.suisa_sendemeldung.ArgumentParser") as mock:
+    with pytest.raises(InvalidValueError) as excinfo:
         suisa_sendemeldung.validate_arguments(settings)
-        mock.error.assert_called_once_with(
-            "\n"
-            "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"  # noqa: E501
-            "- wrong format on stream_id, expected 9 or 10 characters but got 12\n"
-            "- wrong CRID mode, expected 'cridlib' or 'local'\n"
-            "- no output option has been set, specify one of --file, --email or --stdout\n"  # noqa: E501
-            "- argument --last_month not allowed with --start_date or --end_date",
-        )
+    assert "argument --last_month not allowed with --start_date or --end_date" in str(
+        excinfo.value
+    )
 
+    settings = Settings()
     settings.output = OutputMode.stdout
     settings.file.format = FileFormat.xlsx
-    with patch("suisa_sendemeldung.suisa_sendemeldung.ArgumentParser") as mock:
+    with pytest.raises(InvalidValueError) as excinfo:
         suisa_sendemeldung.validate_arguments(settings)
-        mock.error.assert_called_once_with(
-            "\n"
-            "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"  # noqa: E501
-            "- wrong format on stream_id, expected 9 or 10 characters but got 12\n"
-            "- wrong CRID mode, expected 'cridlib' or 'local'\n"
-            "- xlsx cannot be printed to stdout, please set --filetype to csv\n"
-            "- argument --last_month not allowed with --start_date or --end_date",
-        )
+    assert "xlsx cannot be printed to stdout, please set --filetype to csv" in str(
+        excinfo.value
+    )
+
 
 
 def test_parse_date():

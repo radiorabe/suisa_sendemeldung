@@ -30,6 +30,7 @@ from openpyxl import Workbook
 from openpyxl.cell.cell import Cell, MergedCell
 from openpyxl.styles import Border, Font, PatternFill, Side
 from tqdm import tqdm
+from typed_settings.exceptions import InvalidValueError
 
 from suisa_sendemeldung.settings import Settings
 
@@ -65,7 +66,7 @@ def validate_arguments(settings: Settings) -> None:
         msgs.append("argument --last_month not allowed with --start_date or --end_date")
     # exit if there are error messages
     if msgs:
-        raise typed_settings.exceptions.InvalidValueError(msgs)
+        raise InvalidValueError(msgs)
 
 
 def get_arguments() -> Settings:
