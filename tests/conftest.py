@@ -2,6 +2,7 @@ import pytest
 
 from suisa_sendemeldung.settings import (
     ACR,
+    IdentifierMode,
     LocalizationSettings,
     OutputMode,
     Settings,
@@ -13,6 +14,7 @@ from suisa_sendemeldung.settings import (
 def settings():
     return Settings(
         output=OutputMode.file,
+        crid_mode=IdentifierMode.cridlib,
         acr=ACR(
             bearer_token="butaisheeph6sewoo8aiDa8ieyaethoo",
             project_id=123456789,
