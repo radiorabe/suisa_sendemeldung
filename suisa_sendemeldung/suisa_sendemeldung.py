@@ -66,7 +66,7 @@ def validate_arguments(settings: Settings) -> None:
         msgs.append("argument --last_month not allowed with --start_date or --end_date")
     # exit if there are error messages
     if msgs:
-        raise typed_settings.exceptions.InvalidValueErrors(msgs)
+        raise typed_settings.exceptions.InvalidValueError(msgs)
 
 
 def get_arguments() -> Settings:

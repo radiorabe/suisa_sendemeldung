@@ -12,26 +12,25 @@ from freezegun import freeze_time
 from openpyxl import load_workbook
 
 from suisa_sendemeldung import suisa_sendemeldung
+from suisa_sendemeldung.settings import Settings
 
 
 def test_validate_arguments():
     """Test validate_arguments."""
 
-    args = ArgumentParser()
+    settings = Settings()
     # length of bearer_token should be 32 or more chars long
-    args.bearer_token = "iamclearlynotthirtytwocharslong"
+    settings.acr.bearer_token = "iamclearlynotthirtytwocharslong"
     # check length of stream_id
-    args.stream_id = "iamnot9chars"
-    # one output option has to be set (but none is)
-    args.file = False
-    args.email = False
-    args.stdout = False
+    settings.acr.stream_id = "iamnot9chars"
+    # one output option has to be set (but is invalid)
+    settings.output = "invalid" # type: ignore
     # last_month is in conflict with start_date and end_date
-    args.last_month = True
-    args.start_date = date(1993, 3, 1)
-    args.crid_mode = "invalid"
+    settings.date.last_month = True
+    settings.date.start = date(1993, 3, 1).strftime("%Y-%m-%d")
+    settings.crid_mode = "invalid" # type: ignore
     with patch("suisa_sendemeldung.suisa_sendemeldung.ArgumentParser") as mock:
-        suisa_sendemeldung.validate_arguments(mock, args)
+        suisa_sendemeldung.validate_arguments(mock, settings)
         mock.error.assert_called_once_with(
             "\n"
             "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"  # noqa: E501
@@ -41,10 +40,10 @@ def test_validate_arguments():
             "- argument --last_month not allowed with --start_date or --end_date",
         )
 
-    args.stdout = True
-    args.filetype = "xlsx"
+    settings.stdout = True
+    settings.filetype = "xlsx"
     with patch("suisa_sendemeldung.suisa_sendemeldung.ArgumentParser") as mock:
-        suisa_sendemeldung.validate_arguments(mock, args)
+        suisa_sendemeldung.validate_arguments(mock, settings)
         mock.error.assert_called_once_with(
             "\n"
             "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"  # noqa: E501
