@@ -10,7 +10,7 @@ from suisa_sendemeldung.settings import (
 
 
 @pytest.fixture
-def args():
+def settings():
     return Settings(
         output=OutputMode.file,
         acr=ACR(

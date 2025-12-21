@@ -7,7 +7,6 @@ from io import BytesIO
 from unittest.mock import call, patch
 
 import pytest
-from configargparse import ArgumentParser  # type: ignore[import-untyped]
 from freezegun import freeze_time
 from openpyxl import load_workbook
 
@@ -23,12 +22,10 @@ def test_validate_arguments():
     settings.acr.bearer_token = "iamclearlynotthirtytwocharslong"
     # check length of stream_id
     settings.acr.stream_id = "iamnot9chars"
-    # one output option has to be set (but is invalid)
-    settings.output = "invalid"  # type: ignore
     # last_month is in conflict with start_date and end_date
     settings.date.last_month = True
     settings.date.start = date(1993, 3, 1).strftime("%Y-%m-%d")
-    settings.crid_mode = "invalid"  # type: ignore
+
     with patch("suisa_sendemeldung.suisa_sendemeldung.ArgumentParser") as mock:
         suisa_sendemeldung.validate_arguments(settings)
         mock.error.assert_called_once_with(
@@ -99,31 +96,29 @@ def test_parse_filename():
     """Test parse_filename."""
 
     # pass filename from cli
-    args = ArgumentParser()
-    args.filename = "/foo/bar"
-    args.station_name_short = "test"
-    filename = suisa_sendemeldung.parse_filename(args, None)
+    settings = Settings()
+    settings.file.path = "/foo/bar"
+    settings.station.name_short = "test"
+    filename = suisa_sendemeldung.parse_filename(settings, datetime.now())
     assert filename == "/foo/bar"
 
     # last_month mode
-    args = ArgumentParser()
-    args.filename = None
-    args.station_name_short = "test"
-    args.last_month = True
-    args.filetype = "xlsx"
+    settings = Settings()
+    settings.station.name_short = "test"
+    settings.date.last_month = True
+    settings.file.format = FileFormat.xlsx
     with freeze_time("1996-03-01"):
-        filename = suisa_sendemeldung.parse_filename(args, datetime.now())
+        filename = suisa_sendemeldung.parse_filename(settings, datetime.now())
     assert filename == "test_1996_03.xlsx"
 
     # start date mode
-    args = ArgumentParser()
-    args.filename = None
-    args.last_month = False
-    args.start_date = "1996-03-01"
-    args.filetype = "xlsx"
-    args.station_name_short = "test"
+    settings = Settings()
+    settings.date.last_month = False
+    settings.date.start = "1996-03-01"
+    settings.file.format = FileFormat.xlsx
+    settings.station.name_short = "test"
     with freeze_time("1996-03-01"):
-        filename = suisa_sendemeldung.parse_filename(args, datetime.now())
+        filename = suisa_sendemeldung.parse_filename(settings, datetime.now())
     assert filename == "test_1996-03-01.xlsx"
 
 
@@ -197,13 +192,13 @@ def test_funge_release_date(test_date, expected):
 
 
 @patch("cridlib.get")
-def test_get_csv(mock_cridlib_get, snapshot, args):
+def test_get_csv(mock_cridlib_get, snapshot, settings):
     """Test get_csv."""
     mock_cridlib_get.return_value = "crid://rabe.ch/v1/test"
 
     # empty data
     data = []
-    csv = suisa_sendemeldung.get_csv(data, args=args)
+    csv = suisa_sendemeldung.get_csv(data, settings=settings)
     assert csv == snapshot
     mock_cridlib_get.assert_not_called()
 
@@ -325,7 +320,7 @@ def test_get_csv(mock_cridlib_get, snapshot, args):
             },
         },
     ]
-    csv = suisa_sendemeldung.get_csv(data, args=args)
+    csv = suisa_sendemeldung.get_csv(data, settings=settings)
     assert csv == snapshot
     mock_cridlib_get.assert_has_calls(
         [
@@ -354,18 +349,18 @@ def test_get_csv(mock_cridlib_get, snapshot, args):
 
     # no cridib
     mock_cridlib_get.reset_mock()
-    args.crid_mode = "local"
-    csv = suisa_sendemeldung.get_csv(data, args=args)
+    settings.crid_mode = "local"
+    csv = suisa_sendemeldung.get_csv(data, settings=settings)
     assert csv == snapshot
     mock_cridlib_get.assert_not_called()
 
 
-def test_get_xlsx(snapshot, args):
+def test_get_xlsx(snapshot, settings):
     """Test get_xlsx."""
 
     # empty data
     data = []
-    xlsx = suisa_sendemeldung.get_xlsx(data, args=args)
+    xlsx = suisa_sendemeldung.get_xlsx(data, settings=settings)
     workbook = load_workbook(xlsx)
     worksheet = workbook.active
     assert list(worksheet.values) == snapshot

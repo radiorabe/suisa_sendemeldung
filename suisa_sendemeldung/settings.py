@@ -1,5 +1,7 @@
 """Settings for SUISA Sendemeldung."""
 
+from __future__ import annotations
+
 from datetime import datetime, timedelta
 from enum import StrEnum
 from zoneinfo import ZoneInfo
