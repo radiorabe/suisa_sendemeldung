@@ -36,7 +36,6 @@ from suisa_sendemeldung.settings import Settings
 from .acrclient import ACRClient
 
 if TYPE_CHECKING:  # pragma: no cover
-
     from openpyxl.worksheet.worksheet import Worksheet
 
 

@@ -24,11 +24,11 @@ def test_validate_arguments():
     # check length of stream_id
     settings.acr.stream_id = "iamnot9chars"
     # one output option has to be set (but is invalid)
-    settings.output = "invalid" # type: ignore
+    settings.output = "invalid"  # type: ignore
     # last_month is in conflict with start_date and end_date
     settings.date.last_month = True
     settings.date.start = date(1993, 3, 1).strftime("%Y-%m-%d")
-    settings.crid_mode = "invalid" # type: ignore
+    settings.crid_mode = "invalid"  # type: ignore
     with patch("suisa_sendemeldung.suisa_sendemeldung.ArgumentParser") as mock:
         suisa_sendemeldung.validate_arguments(settings)
         mock.error.assert_called_once_with(

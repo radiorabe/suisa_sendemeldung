@@ -1,4 +1,3 @@
-
 import pytest
 
 from suisa_sendemeldung.settings import (

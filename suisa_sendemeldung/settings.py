@@ -198,4 +198,4 @@ class Settings:
     l10n: LocalizationSettings = ts.option(default=LocalizationSettings())
     acr: ACR = ts.option(default=ACR())
     file: FileSettings = ts.option(default=FileSettings())
-    email: EmailSettings|None = ts.option(default=None)
+    email: EmailSettings | None = ts.option(default=None)
