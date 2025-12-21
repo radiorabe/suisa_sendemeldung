@@ -11,7 +11,14 @@ from freezegun import freeze_time
 from openpyxl import load_workbook
 
 from suisa_sendemeldung import suisa_sendemeldung
-from suisa_sendemeldung.settings import FileFormat, OutputMode, Settings
+from suisa_sendemeldung.settings import (
+    FileFormat,
+    FileSettings,
+    OutputMode,
+    RangeSettings,
+    Settings,
+    StationSettings,
+)
 
 
 def test_validate_arguments():
@@ -96,27 +103,29 @@ def test_parse_filename():
     """Test parse_filename."""
 
     # pass filename from cli
-    settings = Settings()
-    settings.file.path = "/foo/bar"
-    settings.station.name_short = "test"
+    settings = Settings(
+        file=FileSettings(path="/foo/bar"),
+        station=StationSettings(name_short="test"),
+    )
     filename = suisa_sendemeldung.parse_filename(settings, datetime.now())
     assert filename == "/foo/bar"
 
     # last_month mode
-    settings = Settings()
-    settings.station.name_short = "test"
-    settings.date.last_month = True
-    settings.file.format = FileFormat.xlsx
+    settings = Settings(
+        date=RangeSettings(last_month=True),
+        file=FileSettings(format=FileFormat.xlsx),
+        station=StationSettings(name_short="test"),
+    )
     with freeze_time("1996-03-01"):
         filename = suisa_sendemeldung.parse_filename(settings, datetime.now())
     assert filename == "test_1996_03.xlsx"
 
     # start date mode
-    settings = Settings()
-    settings.date.last_month = False
-    settings.date.start = "1996-03-01"
-    settings.file.format = FileFormat.xlsx
-    settings.station.name_short = "test"
+    settings = Settings(
+        date=RangeSettings(last_month=False, start="1996-03-01"),
+        file=FileSettings(format=FileFormat.xlsx),
+        station=StationSettings(name_short="test"),
+    )
     with freeze_time("1996-03-01"):
         filename = suisa_sendemeldung.parse_filename(settings, datetime.now())
     assert filename == "test_1996-03-01.xlsx"
