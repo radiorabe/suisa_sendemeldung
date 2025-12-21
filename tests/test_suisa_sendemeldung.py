@@ -463,7 +463,7 @@ def test_get_isrc(test_music, expected):
     assert isrc == expected
 
 
-def test_cli_help(snapshot, capsys):
+def test_cli_help(snapshot):
     """Snapshot test cli output."""
     runner = CliRunner()
     # Invoke the command with the --help option
