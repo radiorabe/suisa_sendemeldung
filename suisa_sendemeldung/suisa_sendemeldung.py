@@ -70,24 +70,6 @@ def validate_arguments(settings: Settings) -> None:
         raise InvalidValueError(msgs)
 
 
-def get_arguments() -> Settings:
-    """Create :class:`ArgumentParser` with arguments.
-
-    Arguments:
-    ---------
-        parser: the parser to add arguments
-        sysargs: sys.arg[1:] or something else for testing
-
-    Returns:
-    -------
-        args: the parsed args from the parser
-
-    """
-    settings = typed_settings.load(Settings, appname="suisa_sendemeldung")
-    validate_arguments(settings)
-    return settings
-
-
 def parse_date(settings: Settings) -> tuple[date, date]:
     """Parse date from args.
 
@@ -635,9 +617,9 @@ def send_message(
 
 @click.command()
 @typed_settings.click_options(Settings, "SUISA Sendemeldung")
-def main() -> None:  # pragma: no cover
+def main(settings: Settings) -> None:  # pragma: no cover
     """ACRCloud client for SUISA reporting @ RaBe."""
-    settings = get_arguments()
+    validate_arguments(settings)
 
     start_date, end_date = parse_date(settings)
     filename = parse_filename(settings, start_date)

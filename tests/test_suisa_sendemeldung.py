@@ -22,13 +22,6 @@ from suisa_sendemeldung.settings import (
 )
 
 
-def test_get_arguments(snapshot):
-    """Test get_arguments."""
-
-    parsed_settings = suisa_sendemeldung.get_arguments()
-    assert parsed_settings == snapshot
-
-
 def test_validate_arguments():
     """Test validate_arguments."""
 
