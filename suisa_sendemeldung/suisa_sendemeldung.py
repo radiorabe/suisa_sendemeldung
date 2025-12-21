@@ -20,6 +20,7 @@ from smtplib import SMTP
 from string import Template
 from typing import TYPE_CHECKING, Any, TypeVar
 
+import click
 import cridlib
 import pytz
 import typed_settings
@@ -548,7 +549,7 @@ def get_email_attachment(filename: str, filetype: str, data: Any) -> MIMEBase:  
     """
     maintype = "application"
     subtype = "vnd.ms-excel"
-    payload = data.getvalue()
+    payload = str(data)
     if filetype == "csv":
         maintype = "text"
         subtype = "csv"
@@ -632,8 +633,10 @@ def send_message(
         smtp.send_message(msg)
 
 
+@click.command()
+@typed_settings.click_options(Settings, "SUISA Sendemeldung")
 def main() -> None:  # pragma: no cover
-    """Entrypoint for SUISA Sendemeldung ."""
+    """ACRCloud client for SUISA reporting @ RaBe."""
     settings = get_arguments()
 
     start_date, end_date = parse_date(settings)

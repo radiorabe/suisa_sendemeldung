@@ -1,12 +1,12 @@
 """Test the suisa_sendemeldung.suisa_sendemeldung module."""
 
-import contextlib
 from datetime import date, datetime, timezone
 from email.message import Message
 from io import BytesIO
 from unittest.mock import call, patch
 
 import pytest
+from click.testing import CliRunner
 from freezegun import freeze_time
 from openpyxl import load_workbook
 from typed_settings.exceptions import InvalidValueError
@@ -44,7 +44,6 @@ def test_validate_arguments():
     assert "xlsx cannot be printed to stdout, please set --filetype to csv" in str(
         excinfo.value
     )
-
 
 
 def test_parse_date():
@@ -466,8 +465,7 @@ def test_get_isrc(test_music, expected):
 
 def test_cli_help(snapshot, capsys):
     """Snapshot test cli output."""
-    parser = ArgumentParser()
-    with contextlib.suppress(SystemExit):
-        suisa_sendemeldung.get_arguments(parser, ["-h"])
-    captured = capsys.readouterr()
-    assert captured.out == snapshot
+    runner = CliRunner()
+    # Invoke the command with the --help option
+    result = runner.invoke(suisa_sendemeldung.main, ["--help"])
+    assert result.output == snapshot
