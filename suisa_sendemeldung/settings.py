@@ -75,7 +75,7 @@ class IdentifierMode(StrEnum):
 class FileFormat(StrEnum):
     """File formats for the report."""
 
-    xslx = "xlsx"
+    xlsx = "xlsx"
     csv = "csv"
 
 
@@ -122,7 +122,7 @@ class EmailSettings:
 class FileSettings:
     """File configuration."""
 
-    format: FileFormat = ts.option(default=FileFormat.xslx)
+    format: FileFormat = ts.option(default=FileFormat.xlsx)
     path: str = ts.option(default="")
 
 

@@ -12,7 +12,7 @@ from freezegun import freeze_time
 from openpyxl import load_workbook
 
 from suisa_sendemeldung import suisa_sendemeldung
-from suisa_sendemeldung.settings import Settings
+from suisa_sendemeldung.settings import FileFormat, OutputMode, Settings
 
 
 def test_validate_arguments():
@@ -30,7 +30,7 @@ def test_validate_arguments():
     settings.date.start = date(1993, 3, 1).strftime("%Y-%m-%d")
     settings.crid_mode = "invalid" # type: ignore
     with patch("suisa_sendemeldung.suisa_sendemeldung.ArgumentParser") as mock:
-        suisa_sendemeldung.validate_arguments(mock, settings)
+        suisa_sendemeldung.validate_arguments(settings)
         mock.error.assert_called_once_with(
             "\n"
             "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"  # noqa: E501
@@ -40,10 +40,10 @@ def test_validate_arguments():
             "- argument --last_month not allowed with --start_date or --end_date",
         )
 
-    settings.stdout = True
-    settings.filetype = "xlsx"
+    settings.output = OutputMode.stdout
+    settings.file.format = FileFormat.xlsx
     with patch("suisa_sendemeldung.suisa_sendemeldung.ArgumentParser") as mock:
-        suisa_sendemeldung.validate_arguments(mock, settings)
+        suisa_sendemeldung.validate_arguments(settings)
         mock.error.assert_called_once_with(
             "\n"
             "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"  # noqa: E501
