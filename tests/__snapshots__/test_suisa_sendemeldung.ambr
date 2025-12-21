@@ -6,34 +6,34 @@
     ACRCloud client for SUISA reporting @ RaBe.
   
   Options:
-    Settings for SUSIA Sendemeldung.: 
+    Settings: 
       --output [file|email|stdout]  How to output the report  [default: file]
       --crid-mode [local|cridlib]   How to generate the identifier in the report
                                     [default: local]
-    Configure the range of the report.: 
+    Configure the range of the report: 
       --last-month                  Generate report for the full last month,
                                     overrides --date-start and --date-end
       --date-start TEXT             The start date of the interval in format YYYY-
                                     MM-DD  [default: 2025-11-21]
       --date-end TEXT               The end date of the interval in format YYYY-
                                     MM-DD  [default: 2025-12-21]
-    Basic station information.: 
+    Basic station information: 
       --station-name TEXT           Station name, used in output and emails
                                     [default: Radio Bern RaBe]
       --station-name-short TEXT     Shortname for station as used in filenames
                                     (locally and in attachment)  [default: rabe]
-    Localization configuration.: 
+    Localization configuration: 
       --l10n-timezone TEXT          [default: UTC]
       --l10n-locale TEXT            [default: de_CH]
-    ACRCloud configuration.: 
+    ACRCloud configuration: 
       --acr-bearer-token TEXT       Bearer token for ACRCloud API access
                                     [default: (*******)]
       --acr-project-id INTEGER      Id of the project in ACRCloud  [default: 0]
       --acr-stream-id TEXT          Id of the stream in ACRCloud  [default: ""]
-    File configuration.: 
+    File configuration: 
       --file-format [xlsx|csv]      [default: xlsx]
       --file-path TEXT              [default: ""]
-    Email configuration.: 
+    Email configuration: 
       --email-sender TEXT           the sender of the email  [default: ""]
       --email-to TEXT               the recipients of the email  [default: ""]
       --email-server TEXT           the smtp server to send the mail with

@@ -18,7 +18,7 @@ from io import BytesIO, StringIO
 from pathlib import Path
 from smtplib import SMTP
 from string import Template
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, TypeVar, cast
 
 import click
 import cridlib
@@ -133,7 +133,7 @@ def parse_filename(settings: Settings, start_date: date) -> str:
     return filename
 
 
-def check_duplicate(entry_a: Any, entry_b: Any) -> bool:  # noqa: ANN401
+def check_duplicate(entry_a: dict, entry_b: dict) -> bool:
     """Check if two entries are duplicates by checking their acrid in all music items.
 
     Arguments:
@@ -207,7 +207,7 @@ def funge_release_date(release_date: str = "") -> str:
     return ""
 
 
-def get_artist(music: Any) -> str:  # noqa: ANN401
+def get_artist(music: dict) -> str:
     """Get artist from a given dict.
 
     Arguments:
@@ -228,19 +228,19 @@ def get_artist(music: Any) -> str:  # noqa: ANN401
             # Yet another 'wrong' entry in the database:
             # artists in custom_files was sometimes recorded as single value
             # @TODO also remove once way in the past? (2023-01-31)
-            artist = artists
+            artist = cast("str", artists)
     elif music.get("artist") is not None:
-        artist = music.get("artist")
+        artist = cast("str", music.get("artist"))
     elif music.get("Artist") is not None:  # pragma: no cover
         # Uppercase is a hack needed for Jun 2021 since there is a 'wrong' entry
         # in the database. Going forward the record will be available as 'artist'
         # in lowercase.
         # @TODO remove once is waaaay in the past
-        artist = music.get("Artist")
+        artist = cast("str", music.get("Artist"))
     return artist
 
 
-def get_composer(music: Any) -> str:  # noqa: ANN401
+def get_composer(music: dict) -> str:
     """Get composer from a given dict.
 
     Arguments:
@@ -264,13 +264,13 @@ def get_composer(music: Any) -> str:  # noqa: ANN401
     return composer
 
 
-def get_isrc(music: Any) -> str:  # noqa: ANN401
+def get_isrc(music: dict) -> str:
     """Get a valid ISRC from the music record or return an empty string."""
     isrc = ""
     if music.get("external_ids", {}).get("isrc"):
-        isrc = music.get("external_ids").get("isrc")
+        isrc = music.get("external_ids", {}).get("isrc")
     elif music.get("isrc"):
-        isrc = music.get("isrc")
+        isrc = cast("str", music.get("isrc"))
     # was a list with a singular entry for a while back in 2021
     if isinstance(isrc, list):
         isrc = isrc[0]
@@ -428,7 +428,7 @@ def get_csv(data: list, settings: Settings) -> str:
     return csv.getvalue()
 
 
-def get_xlsx(data: Any, settings: Settings) -> BytesIO:  # noqa: ANN401
+def get_xlsx(data: list[dict], settings: Settings) -> BytesIO:
     """Create SUISA compatible xlsx data.
 
     Arguments:
@@ -520,7 +520,7 @@ def write_xlsx(filename: str, xlsx: BytesIO) -> None:  # pragma: no cover
         xlsxfile.write(xlsx.getvalue())
 
 
-def get_email_attachment(filename: str, filetype: str, data: Any) -> MIMEBase:  # noqa: ANN401
+def get_email_attachment(filename: str, filetype: str, data: BytesIO | str) -> MIMEBase:
     """Create attachment based on required filetype and data.
 
     Arguments:
@@ -532,11 +532,11 @@ def get_email_attachment(filename: str, filetype: str, data: Any) -> MIMEBase:  
     """
     maintype = "application"
     subtype = "vnd.ms-excel"
-    payload = str(data)
+    payload: str | bytes = str(data)
     if filetype == "csv":
         maintype = "text"
         subtype = "csv"
-        payload = data.encode("utf-8")
+        payload = str(data).encode("utf-8")
         part = MIMEBase("text", "csv")
 
     part = MIMEBase(maintype, subtype)
@@ -555,7 +555,7 @@ def create_message(  # noqa: PLR0913
     text: str,
     filename: str,
     filetype: str,
-    data: Any,  # noqa: ANN401
+    data: BytesIO | str,
     cc: str | None = None,
     bcc: str | None = None,
 ) -> MIMEMultipart:

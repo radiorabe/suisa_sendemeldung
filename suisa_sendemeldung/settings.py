@@ -83,7 +83,7 @@ class FileFormat(StrEnum):
 
 @ts.settings
 class EmailSettings:
-    """Email configuration."""
+    """Email configuration"""  # noqa: D400, D415
 
     sender: str = ts.option(help="the sender of the email", default="")
     to: str = ts.option(help="the recipients of the email", default="")
@@ -126,7 +126,7 @@ class EmailSettings:
 
 @ts.settings
 class FileSettings:
-    """File configuration."""
+    """File configuration"""  # noqa: D400, D415
 
     format: FileFormat = ts.option(default=FileFormat.xlsx)
     path: str = ts.option(default="")
@@ -134,7 +134,7 @@ class FileSettings:
 
 @ts.settings
 class ACR:
-    """ACRCloud configuration."""
+    """ACRCloud configuration"""  # noqa: D400, D415
 
     bearer_token: str = ts.secret(
         help="Bearer token for ACRCloud API access", default=""
@@ -145,7 +145,7 @@ class ACR:
 
 @ts.settings
 class StationSettings:
-    """Basic station information."""
+    """Basic station information"""  # noqa: D400, D415
 
     name: str = ts.option(
         help="Station name, used in output and emails", default="Radio Bern RaBe"
@@ -158,7 +158,7 @@ class StationSettings:
 
 @ts.settings
 class RangeSettings:
-    """Configure the range of the report."""
+    """Configure the range of the report"""  # noqa: D400, D415
 
     last_month: bool = ts.option(
         help="""
@@ -181,7 +181,7 @@ class RangeSettings:
 
 @ts.settings
 class LocalizationSettings:
-    """Localization configuration."""
+    """Localization configuration"""  # noqa: D400, D415
 
     timezone: str = "UTC"
     locale: str = "de_CH"
@@ -189,7 +189,7 @@ class LocalizationSettings:
 
 @ts.settings
 class Settings:
-    """Settings for SUSIA Sendemeldung."""
+    """Settings"""  # noqa: D400, D415
 
     output: OutputMode = ts.option(
         help="How to output the report", default=OutputMode.file
