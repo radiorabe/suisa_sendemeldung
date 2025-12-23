@@ -708,9 +708,7 @@ def main(settings: Settings) -> None:  # pragma: no cover
 @click.command()
 @typed_settings.click_options(
     Settings,
-    loaders=typed_settings.default_loaders(
-        "sendemeldung", ["suisa_sendemeldung.toml"]
-    ),
+    loaders=typed_settings.default_loaders("sendemeldung", ["suisa_sendemeldung.toml"]),
     decorator_factory=OptionGroupFactory(),
     show_envvars_in_help=True,
 )
