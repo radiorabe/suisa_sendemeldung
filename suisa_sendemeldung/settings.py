@@ -136,7 +136,7 @@ class FileSettings:
 class ACR:
     """ACRCloud configuration"""  # noqa: D400, D415
 
-    bearer_token: str = ts.secret(
+    bearer_token: str = ts.option(
         help="Bearer token for ACRCloud API access", default=""
     )
     project_id: int = ts.option(help="Id of the project in ACRCloud", default=0)
@@ -202,6 +202,6 @@ class Settings:
     date: RangeSettings = ts.option(default=RangeSettings())
     station: StationSettings = ts.option(default=StationSettings())
     l10n: LocalizationSettings = ts.option(default=LocalizationSettings())
-    acr: ACR = ts.option(default=ACR())
     file: FileSettings = ts.option(default=FileSettings())
+    acr: ACR = ts.option(default=ACR())
     email: EmailSettings = ts.option(default=EmailSettings())

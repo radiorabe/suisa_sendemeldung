@@ -14,9 +14,9 @@
       --last-month                  Generate report for the full last month,
                                     overrides --date-start and --date-end
       --date-start TEXT             The start date of the interval in format YYYY-
-                                    MM-DD  [default: 2025-11-21]
+                                    MM-DD  [default: 2025-11-23]
       --date-end TEXT               The end date of the interval in format YYYY-
-                                    MM-DD  [default: 2025-12-21]
+                                    MM-DD  [default: 2025-12-23]
     Basic station information: 
       --station-name TEXT           Station name, used in output and emails
                                     [default: Radio Bern RaBe]
@@ -25,14 +25,14 @@
     Localization configuration: 
       --l10n-timezone TEXT          [default: UTC]
       --l10n-locale TEXT            [default: de_CH]
-    ACRCloud configuration: 
-      --acr-bearer-token TEXT       Bearer token for ACRCloud API access
-                                    [default: (*******)]
-      --acr-project-id INTEGER      Id of the project in ACRCloud  [default: 0]
-      --acr-stream-id TEXT          Id of the stream in ACRCloud  [default: ""]
     File configuration: 
       --file-format [xlsx|csv]      [default: xlsx]
       --file-path TEXT              [default: ""]
+    ACRCloud configuration: 
+      --acr-bearer-token TEXT       Bearer token for ACRCloud API access
+                                    [default: ""]
+      --acr-project-id INTEGER      Id of the project in ACRCloud  [default: 0]
+      --acr-stream-id TEXT          Id of the stream in ACRCloud  [default: ""]
     Email configuration: 
       --email-sender TEXT           the sender of the email  [default: ""]
       --email-to TEXT               the recipients of the email  [default: ""]

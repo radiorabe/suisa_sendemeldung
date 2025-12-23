@@ -62,10 +62,10 @@ def validate_arguments(settings: Settings) -> None:
     msgs = []
     # xlsx cannot be printed to stdout
     if settings.output == "stdout" and settings.file and settings.file.format == "xlsx":
-        msgs.append("xlsx cannot be printed to stdout, please set --filetype to csv")
+        msgs.append("xlsx cannot be printed to stdout, please set --file-format to csv")
     # last_month is in conflict with start_date and end_date
     if settings.date.last_month and (settings.date.start or settings.date.end):
-        msgs.append("argument --last_month not allowed with --start_date or --end_date")
+        msgs.append("argument --last-month not allowed with --date-start or --date-end")
     # exit if there are error messages
     if msgs:
         raise InvalidValueError(msgs)
@@ -642,7 +642,8 @@ def main(settings: Settings) -> None:  # pragma: no cover
         data = get_xlsx(data, settings=settings)
     elif settings.file.format == "csv":
         data = get_csv(data, settings=settings)
-    if settings.email:
+
+    if settings.output == "email":
         email_subject = Template(settings.email.subject).substitute(
             {
                 "station_name": settings.station.name,
@@ -695,13 +696,28 @@ def main(settings: Settings) -> None:  # pragma: no cover
             login=settings.email.username,
             password=settings.email.password,
         )
-    if settings.file and settings.file.format == "xlsx":
+
+    elif settings.output == "file" and settings.file.format == "xlsx":
         write_xlsx(filename, data)
-    elif settings.file and settings.file.format == "csv":
+    elif settings.output == "file" and settings.file.format == "csv":
         write_csv(filename, data)
-    if settings.output == "stdout" and settings.file.format == "csv":
+    elif settings.output == "stdout" and settings.file.format == "csv":
         print(data)  # noqa: T201
 
 
+@click.command()
+@typed_settings.click_options(
+    Settings,
+    loaders=typed_settings.default_loaders(
+        "sendemeldung", ["!suisa_sendemeldung.toml"]
+    ),
+    decorator_factory=OptionGroupFactory(),
+    show_envvars_in_help=True,
+)
+def cli(settings: Settings) -> None:  # pragma: no cover
+    """Entry point for console_scripts."""
+    main(settings)
+
+
 if __name__ == "__main__":  # pragma: no cover
-    main()
+    cli()

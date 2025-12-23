@@ -9,7 +9,7 @@ readme = "README.md"
 packages = [{include = "suisa_sendemeldung"}]
 
 [tool.poetry.scripts]
-suisa_sendemeldung = 'suisa_sendemeldung.suisa_sendemeldung:main'
+suisa_sendemeldung = 'suisa_sendemeldung.suisa_sendemeldung:cli'
 
 [tool.poetry.dependencies]
 python = "^3.12"

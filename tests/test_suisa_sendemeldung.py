@@ -32,7 +32,7 @@ def test_validate_arguments():
 
     with pytest.raises(InvalidValueError) as excinfo:
         suisa_sendemeldung.validate_arguments(settings)
-    assert "argument --last_month not allowed with --start_date or --end_date" in str(
+    assert "argument --last-month not allowed with --date-start or --date-end" in str(
         excinfo.value
     )
 
@@ -41,7 +41,7 @@ def test_validate_arguments():
     settings.file.format = FileFormat.xlsx
     with pytest.raises(InvalidValueError) as excinfo:
         suisa_sendemeldung.validate_arguments(settings)
-    assert "xlsx cannot be printed to stdout, please set --filetype to csv" in str(
+    assert "xlsx cannot be printed to stdout, please set --file-format to csv" in str(
         excinfo.value
     )
 
