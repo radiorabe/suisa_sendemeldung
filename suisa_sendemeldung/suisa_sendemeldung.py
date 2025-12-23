@@ -34,7 +34,7 @@ from tqdm import tqdm
 from typed_settings.cli_click import OptionGroupFactory
 from typed_settings.exceptions import InvalidValueError
 
-from suisa_sendemeldung.settings import FileFormat, OutputMode, Settings
+from suisa_sendemeldung.settings import FileFormat, IdentifierMode, OutputMode, Settings
 
 from .acrclient import ACRClient
 
@@ -61,7 +61,11 @@ def validate_arguments(settings: Settings) -> None:
     """
     msgs = []
     # xlsx cannot be printed to stdout
-    if settings.output == "stdout" and settings.file and settings.file.format == "xlsx":
+    if (
+        settings.output == OutputMode.stdout
+        and settings.file
+        and settings.file.format == FileFormat.xlsx
+    ):
         msgs.append("xlsx cannot be printed to stdout, please set --file-format to csv")
     # last_month is in conflict with start_date and end_date
     if settings.date.last_month and (settings.date.start or settings.date.end):
@@ -389,11 +393,11 @@ def get_csv(data: list, settings: Settings) -> str:
         # in case any questions about the data we delivered are asked
         acrid = music.get("acrid")
 
-        if settings.crid_mode == "cridlib":
+        if settings.crid_mode == IdentifierMode.cridlib:
             local_id = str(
                 cridlib.get(timestamp=timestamp_utc, fragment=f"acrid={acrid}")
             )
-        elif settings.crid_mode == "local":
+        elif settings.crid_mode == IdentifierMode.local:
             local_id = f"{timestamp_utc.isoformat()}#acrid={acrid}"
 
         csv_writer.writerow(
