@@ -30,7 +30,7 @@
       --file-path TEXT              [default: ""]
     ACRCloud configuration: 
       --acr-bearer-token TEXT       Bearer token for ACRCloud API access
-                                    [default: ""]
+                                    [default: (*******)]
       --acr-project-id INTEGER      Id of the project in ACRCloud  [default: 0]
       --acr-stream-id TEXT          Id of the stream in ACRCloud  [default: ""]
     Email configuration: 

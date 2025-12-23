@@ -34,7 +34,7 @@ from tqdm import tqdm
 from typed_settings.cli_click import OptionGroupFactory
 from typed_settings.exceptions import InvalidValueError
 
-from suisa_sendemeldung.settings import Settings
+from suisa_sendemeldung.settings import FileFormat, OutputMode, Settings
 
 from .acrclient import ACRClient
 
@@ -638,12 +638,12 @@ def main(settings: Settings) -> None:  # pragma: no cover
         timezone=settings.l10n.timezone,
     )
     data = merge_duplicates(data)
-    if settings.file.format == "xlsx":
+    if settings.file.format == FileFormat.xlsx:
         data = get_xlsx(data, settings=settings)
-    elif settings.file.format == "csv":
+    elif settings.file.format == FileFormat.csv:
         data = get_csv(data, settings=settings)
 
-    if settings.output == "email":
+    if settings.output == OutputMode.email:
         email_subject = Template(settings.email.subject).substitute(
             {
                 "station_name": settings.station.name,
@@ -697,11 +697,13 @@ def main(settings: Settings) -> None:  # pragma: no cover
             password=settings.email.password,
         )
 
-    elif settings.output == "file" and settings.file.format == "xlsx":
+    elif settings.output == OutputMode.file and settings.file.format == FileFormat.xlsx:
         write_xlsx(filename, data)
-    elif settings.output == "file" and settings.file.format == "csv":
+    elif settings.output == OutputMode.file and settings.file.format == FileFormat.csv:
         write_csv(filename, data)
-    elif settings.output == "stdout" and settings.file.format == "csv":
+    elif (
+        settings.output == OutputMode.stdout and settings.file.format == FileFormat.csv
+    ):
         print(data)  # noqa: T201
 
 
