@@ -13,12 +13,12 @@ Hallo SUISA
 
 Im Anhang finden Sie die Sendemeldung von $station_name für den $month $year.
 
-Diese Sendemeldung erfolgt gemäss den Bestimmungen "Gemeinsamer Tarif S 2020 - 2024" [1] unter
+Diese Sendemeldung erfolgt gemäss den Bestimmungen "Gemeinsamer Tarif S 2026 - 2028" [1] unter
 Einhaltung der Einreichefrist für den Monat $month gemäss Ziffer 45 des Tarifs.
 
 In der Sendungsmeldung enthalten sind die unter Buchstaben G (Verzeichnisse) des Tarifs
 genannten Programmangaben, in elektronischer Form. Die Angaben richten sich nach dem
-standardisierten Format gemäss der "Vorlage für Sendemeldungen: Gemeinsamer Tarif S" [2]
+standardisierten Format gemäss Anhang 1 "Vorlage Sendelisten Radio" des obengenannten Tarifs
 sowie der Abstimmung zwischen SUISA und $station_name.
 
 
@@ -26,12 +26,25 @@ Diese Sendemeldung enthält unter anderem die unter Ziffer 34 geforderten Angabe
 
 - Titel des Musikwerks
 - Name des Komponisten
-- Name des bzw. der Hauptinterpreten
-- Label
-- ISRC der benützten Aufnahme (sofern zusammen mit der Aufnahme vom Lieferanten der Aufnahme mitgeliefert)
-- vom Sender der Aufnahme selbst zugewiesene Identifikationsnummer
-- Sendezeit
+- Name des/der Hauptinterpreten bzw. Gruppenname oder Name des Orchesters (falls zutreffend)
+- Sendedatum
 - Sendedauer
+- Sendezeit
+- vom Sender der Aufnahme selbst zugewiesene Identifikationsnummer
+- Kennzeichnung der Eigenaufnahmen
+- Label
+- ISRC der benützten Aufnahme (sofern zusammen mit der Aufnahme vom Lieferanten der Aufnahme irgendeiner Form mitgeteilt bzw. mitgeliefert)
+
+Die folgenden subsidiären Angaben melden wir in allen Fällen wo diese vom Lieferanten der Aufnahme mitgeteilt bzw. mitgeliefert wurden, insbesondere in Fällen wo der Lieferant der Aufnahme uns keine ISRC mitgeteilt bzw. mitgeliefert hat.
+
+- EAN / GTIN (European Article Number / Global Trade Item Number)
+- Albumtitel / Titel des Tonträgers
+- Aufnahmedatum
+- Aufnahmeland
+- (Erst-)Veröffentlichungsdatum bzw. -jahr
+- Katalognummer des Tonträgers / CD ID
+- Werkverzeichnisangaben wie Opuszahl etc.
+- Bestellnummer
 
 
 Allfällige Beanstandungen oder technische Rückfragen zu dieser Sendemeldung müssen in
@@ -49,8 +62,7 @@ Diese Email und Sendemeldung wurde automatisch generiert.
 Freundliche Grüsse,
 $station_name
 
-[1] <https://www.suisa.ch/dam/jcr:1d82128b-8cc7-4cf0-b0ef-1890ae9d434d/GTS_2020-2024_GER.pdf>
-[2] <https://www.suisa.ch/dam/jcr:6934be98-4319-4565-8936-05007d83fd35/Vorlage_fuer_Sendemeldungen__GTS__2020-2022.xlsx>
+[1] <https://www.suisa.ch/dam/jcr:ea035e73-ce1a-48b7-9269-3f6aedc4057f/GTS_2026-2028_GER.pdf>
 
 --
 $email_footer
