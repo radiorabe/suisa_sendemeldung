@@ -308,31 +308,27 @@ def get_csv(data: list, settings: Settings) -> str:
     """
     station_name = settings.station.name
     header = [
-        "Titel",
-        "Komponist",
-        "Interpret",
-        "Interpreten-Info",
         "Sender",
+        "Titel des Musikwerks",
+        "Name des Komponisten",
+        "Interpret(en)",
         "Sendedatum",
         "Sendedauer",
         "Sendezeit",
-        "Werkverzeichnisangaben",
         "ISRC",
         "Label",
-        "CD ID / Katalog-Nummer",
+        "Identifikationsnummer",
+        "Eigenaufnahmen",
+        "EAN/GTIN",
+        "Albumtitel / Titel des Tonträgers",
         "Aufnahmedatum",
         "Aufnahmeland",
         "Erstveröffentlichungsdatum",
-        "Titel des Tonträgers (Albumtitel)",
-        "Autor Text",
-        "Track Nummer",
-        "Genre",
-        "Programm",
+        "Katalog-Nummer / CD ID",
+        "Werkverzeichnisangaben",
         "Bestellnummer",
-        "Marke",
-        "Label Code",
-        "EAN/GTIN",
-        "Identifikationsnummer",
+        "Veröffentichungsland",
+        "Liveaufnahme",
     ]
     csv = StringIO()
     csv_writer = writer(csv, dialect="excel")
@@ -402,31 +398,27 @@ def get_csv(data: list, settings: Settings) -> str:
 
         csv_writer.writerow(
             [
+                station_name,
                 title,
                 composer,
                 artist,
-                "",  # Interpreten-Info
-                station_name,
                 ts_date,
                 duration,
                 ts_time,
-                "",  # Werkverzeichnisangaben
                 isrc,
                 label,
-                "",  # CD ID / Katalog-Nummer
+                local_id,
+                "",  # Eigenaufnahmen
+                upc,
+                album,
                 "",  # Aufnahmedatum
                 "",  # Aufnahmeland
                 release_date,
-                album,
-                "",  # Autor Text
-                "",  # Track Nummer
-                "",  # Genre
-                "",  # Programm
+                "",  # Katalog-Nummer / CD ID
+                "",  # Werkverzeichnisangaben
                 "",  # Bestellnummer
-                "",  # Marke
-                "",  # Label Code
-                upc,
-                local_id,
+                "",  # Veröffentichungsland
+                "",  # Liveaufnahme
             ],
         )
     return csv.getvalue()
