@@ -88,6 +88,7 @@ class EmailSettings:
     sender: str = ts.option(help="the sender of the email", default="")
     to: str = ts.option(help="the recipients of the email", default="")
     server: str = ts.option(help="the smtp server to send the mail with", default="")
+    port: int = ts.option(help="the port of the smtp server", default=587)
     username: str = ts.option(
         help="the username to logon to the smtp server (default: email_from)",
         default="",
@@ -168,14 +169,16 @@ class RangeSettings:
         click={"param_decls": ("--last-month",)},
     )
     start: str = ts.option(
-        help="The start date of the interval in format YYYY-MM-DD",
+        help="The start date of the interval in format YYYY-MM-DD [env var: SENDEMELDUNG_DATE_START; default: now - 30d]",  # noqa: E501
         default=(
             datetime.now(tz=ZoneInfo("Europe/Zurich")) - timedelta(days=30)
         ).strftime("%Y-%m-%d"),
+        click={"show_default": False, "show_envvar": False},
     )
     end: str = ts.option(
-        help="The end date of the interval in format YYYY-MM-DD",
+        help="The end date of the interval in format YYYY-MM-DD [env var: SENDEMELDUNG_DATE_END; default: now]",  # noqa: E501
         default=datetime.now(tz=ZoneInfo("Europe/Zurich")).strftime("%Y-%m-%d"),
+        click={"show_default": False, "show_envvar": False},
     )
 
 

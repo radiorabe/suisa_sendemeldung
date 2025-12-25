@@ -1,62 +1,97 @@
 # serializer version: 1
 # name: test_cli_help
   '''
-  Usage: main [OPTIONS]
+  Usage: cli [OPTIONS]
   
-    ACRCloud client for SUISA reporting @ RaBe.
+    SUISA Sendemeldung.
+  
+    Create and send playout reports to SUISA.
+  
+    The reports are based on data from ACRCloud.
   
   Options:
     Settings: 
-      --output [file|email|stdout]  How to output the report  [default: file]
+      --output [file|email|stdout]  How to output the report  [env var:
+                                    SENDEMELDUNG_OUTPUT; default: email]
       --crid-mode [local|cridlib]   How to generate the identifier in the report
-                                    [default: local]
+                                    [env var: SENDEMELDUNG_CRID_MODE; default:
+                                    local]
     Configure the range of the report: 
       --last-month                  Generate report for the full last month,
-                                    overrides --date-start and --date-end
+                                    overrides --date-start and --date-end  [env
+                                    var: SENDEMELDUNG_DATE_LAST_MONTH]
       --date-start TEXT             The start date of the interval in format YYYY-
-                                    MM-DD  [default: 2025-11-23]
+                                    MM-DD [env var: SENDEMELDUNG_DATE_START;
+                                    default: now - 30d]
       --date-end TEXT               The end date of the interval in format YYYY-
-                                    MM-DD  [default: 2025-12-23]
+                                    MM-DD [env var: SENDEMELDUNG_DATE_END;
+                                    default: now]
     Basic station information: 
-      --station-name TEXT           Station name, used in output and emails
-                                    [default: Radio Bern RaBe]
+      --station-name TEXT           Station name, used in output and emails  [env
+                                    var: SENDEMELDUNG_STATION_NAME; default: Radio
+                                    Bern RaBe]
       --station-name-short TEXT     Shortname for station as used in filenames
-                                    (locally and in attachment)  [default: rabe]
+                                    (locally and in attachment)  [env var:
+                                    SENDEMELDUNG_STATION_NAME_SHORT; default:
+                                    rabe]
     Localization configuration: 
-      --l10n-timezone TEXT          [default: UTC]
-      --l10n-locale TEXT            [default: de_CH]
+      --l10n-timezone TEXT          [env var: SENDEMELDUNG_L10N_TIMEZONE; default:
+                                    UTC]
+      --l10n-locale TEXT            [env var: SENDEMELDUNG_L10N_LOCALE; default:
+                                    de_CH]
     File configuration: 
-      --file-format [xlsx|csv]      [default: xlsx]
-      --file-path TEXT              [default: ""]
+      --file-format [xlsx|csv]      [env var: SENDEMELDUNG_FILE_FORMAT; default:
+                                    csv]
+      --file-path TEXT              [env var: SENDEMELDUNG_FILE_PATH; default: ""]
     ACRCloud configuration: 
-      --acr-bearer-token TEXT       Bearer token for ACRCloud API access
-                                    [default: (*******)]
-      --acr-project-id INTEGER      Id of the project in ACRCloud  [default: 0]
-      --acr-stream-id TEXT          Id of the stream in ACRCloud  [default: ""]
+      --acr-bearer-token TEXT       Bearer token for ACRCloud API access  [env
+                                    var: SENDEMELDUNG_ACR_BEARER_TOKEN; default:
+                                    (*******)]
+      --acr-project-id INTEGER      Id of the project in ACRCloud  [env var:
+                                    SENDEMELDUNG_ACR_PROJECT_ID; default: 11691]
+      --acr-stream-id TEXT          Id of the stream in ACRCloud  [env var:
+                                    SENDEMELDUNG_ACR_STREAM_ID; default:
+                                    s-qXuJARB]
     Email configuration: 
-      --email-sender TEXT           the sender of the email  [default: ""]
-      --email-to TEXT               the recipients of the email  [default: ""]
-      --email-server TEXT           the smtp server to send the mail with
-                                    [default: ""]
+      --email-sender TEXT           the sender of the email  [env var:
+                                    SENDEMELDUNG_EMAIL_SENDER; default: suisa-
+                                    rapport@rabe.ch]
+      --email-to TEXT               the recipients of the email  [env var:
+                                    SENDEMELDUNG_EMAIL_TO; default:
+                                    hairmare@rabe.ch]
+      --email-server TEXT           the smtp server to send the mail with  [env
+                                    var: SENDEMELDUNG_EMAIL_SERVER; default:
+                                    asmtp.mail.hostpoint.ch]
+      --email-port INTEGER          the port of the smtp server  [env var:
+                                    SENDEMELDUNG_EMAIL_PORT; default: 587]
       --email-username TEXT         the username to logon to the smtp server
-                                    (default: email_from)  [default: ""]
-      --email-password TEXT         the password for the smtp server  [default:
+                                    (default: email_from)  [env var:
+                                    SENDEMELDUNG_EMAIL_USERNAME; default: smtp-
+                                    submit@rabe.ch]
+      --email-password TEXT         the password for the smtp server  [env var:
+                                    SENDEMELDUNG_EMAIL_PASSWORD; default:
                                     (*******)]
       --email-responsible-email TEXT
                                     Used to hint whom to contact in the emails
-                                    text.  [default: ""]
-      --email-cc TEXT               the cc recipients of the email  [default: ""]
-      --email-bcc TEXT              the bcc recipients of the email  [default: ""]
+                                    text.  [env var:
+                                    SENDEMELDUNG_EMAIL_RESPONSIBLE_EMAIL; default:
+                                    ""]
+      --email-cc TEXT               the cc recipients of the email  [env var:
+                                    SENDEMELDUNG_EMAIL_CC; default: ""]
+      --email-bcc TEXT              the bcc recipients of the email  [env var:
+                                    SENDEMELDUNG_EMAIL_BCC; default: ""]
       --email-subject TEXT          Template for subject of the email.
                                     
                                     Placeholders are $station_name, $year and
-                                    $month.
+                                    $month.  [env var: SENDEMELDUNG_EMAIL_SUBJECT]
       --email-text TEXT             Template for email text.
                                     
                                     Placeholders are $station_name, $month, $year,
                                     $previous_year, $responsible_email, and
-                                    $email_footer.
-      --email-footer TEXT           Footer for the Email
+                                    $email_footer.  [env var:
+                                    SENDEMELDUNG_EMAIL_TEXT]
+      --email-footer TEXT           Footer for the Email  [env var:
+                                    SENDEMELDUNG_EMAIL_FOOTER]
     --help                          Show this message and exit.
   
   '''

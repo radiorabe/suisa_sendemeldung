@@ -597,6 +597,7 @@ def create_message(  # noqa: PLR0913
 def send_message(
     msg: MIMEMultipart,
     server: str = "127.0.0.1",
+    port: int = 587,
     login: str | None = None,
     password: str | None = None,
 ) -> None:
@@ -606,11 +607,12 @@ def send_message(
     ---------
         msg: The message to send (an email.messag.Message object)
         server: The SMTP server to use to send the email.
+        port: The port of the SMTP server.
         login: The username for `sender`@`server`.
         password: The password for `sender`@`server`.
 
     """
-    with SMTP(server) as smtp:
+    with SMTP(host=server, port=port) as smtp:
         smtp.starttls()
         if password:
             if login:
@@ -620,12 +622,6 @@ def send_message(
         smtp.send_message(msg)
 
 
-@click.command()
-@typed_settings.click_options(
-    Settings,
-    "SUISA Sendemeldung",
-    decorator_factory=OptionGroupFactory(),
-)
 def main(settings: Settings) -> None:  # pragma: no cover
     """ACRCloud client for SUISA reporting @ RaBe."""
     validate_arguments(settings)
@@ -697,6 +693,7 @@ def main(settings: Settings) -> None:  # pragma: no cover
         send_message(
             msg,
             server=settings.email.server,
+            port=settings.email.port,
             login=settings.email.username,
             password=settings.email.password,
         )
@@ -719,7 +716,12 @@ def main(settings: Settings) -> None:  # pragma: no cover
     show_envvars_in_help=True,
 )
 def cli(settings: Settings) -> None:  # pragma: no cover
-    """Entry point for console_scripts."""
+    """SUISA Sendemeldung.
+
+    Create and send playout reports to SUISA.
+
+    The reports are based on data from ACRCloud.
+    """
     main(settings)
 
 

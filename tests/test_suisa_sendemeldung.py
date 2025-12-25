@@ -418,15 +418,15 @@ def test_send_message():
     # no auth
     with patch("suisa_sendemeldung.suisa_sendemeldung.SMTP", autospec=True) as mock:
         suisa_sendemeldung.send_message(msg)
-        mock.assert_called_once_with("127.0.0.1")
+        mock.assert_called_once_with("127.0.0.1", 587)
         ctx = mock.return_value.__enter__.return_value
         ctx.starttls.assert_called_once()
         ctx.send_message.assert_called_once_with(msg)
 
     # auth, user provided login
     with patch("suisa_sendemeldung.suisa_sendemeldung.SMTP", autospec=True) as mock:
-        suisa_sendemeldung.send_message(msg, "127.0.0.1", "user", "password")
-        mock.assert_called_once_with("127.0.0.1")
+        suisa_sendemeldung.send_message(msg, "127.0.0.1", 587, "user", "password")
+        mock.assert_called_once_with("127.0.0.1", 587)
         ctx = mock.return_value.__enter__.return_value
         ctx.starttls.assert_called_once()
         ctx.login.assert_called_once_with("user", "password")
@@ -434,8 +434,8 @@ def test_send_message():
     # auth, user from msg
     with patch("suisa_sendemeldung.suisa_sendemeldung.SMTP", autospec=True) as mock:
         msg.add_header("From", "test@example.org")
-        suisa_sendemeldung.send_message(msg, "127.0.0.1", None, "password")
-        mock.assert_called_once_with("127.0.0.1")
+        suisa_sendemeldung.send_message(msg, "127.0.0.1", 587, None, "password")
+        mock.assert_called_once_with("127.0.0.1", 587)
         ctx = mock.return_value.__enter__.return_value
         ctx.starttls.assert_called_once()
         ctx.login.assert_called_once_with("test@example.org", "password")
@@ -467,5 +467,5 @@ def test_cli_help(snapshot):
     """Snapshot test cli output."""
     runner = CliRunner()
     # Invoke the command with the --help option
-    result = runner.invoke(suisa_sendemeldung.main, ["--help"])
+    result = runner.invoke(suisa_sendemeldung.cli, ["--help"])
     assert result.output == snapshot
