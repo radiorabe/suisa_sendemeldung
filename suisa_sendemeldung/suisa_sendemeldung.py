@@ -19,6 +19,7 @@ from pathlib import Path
 from smtplib import SMTP
 from string import Template
 from typing import TYPE_CHECKING, TypeVar, cast
+from zoneinfo import ZoneInfo
 
 import click
 import cridlib
@@ -308,31 +309,27 @@ def get_csv(data: list, settings: Settings) -> str:
     """
     station_name = settings.station.name
     header = [
-        "Titel",
-        "Komponist",
-        "Interpret",
-        "Interpreten-Info",
         "Sender",
+        "Titel des Musikwerks",
+        "Name des Komponisten",
+        "Interpret(en)",
         "Sendedatum",
         "Sendedauer",
         "Sendezeit",
-        "Werkverzeichnisangaben",
         "ISRC",
         "Label",
-        "CD ID / Katalog-Nummer",
+        "Identifikationsnummer",
+        "Eigenaufnahmen",
+        "EAN/GTIN",
+        "Albumtitel / Titel des Tonträgers",
         "Aufnahmedatum",
         "Aufnahmeland",
         "Erstveröffentlichungsdatum",
-        "Titel des Tonträgers (Albumtitel)",
-        "Autor Text",
-        "Track Nummer",
-        "Genre",
-        "Programm",
+        "Katalog-Nummer / CD ID",
+        "Werkverzeichnisangaben",
         "Bestellnummer",
-        "Marke",
-        "Label Code",
-        "EAN/GTIN",
-        "Identifikationsnummer",
+        "Veröffentichungsland",
+        "Liveaufnahme",
     ]
     csv = StringIO()
     csv_writer = writer(csv, dialect="excel")
@@ -402,31 +399,27 @@ def get_csv(data: list, settings: Settings) -> str:
 
         csv_writer.writerow(
             [
+                station_name,
                 title,
                 composer,
                 artist,
-                "",  # Interpreten-Info
-                station_name,
                 ts_date,
                 duration,
                 ts_time,
-                "",  # Werkverzeichnisangaben
                 isrc,
                 label,
-                "",  # CD ID / Katalog-Nummer
+                local_id,
+                "",  # Eigenaufnahmen
+                upc,
+                album,
                 "",  # Aufnahmedatum
                 "",  # Aufnahmeland
                 release_date,
-                album,
-                "",  # Autor Text
-                "",  # Track Nummer
-                "",  # Genre
-                "",  # Programm
+                "",  # Katalog-Nummer / CD ID
+                "",  # Werkverzeichnisangaben
                 "",  # Bestellnummer
-                "",  # Marke
-                "",  # Label Code
-                upc,
-                local_id,
+                "",  # Veröffentichungsland
+                "",  # Liveaufnahme
             ],
         )
     return csv.getvalue()
@@ -495,24 +488,38 @@ def get_xlsx(data: list[dict], settings: Settings) -> BytesIO:
     for col, value in dims.items():
         worksheet.column_dimensions[col].width = value + padding
 
-    reformat_start_date_in_xlsx(worksheet)
+    reformat_start_date_in_xlsx(worksheet, settings)
 
     workbook.save(xlsx)
     return xlsx
 
 
-def reformat_start_date_in_xlsx(worksheet: Worksheet) -> None:
-    """Set date number formatting on "Sendedatum" col."""
+def reformat_start_date_in_xlsx(worksheet: Worksheet, settings: Settings) -> None:
+    """Set date number formatting on relevant columns."""
     for idx, row in enumerate(worksheet.rows):
         # skip first row
         if idx < 1:
             continue
-        # turn the str from the CSV into a real datetime.datetime again
-        row[5].value = datetime.strptime(  # noqa: DTZ007
-            f"{row[5].value} {row[7].value}", "%Y-%m-%d %H:%M:%S"
-        ).date()
+
+        # turn the str from the CSV into a real datetime.datetime in Sendedatum column
+        _new_date = datetime.strptime(
+            f"{row[4].value} {row[6].value}", "%Y-%m-%d %H:%M:%S"
+        ).astimezone(tz=ZoneInfo(settings.l10n.timezone))
+        row[4].value = _new_date.date()
+        row[6].value = _new_date.time()
         # adjust the formatting
-        row[5].number_format = "dd.mm.yyyy"
+        row[4].number_format = "dd.mm.yyyy"
+
+        # same thing for date fields "Aufnahmedatum" and "Erstveröffentlichungsdatum"
+        for col_idx in [13, 15]:
+            row[col_idx].value = (
+                datetime.strptime(  # noqa: DTZ007
+                    str(row[col_idx].value), "%Y%m%d"
+                ).date()
+                if row[col_idx].value
+                else None
+            )
+            row[col_idx].number_format = "dd.mm.yyyy"
 
 
 def write_csv(filename: str, csv: BytesIO | str) -> None:  # pragma: no cover

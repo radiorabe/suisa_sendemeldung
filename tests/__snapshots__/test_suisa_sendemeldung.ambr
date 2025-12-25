@@ -36,7 +36,7 @@
                                     rabe]
     Localization configuration: 
       --l10n-timezone TEXT          [env var: SENDEMELDUNG_L10N_TIMEZONE; default:
-                                    UTC]
+                                    Europe/Zurich]
       --l10n-locale TEXT            [env var: SENDEMELDUNG_L10N_LOCALE; default:
                                     de_CH]
     File configuration: 
@@ -93,93 +93,85 @@
 # ---
 # name: test_get_csv
   '''
-  Titel,Komponist,Interpret,Interpreten-Info,Sender,Sendedatum,Sendedauer,Sendezeit,Werkverzeichnisangaben,ISRC,Label,CD ID / Katalog-Nummer,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Titel des Tonträgers (Albumtitel),Autor Text,Track Nummer,Genre,Programm,Bestellnummer,Marke,Label Code,EAN/GTIN,Identifikationsnummer
+  Sender,Titel des Musikwerks,Name des Komponisten,Interpret(en),Sendedatum,Sendedauer,Sendezeit,ISRC,Label,Identifikationsnummer,Eigenaufnahmen,EAN/GTIN,Albumtitel / Titel des Tonträgers,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Katalog-Nummer / CD ID,Werkverzeichnisangaben,Bestellnummer,Veröffentichungsland,Liveaufnahme
   
   '''
 # ---
 # name: test_get_csv.1
   '''
-  Titel,Komponist,Interpret,Interpreten-Info,Sender,Sendedatum,Sendedauer,Sendezeit,Werkverzeichnisangaben,ISRC,Label,CD ID / Katalog-Nummer,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Titel des Tonträgers (Albumtitel),Autor Text,Track Nummer,Genre,Programm,Bestellnummer,Marke,Label Code,EAN/GTIN,Identifikationsnummer
-  Uhrenvergleich,,,,Station Name,1993-03-01,00:01:00,13:12:00,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test
-  Meme Dub,Da Composah,Da Gang,,Station Name,1993-03-01,00:01:00,13:37:00,,DEZ650710376,,,,,,"album, but string",,,,,,,,,crid://rabe.ch/v1/test
-  Bubbles,,"Mary's Surprise Act, Climmy Jiff",,Station Name,1993-03-01,00:01:00,16:20:00,,DEZ650710376,Jane Records,,,,20221213,Da Alboom,,,,,,,,greedy-capitalist-number,crid://rabe.ch/v1/test
-  ,,Artists as string not list,,Station Name,1993-03-01,00:01:00,17:17:17,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test
-  Long Playing,,,,Station Name,1993-03-01,19:48:57,18:18:18,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test
-  composer in works,Worker,,,Station Name,1993-03-01,19:48:57,18:18:18,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test
-  composer better in works,composer,same,,Station Name,1993-03-01,19:48:57,18:18:18,,,,,,,,,,,,,,,,,crid://rabe.ch/v1/test
+  Sender,Titel des Musikwerks,Name des Komponisten,Interpret(en),Sendedatum,Sendedauer,Sendezeit,ISRC,Label,Identifikationsnummer,Eigenaufnahmen,EAN/GTIN,Albumtitel / Titel des Tonträgers,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Katalog-Nummer / CD ID,Werkverzeichnisangaben,Bestellnummer,Veröffentichungsland,Liveaufnahme
+  Station Name,Uhrenvergleich,,,1993-03-01,00:01:00,13:12:00,,,crid://rabe.ch/v1/test,,,,,,,,,,,
+  Station Name,Meme Dub,Da Composah,Da Gang,1993-03-01,00:01:00,13:37:00,DEZ650710376,,crid://rabe.ch/v1/test,,,"album, but string",,,,,,,,
+  Station Name,Bubbles,,"Mary's Surprise Act, Climmy Jiff",1993-03-01,00:01:00,16:20:00,DEZ650710376,Jane Records,crid://rabe.ch/v1/test,,greedy-capitalist-number,Da Alboom,,,20221213,,,,,
+  Station Name,,,Artists as string not list,1993-03-01,00:01:00,17:17:17,,,crid://rabe.ch/v1/test,,,,,,,,,,,
+  Station Name,Long Playing,,,1993-03-01,19:48:57,18:18:18,,,crid://rabe.ch/v1/test,,,,,,,,,,,
+  Station Name,composer in works,Worker,,1993-03-01,19:48:57,18:18:18,,,crid://rabe.ch/v1/test,,,,,,,,,,,
+  Station Name,composer better in works,composer,same,1993-03-01,19:48:57,18:18:18,,,crid://rabe.ch/v1/test,,,,,,,,,,,
   
   '''
 # ---
 # name: test_get_csv.2
   '''
-  Titel,Komponist,Interpret,Interpreten-Info,Sender,Sendedatum,Sendedauer,Sendezeit,Werkverzeichnisangaben,ISRC,Label,CD ID / Katalog-Nummer,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Titel des Tonträgers (Albumtitel),Autor Text,Track Nummer,Genre,Programm,Bestellnummer,Marke,Label Code,EAN/GTIN,Identifikationsnummer
-  Uhrenvergleich,,,,Station Name,1993-03-01,00:01:00,13:12:00,,,,,,,,,,,,,,,,,1993-03-01T13:12:00+00:00#acrid=a1
-  Meme Dub,Da Composah,Da Gang,,Station Name,1993-03-01,00:01:00,13:37:00,,DEZ650710376,,,,,,"album, but string",,,,,,,,,1993-03-01T13:37:00+00:00#acrid=a2
-  Bubbles,,"Mary's Surprise Act, Climmy Jiff",,Station Name,1993-03-01,00:01:00,16:20:00,,DEZ650710376,Jane Records,,,,20221213,Da Alboom,,,,,,,,greedy-capitalist-number,1993-03-01T16:20:00+00:00#acrid=a3
-  ,,Artists as string not list,,Station Name,1993-03-01,00:01:00,17:17:17,,,,,,,,,,,,,,,,,1993-03-01T17:17:17+00:00#acrid=a4
-  Long Playing,,,,Station Name,1993-03-01,19:48:57,18:18:18,,,,,,,,,,,,,,,,,1993-03-01T18:18:18+00:00#acrid=a5
-  composer in works,Worker,,,Station Name,1993-03-01,19:48:57,18:18:18,,,,,,,,,,,,,,,,,1993-03-01T18:18:18+00:00#acrid=a6
-  composer better in works,composer,same,,Station Name,1993-03-01,19:48:57,18:18:18,,,,,,,,,,,,,,,,,1993-03-01T18:18:18+00:00#acrid=a6
+  Sender,Titel des Musikwerks,Name des Komponisten,Interpret(en),Sendedatum,Sendedauer,Sendezeit,ISRC,Label,Identifikationsnummer,Eigenaufnahmen,EAN/GTIN,Albumtitel / Titel des Tonträgers,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Katalog-Nummer / CD ID,Werkverzeichnisangaben,Bestellnummer,Veröffentichungsland,Liveaufnahme
+  Station Name,Uhrenvergleich,,,1993-03-01,00:01:00,13:12:00,,,1993-03-01T13:12:00+00:00#acrid=a1,,,,,,,,,,,
+  Station Name,Meme Dub,Da Composah,Da Gang,1993-03-01,00:01:00,13:37:00,DEZ650710376,,1993-03-01T13:37:00+00:00#acrid=a2,,,"album, but string",,,,,,,,
+  Station Name,Bubbles,,"Mary's Surprise Act, Climmy Jiff",1993-03-01,00:01:00,16:20:00,DEZ650710376,Jane Records,1993-03-01T16:20:00+00:00#acrid=a3,,greedy-capitalist-number,Da Alboom,,,20221213,,,,,
+  Station Name,,,Artists as string not list,1993-03-01,00:01:00,17:17:17,,,1993-03-01T17:17:17+00:00#acrid=a4,,,,,,,,,,,
+  Station Name,Long Playing,,,1993-03-01,19:48:57,18:18:18,,,1993-03-01T18:18:18+00:00#acrid=a5,,,,,,,,,,,
+  Station Name,composer in works,Worker,,1993-03-01,19:48:57,18:18:18,,,1993-03-01T18:18:18+00:00#acrid=a6,,,,,,,,,,,
+  Station Name,composer better in works,composer,same,1993-03-01,19:48:57,18:18:18,,,1993-03-01T18:18:18+00:00#acrid=a6,,,,,,,,,,,
   
   '''
 # ---
 # name: test_get_xlsx
   list([
     tuple(
-      'Titel',
-      'Komponist',
-      'Interpret',
-      'Interpreten-Info',
       'Sender',
+      'Titel des Musikwerks',
+      'Name des Komponisten',
+      'Interpret(en)',
       'Sendedatum',
       'Sendedauer',
       'Sendezeit',
-      'Werkverzeichnisangaben',
       'ISRC',
       'Label',
-      'CD ID / Katalog-Nummer',
+      'Identifikationsnummer',
+      'Eigenaufnahmen',
+      'EAN/GTIN',
+      'Albumtitel / Titel des Tonträgers',
       'Aufnahmedatum',
       'Aufnahmeland',
       'Erstveröffentlichungsdatum',
-      'Titel des Tonträgers (Albumtitel)',
-      'Autor Text',
-      'Track Nummer',
-      'Genre',
-      'Programm',
+      'Katalog-Nummer / CD ID',
+      'Werkverzeichnisangaben',
       'Bestellnummer',
-      'Marke',
-      'Label Code',
-      'EAN/GTIN',
-      'Identifikationsnummer',
+      'Veröffentichungsland',
+      'Liveaufnahme',
     ),
   ])
 # ---
 # name: test_get_xlsx.1
   DimensionHolder({
-    'A': <ColumnDimension Instance, Attributes={'width': '8', 'customWidth': '1', 'min': '1', 'max': '1'}>,
-    'B': <ColumnDimension Instance, Attributes={'width': '12', 'customWidth': '1', 'min': '2', 'max': '2'}>,
-    'C': <ColumnDimension Instance, Attributes={'width': '12', 'customWidth': '1', 'min': '3', 'max': '3'}>,
-    'D': <ColumnDimension Instance, Attributes={'width': '19', 'customWidth': '1', 'min': '4', 'max': '4'}>,
-    'E': <ColumnDimension Instance, Attributes={'width': '9', 'customWidth': '1', 'min': '5', 'max': '5'}>,
+    'A': <ColumnDimension Instance, Attributes={'width': '9', 'customWidth': '1', 'min': '1', 'max': '1'}>,
+    'B': <ColumnDimension Instance, Attributes={'width': '23', 'customWidth': '1', 'min': '2', 'max': '2'}>,
+    'C': <ColumnDimension Instance, Attributes={'width': '23', 'customWidth': '1', 'min': '3', 'max': '3'}>,
+    'D': <ColumnDimension Instance, Attributes={'width': '16', 'customWidth': '1', 'min': '4', 'max': '4'}>,
+    'E': <ColumnDimension Instance, Attributes={'width': '13', 'customWidth': '1', 'min': '5', 'max': '5'}>,
     'F': <ColumnDimension Instance, Attributes={'width': '13', 'customWidth': '1', 'min': '6', 'max': '6'}>,
-    'G': <ColumnDimension Instance, Attributes={'width': '13', 'customWidth': '1', 'min': '7', 'max': '7'}>,
-    'H': <ColumnDimension Instance, Attributes={'width': '12', 'customWidth': '1', 'min': '8', 'max': '8'}>,
-    'I': <ColumnDimension Instance, Attributes={'width': '25', 'customWidth': '1', 'min': '9', 'max': '9'}>,
-    'J': <ColumnDimension Instance, Attributes={'width': '7', 'customWidth': '1', 'min': '10', 'max': '10'}>,
-    'K': <ColumnDimension Instance, Attributes={'width': '8', 'customWidth': '1', 'min': '11', 'max': '11'}>,
-    'L': <ColumnDimension Instance, Attributes={'width': '25', 'customWidth': '1', 'min': '12', 'max': '12'}>,
-    'M': <ColumnDimension Instance, Attributes={'width': '16', 'customWidth': '1', 'min': '13', 'max': '13'}>,
-    'N': <ColumnDimension Instance, Attributes={'width': '15', 'customWidth': '1', 'min': '14', 'max': '14'}>,
-    'O': <ColumnDimension Instance, Attributes={'width': '29', 'customWidth': '1', 'min': '15', 'max': '15'}>,
-    'P': <ColumnDimension Instance, Attributes={'width': '36', 'customWidth': '1', 'min': '16', 'max': '16'}>,
-    'Q': <ColumnDimension Instance, Attributes={'width': '13', 'customWidth': '1', 'min': '17', 'max': '17'}>,
-    'R': <ColumnDimension Instance, Attributes={'width': '15', 'customWidth': '1', 'min': '18', 'max': '18'}>,
-    'S': <ColumnDimension Instance, Attributes={'width': '8', 'customWidth': '1', 'min': '19', 'max': '19'}>,
-    'T': <ColumnDimension Instance, Attributes={'width': '11', 'customWidth': '1', 'min': '20', 'max': '20'}>,
-    'U': <ColumnDimension Instance, Attributes={'width': '16', 'customWidth': '1', 'min': '21', 'max': '21'}>,
-    'V': <ColumnDimension Instance, Attributes={'width': '8', 'customWidth': '1', 'min': '22', 'max': '22'}>,
-    'W': <ColumnDimension Instance, Attributes={'width': '13', 'customWidth': '1', 'min': '23', 'max': '23'}>,
-    'X': <ColumnDimension Instance, Attributes={'width': '11', 'customWidth': '1', 'min': '24', 'max': '24'}>,
-    'Y': <ColumnDimension Instance, Attributes={'width': '24', 'customWidth': '1', 'min': '25', 'max': '25'}>,
+    'G': <ColumnDimension Instance, Attributes={'width': '12', 'customWidth': '1', 'min': '7', 'max': '7'}>,
+    'H': <ColumnDimension Instance, Attributes={'width': '7', 'customWidth': '1', 'min': '8', 'max': '8'}>,
+    'I': <ColumnDimension Instance, Attributes={'width': '8', 'customWidth': '1', 'min': '9', 'max': '9'}>,
+    'J': <ColumnDimension Instance, Attributes={'width': '24', 'customWidth': '1', 'min': '10', 'max': '10'}>,
+    'K': <ColumnDimension Instance, Attributes={'width': '17', 'customWidth': '1', 'min': '11', 'max': '11'}>,
+    'L': <ColumnDimension Instance, Attributes={'width': '11', 'customWidth': '1', 'min': '12', 'max': '12'}>,
+    'M': <ColumnDimension Instance, Attributes={'width': '36', 'customWidth': '1', 'min': '13', 'max': '13'}>,
+    'N': <ColumnDimension Instance, Attributes={'width': '16', 'customWidth': '1', 'min': '14', 'max': '14'}>,
+    'O': <ColumnDimension Instance, Attributes={'width': '15', 'customWidth': '1', 'min': '15', 'max': '15'}>,
+    'P': <ColumnDimension Instance, Attributes={'width': '29', 'customWidth': '1', 'min': '16', 'max': '16'}>,
+    'Q': <ColumnDimension Instance, Attributes={'width': '25', 'customWidth': '1', 'min': '17', 'max': '17'}>,
+    'R': <ColumnDimension Instance, Attributes={'width': '25', 'customWidth': '1', 'min': '18', 'max': '18'}>,
+    'S': <ColumnDimension Instance, Attributes={'width': '16', 'customWidth': '1', 'min': '19', 'max': '19'}>,
+    'T': <ColumnDimension Instance, Attributes={'width': '23', 'customWidth': '1', 'min': '20', 'max': '20'}>,
+    'U': <ColumnDimension Instance, Attributes={'width': '15', 'customWidth': '1', 'min': '21', 'max': '21'}>,
   })
 # ---
