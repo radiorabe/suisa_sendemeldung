@@ -186,7 +186,7 @@ class RangeSettings:
 class LocalizationSettings:
     """Localization configuration"""  # noqa: D400, D415
 
-    timezone: str = "UTC"
+    timezone: str = "Europe/Zurich"
     locale: str = "de_CH"
 
 

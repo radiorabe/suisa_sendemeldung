@@ -19,6 +19,7 @@ from pathlib import Path
 from smtplib import SMTP
 from string import Template
 from typing import TYPE_CHECKING, TypeVar, cast
+from zoneinfo import ZoneInfo
 
 import click
 import cridlib
@@ -487,13 +488,13 @@ def get_xlsx(data: list[dict], settings: Settings) -> BytesIO:
     for col, value in dims.items():
         worksheet.column_dimensions[col].width = value + padding
 
-    reformat_start_date_in_xlsx(worksheet)
+    reformat_start_date_in_xlsx(worksheet, settings)
 
     workbook.save(xlsx)
     return xlsx
 
 
-def reformat_start_date_in_xlsx(worksheet: Worksheet) -> None:
+def reformat_start_date_in_xlsx(worksheet: Worksheet, settings: Settings) -> None:
     """Set date number formatting on relevant columns."""
     for idx, row in enumerate(worksheet.rows):
         # skip first row
@@ -501,9 +502,11 @@ def reformat_start_date_in_xlsx(worksheet: Worksheet) -> None:
             continue
 
         # turn the str from the CSV into a real datetime.datetime in Sendedatum column
-        row[4].value = datetime.strptime(  # noqa: DTZ007
+        _new_date = datetime.strptime(  # noqa: DTZ007
             f"{row[4].value} {row[6].value}", "%Y-%m-%d %H:%M:%S"
-        ).date()
+        ).astimezone(tz=ZoneInfo(settings.l10n.timezone))
+        row[4].value = _new_date.date()
+        row[6].value = _new_date.time()
         # adjust the formatting
         row[4].number_format = "dd.mm.yyyy"
 
