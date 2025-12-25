@@ -36,7 +36,7 @@
                                     rabe]
     Localization configuration: 
       --l10n-timezone TEXT          [env var: SENDEMELDUNG_L10N_TIMEZONE; default:
-                                    UTC]
+                                    Europe/Zurich]
       --l10n-locale TEXT            [env var: SENDEMELDUNG_L10N_LOCALE; default:
                                     de_CH]
     File configuration: 
