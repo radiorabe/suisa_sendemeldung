@@ -509,10 +509,15 @@ def reformat_start_date_in_xlsx(worksheet: Worksheet) -> None:
 
         # same thing for date fields "Aufnahmedatum" and "Erstveröffentlichungsdatum"
         for col_idx in [13, 15]:
-            row[col_idx].value = datetime.strptime(  # noqa: DTZ007
-                str(row[col_idx].value), "%Y%m%d"
-            ).date() if row[col_idx].value else None
+            row[col_idx].value = (
+                datetime.strptime(  # noqa: DTZ007
+                    str(row[col_idx].value), "%Y%m%d"
+                ).date()
+                if row[col_idx].value
+                else None
+            )
             row[col_idx].number_format = "dd.mm.yyyy"
+
 
 def write_csv(filename: str, csv: BytesIO | str) -> None:  # pragma: no cover
     """Write contents of `csv` to file.

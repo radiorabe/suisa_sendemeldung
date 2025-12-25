@@ -374,11 +374,34 @@ def test_reformat_start_date_in_xlsx():
         raise RuntimeError
     worksheet: Worksheet = workbook.active  # type: ignore[assignment]
     worksheet.append([])
-    worksheet.append(["", "", "", "", "", "2025-01-01", "", "01:01:01"])
+    worksheet.append(
+        [
+            "",
+            "",
+            "",
+            "",
+            "2025-01-01",  # Sendedatum
+            "",
+            "01:01:01",  # Sendezeit
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "20250101",  # Aufnahmedatum
+            "",
+            "20250101",  # Erstveröffentlichungsdatum
+        ]
+    )
     suisa_sendemeldung.reformat_start_date_in_xlsx(worksheet)
     row = list(worksheet.rows)[1]
-    assert row[5].value == datetime(2025, 1, 1, 1, 1, 1).date()
-    assert row[5].number_format == "dd.mm.yyyy"
+    assert row[4].value == datetime(2025, 1, 1, 1, 1, 1).date()
+    assert row[4].number_format == "dd.mm.yyyy"
+    assert row[13].value == datetime(2025, 1, 1).date()
+    assert row[13].number_format == "dd.mm.yyyy"
+    assert row[15].value == datetime(2025, 1, 1).date()
+    assert row[15].number_format == "dd.mm.yyyy"
 
 
 def test_get_email_attachment():
