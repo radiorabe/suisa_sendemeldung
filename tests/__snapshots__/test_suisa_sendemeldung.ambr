@@ -12,7 +12,7 @@
   Options:
     Settings: 
       --output [file|email|stdout]  How to output the report  [env var:
-                                    SENDEMELDUNG_OUTPUT; default: email]
+                                    SENDEMELDUNG_OUTPUT; default: file]
       --crid-mode [local|cridlib]   How to generate the identifier in the report
                                     [env var: SENDEMELDUNG_CRID_MODE; default:
                                     local]
@@ -41,33 +41,28 @@
                                     de_CH]
     File configuration: 
       --file-format [xlsx|csv]      [env var: SENDEMELDUNG_FILE_FORMAT; default:
-                                    csv]
+                                    xlsx]
       --file-path TEXT              [env var: SENDEMELDUNG_FILE_PATH; default: ""]
     ACRCloud configuration: 
       --acr-bearer-token TEXT       Bearer token for ACRCloud API access  [env
                                     var: SENDEMELDUNG_ACR_BEARER_TOKEN; default:
                                     (*******)]
       --acr-project-id INTEGER      Id of the project in ACRCloud  [env var:
-                                    SENDEMELDUNG_ACR_PROJECT_ID; default: 11691]
+                                    SENDEMELDUNG_ACR_PROJECT_ID; default: 0]
       --acr-stream-id TEXT          Id of the stream in ACRCloud  [env var:
-                                    SENDEMELDUNG_ACR_STREAM_ID; default:
-                                    s-qXuJARB]
+                                    SENDEMELDUNG_ACR_STREAM_ID; default: ""]
     Email configuration: 
       --email-sender TEXT           the sender of the email  [env var:
-                                    SENDEMELDUNG_EMAIL_SENDER; default: suisa-
-                                    rapport@rabe.ch]
+                                    SENDEMELDUNG_EMAIL_SENDER; default: ""]
       --email-to TEXT               the recipients of the email  [env var:
-                                    SENDEMELDUNG_EMAIL_TO; default:
-                                    hairmare@rabe.ch]
+                                    SENDEMELDUNG_EMAIL_TO; default: ""]
       --email-server TEXT           the smtp server to send the mail with  [env
-                                    var: SENDEMELDUNG_EMAIL_SERVER; default:
-                                    asmtp.mail.hostpoint.ch]
+                                    var: SENDEMELDUNG_EMAIL_SERVER; default: ""]
       --email-port INTEGER          the port of the smtp server  [env var:
                                     SENDEMELDUNG_EMAIL_PORT; default: 587]
       --email-username TEXT         the username to logon to the smtp server
                                     (default: email_from)  [env var:
-                                    SENDEMELDUNG_EMAIL_USERNAME; default: smtp-
-                                    submit@rabe.ch]
+                                    SENDEMELDUNG_EMAIL_USERNAME; default: ""]
       --email-password TEXT         the password for the smtp server  [env var:
                                     SENDEMELDUNG_EMAIL_PASSWORD; default:
                                     (*******)]
