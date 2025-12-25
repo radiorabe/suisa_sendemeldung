@@ -1,97 +1,88 @@
 """Test the suisa_sendemeldung.suisa_sendemeldung module."""
 
-import contextlib
 from datetime import date, datetime, timezone
 from email.message import Message
 from io import BytesIO
 from unittest.mock import call, patch
 
 import pytest
-from configargparse import ArgumentParser  # type: ignore[import-untyped]
+from click.testing import CliRunner
 from freezegun import freeze_time
 from openpyxl import load_workbook
+from typed_settings.exceptions import InvalidValueError
 
 from suisa_sendemeldung import suisa_sendemeldung
+from suisa_sendemeldung.settings import (
+    FileFormat,
+    FileSettings,
+    OutputMode,
+    RangeSettings,
+    Settings,
+    StationSettings,
+)
 
 
 def test_validate_arguments():
     """Test validate_arguments."""
 
-    args = ArgumentParser()
-    # length of bearer_token should be 32 or more chars long
-    args.bearer_token = "iamclearlynotthirtytwocharslong"
-    # check length of stream_id
-    args.stream_id = "iamnot9chars"
-    # one output option has to be set (but none is)
-    args.file = False
-    args.email = False
-    args.stdout = False
+    settings = Settings()
     # last_month is in conflict with start_date and end_date
-    args.last_month = True
-    args.start_date = date(1993, 3, 1)
-    args.crid_mode = "invalid"
-    with patch("suisa_sendemeldung.suisa_sendemeldung.ArgumentParser") as mock:
-        suisa_sendemeldung.validate_arguments(mock, args)
-        mock.error.assert_called_once_with(
-            "\n"
-            "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"  # noqa: E501
-            "- wrong format on stream_id, expected 9 or 10 characters but got 12\n"
-            "- wrong CRID mode, expected 'cridlib' or 'local'\n"
-            "- no output option has been set, specify one of --file, --email or --stdout\n"  # noqa: E501
-            "- argument --last_month not allowed with --start_date or --end_date",
-        )
+    settings.date.last_month = True
+    settings.date.start = date(1993, 3, 1).strftime("%Y-%m-%d")
 
-    args.stdout = True
-    args.filetype = "xlsx"
-    with patch("suisa_sendemeldung.suisa_sendemeldung.ArgumentParser") as mock:
-        suisa_sendemeldung.validate_arguments(mock, args)
-        mock.error.assert_called_once_with(
-            "\n"
-            "- wrong format on bearer_token, expected larger than 32 characters but got 31\n"  # noqa: E501
-            "- wrong format on stream_id, expected 9 or 10 characters but got 12\n"
-            "- wrong CRID mode, expected 'cridlib' or 'local'\n"
-            "- xlsx cannot be printed to stdout, please set --filetype to csv\n"
-            "- argument --last_month not allowed with --start_date or --end_date",
-        )
+    with pytest.raises(InvalidValueError) as excinfo:
+        suisa_sendemeldung.validate_arguments(settings)
+    assert "argument --last-month not allowed with --date-start or --date-end" in str(
+        excinfo.value
+    )
+
+    settings = Settings()
+    settings.output = OutputMode.stdout
+    settings.file.format = FileFormat.xlsx
+    with pytest.raises(InvalidValueError) as excinfo:
+        suisa_sendemeldung.validate_arguments(settings)
+    assert "xlsx cannot be printed to stdout, please set --file-format to csv" in str(
+        excinfo.value
+    )
 
 
 def test_parse_date():
     """Test parse_date."""
 
     # default, "last_month" case
-    args = ArgumentParser()
-    args.last_month = True
+    settings = Settings()
+    settings.date.last_month = True
     with freeze_time("1996-04-01"):
-        (start_date, end_date) = suisa_sendemeldung.parse_date(args)
+        (start_date, end_date) = suisa_sendemeldung.parse_date(settings)
     assert start_date == date(1996, 3, 1)
     assert end_date == date(1996, 3, 31)
 
     # if no start_date was set, default to 30 days before end_date
-    args = ArgumentParser()
-    args.last_month = False
-    args.start_date = None
-    args.end_date = "1996-03-31"
-    (start_date, end_date) = suisa_sendemeldung.parse_date(args)
+    settings = Settings()
+    settings.date.last_month = False
+    settings.date.start = ""
+    settings.date.end = "1996-03-31"
+    (start_date, end_date) = suisa_sendemeldung.parse_date(settings)
     assert start_date == date(1996, 3, 1)
     assert end_date == date(1996, 3, 31)
 
     # if no end_date was set, default to today
-    args = ArgumentParser()
-    args.last_month = False
-    args.start_date = False
-    args.end_date = False
+    settings = Settings()
+    settings.date.last_month = False
+    settings.date.start = ""
+    settings.date.end = ""
     with freeze_time("1996-03-31"):
-        (start_date, end_date) = suisa_sendemeldung.parse_date(args)
+        (start_date, end_date) = suisa_sendemeldung.parse_date(settings)
     assert start_date == date(1996, 3, 1)
     assert end_date == date(1996, 3, 31)
 
     # only specify start_date, selects up to today
-    args = ArgumentParser()
-    args.last_month = False
-    args.start_date = "1996-03-01"
-    args.end_date = False
+    settings = Settings()
+    settings.date.last_month = False
+    settings.date.start = "1996-03-01"
+    settings.date.end = ""
     with freeze_time("1996-04-04"):
-        (start_date, end_date) = suisa_sendemeldung.parse_date(args)
+        (start_date, end_date) = suisa_sendemeldung.parse_date(settings)
     assert start_date == date(1996, 3, 1)
     assert end_date == date(1996, 4, 4)
 
@@ -100,31 +91,31 @@ def test_parse_filename():
     """Test parse_filename."""
 
     # pass filename from cli
-    args = ArgumentParser()
-    args.filename = "/foo/bar"
-    args.station_name_short = "test"
-    filename = suisa_sendemeldung.parse_filename(args, None)
+    settings = Settings(
+        file=FileSettings(path="/foo/bar"),
+        station=StationSettings(name_short="test"),
+    )
+    filename = suisa_sendemeldung.parse_filename(settings, datetime.now())
     assert filename == "/foo/bar"
 
     # last_month mode
-    args = ArgumentParser()
-    args.filename = None
-    args.station_name_short = "test"
-    args.last_month = True
-    args.filetype = "xlsx"
+    settings = Settings(
+        date=RangeSettings(last_month=True),
+        file=FileSettings(format=FileFormat.xlsx),
+        station=StationSettings(name_short="test"),
+    )
     with freeze_time("1996-03-01"):
-        filename = suisa_sendemeldung.parse_filename(args, datetime.now())
+        filename = suisa_sendemeldung.parse_filename(settings, datetime.now())
     assert filename == "test_1996_03.xlsx"
 
     # start date mode
-    args = ArgumentParser()
-    args.filename = None
-    args.last_month = False
-    args.start_date = "1996-03-01"
-    args.filetype = "xlsx"
-    args.station_name_short = "test"
+    settings = Settings(
+        date=RangeSettings(last_month=False, start="1996-03-01"),
+        file=FileSettings(format=FileFormat.xlsx),
+        station=StationSettings(name_short="test"),
+    )
     with freeze_time("1996-03-01"):
-        filename = suisa_sendemeldung.parse_filename(args, datetime.now())
+        filename = suisa_sendemeldung.parse_filename(settings, datetime.now())
     assert filename == "test_1996-03-01.xlsx"
 
 
@@ -198,13 +189,13 @@ def test_funge_release_date(test_date, expected):
 
 
 @patch("cridlib.get")
-def test_get_csv(mock_cridlib_get, snapshot, args):
+def test_get_csv(mock_cridlib_get, snapshot, settings):
     """Test get_csv."""
     mock_cridlib_get.return_value = "crid://rabe.ch/v1/test"
 
     # empty data
     data = []
-    csv = suisa_sendemeldung.get_csv(data, args=args)
+    csv = suisa_sendemeldung.get_csv(data, settings=settings)
     assert csv == snapshot
     mock_cridlib_get.assert_not_called()
 
@@ -326,7 +317,7 @@ def test_get_csv(mock_cridlib_get, snapshot, args):
             },
         },
     ]
-    csv = suisa_sendemeldung.get_csv(data, args=args)
+    csv = suisa_sendemeldung.get_csv(data, settings=settings)
     assert csv == snapshot
     mock_cridlib_get.assert_has_calls(
         [
@@ -355,18 +346,18 @@ def test_get_csv(mock_cridlib_get, snapshot, args):
 
     # no cridib
     mock_cridlib_get.reset_mock()
-    args.crid_mode = "local"
-    csv = suisa_sendemeldung.get_csv(data, args=args)
+    settings.crid_mode = "local"
+    csv = suisa_sendemeldung.get_csv(data, settings=settings)
     assert csv == snapshot
     mock_cridlib_get.assert_not_called()
 
 
-def test_get_xlsx(snapshot, args):
+def test_get_xlsx(snapshot, settings):
     """Test get_xlsx."""
 
     # empty data
     data = []
-    xlsx = suisa_sendemeldung.get_xlsx(data, args=args)
+    xlsx = suisa_sendemeldung.get_xlsx(data, settings=settings)
     workbook = load_workbook(xlsx)
     worksheet = workbook.active
     assert list(worksheet.values) == snapshot
@@ -427,15 +418,15 @@ def test_send_message():
     # no auth
     with patch("suisa_sendemeldung.suisa_sendemeldung.SMTP", autospec=True) as mock:
         suisa_sendemeldung.send_message(msg)
-        mock.assert_called_once_with("127.0.0.1")
+        mock.assert_called_once_with("127.0.0.1", 587)
         ctx = mock.return_value.__enter__.return_value
         ctx.starttls.assert_called_once()
         ctx.send_message.assert_called_once_with(msg)
 
     # auth, user provided login
     with patch("suisa_sendemeldung.suisa_sendemeldung.SMTP", autospec=True) as mock:
-        suisa_sendemeldung.send_message(msg, "127.0.0.1", "user", "password")
-        mock.assert_called_once_with("127.0.0.1")
+        suisa_sendemeldung.send_message(msg, "127.0.0.1", 587, "user", "password")
+        mock.assert_called_once_with("127.0.0.1", 587)
         ctx = mock.return_value.__enter__.return_value
         ctx.starttls.assert_called_once()
         ctx.login.assert_called_once_with("user", "password")
@@ -443,8 +434,8 @@ def test_send_message():
     # auth, user from msg
     with patch("suisa_sendemeldung.suisa_sendemeldung.SMTP", autospec=True) as mock:
         msg.add_header("From", "test@example.org")
-        suisa_sendemeldung.send_message(msg, "127.0.0.1", None, "password")
-        mock.assert_called_once_with("127.0.0.1")
+        suisa_sendemeldung.send_message(msg, "127.0.0.1", 587, None, "password")
+        mock.assert_called_once_with("127.0.0.1", 587)
         ctx = mock.return_value.__enter__.return_value
         ctx.starttls.assert_called_once()
         ctx.login.assert_called_once_with("test@example.org", "password")
@@ -472,10 +463,9 @@ def test_get_isrc(test_music, expected):
     assert isrc == expected
 
 
-def test_cli_help(snapshot, capsys):
+def test_cli_help(snapshot):
     """Snapshot test cli output."""
-    parser = ArgumentParser()
-    with contextlib.suppress(SystemExit):
-        suisa_sendemeldung.get_arguments(parser, ["-h"])
-    captured = capsys.readouterr()
-    assert captured.out == snapshot
+    runner = CliRunner()
+    # Invoke the command with the --help option
+    result = runner.invoke(suisa_sendemeldung.cli, ["--help"])
+    assert result.output == snapshot

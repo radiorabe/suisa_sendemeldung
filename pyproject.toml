@@ -9,29 +9,29 @@ readme = "README.md"
 packages = [{include = "suisa_sendemeldung"}]
 
 [tool.poetry.scripts]
-suisa_sendemeldung = 'suisa_sendemeldung.suisa_sendemeldung:main'
+suisa_sendemeldung = 'suisa_sendemeldung.suisa_sendemeldung:cli'
 
 [tool.poetry.dependencies]
 python = "^3.12"
 acrclient = ">=0.4.4,<0.6.0"
-ConfigArgParse = "^1.5.5"
+Babel = "^2.12.1"
+dateutils = "^0.6.12"
 iso3901 = ">=0.3,<1.2"
 openpyxl = "^3.1.2"
 pytz = ">=2023.3,<2026.0"
-requests = "^2.31.0"
 rabe-cridlib = ">=0.12.0,<0.14.0"
-dateutils = "^0.6.12"
+requests = "^2.31.0"
 tqdm = "^4.65.0"
-Babel = "^2.12.1"
+typed-settings = {extras = ["attrs", "click", "option-groups"], version = "^25.3.0"}
 
 [tool.poetry.group.dev.dependencies]
 freezegun = "^1.2.2"
 mkdocs = "^1.5.3"
-mkdocs-material = "^9.5.14"
+mkdocs-autorefs = "^1.0.1"
 mkdocs-gen-files = ">=0.5,<0.7"
 mkdocs-literate-nav = "^0.6.1"
+mkdocs-material = "^9.5.14"
 mkdocs-section-index = "^0.3.8"
-mkdocs-autorefs = "^1.0.1"
 mkdocstrings = {extras = ["python"], version = ">=0.24.1,<1.1.0"}
 mock = "^5.0.2"
 pytest = ">=7.4,<10.0"

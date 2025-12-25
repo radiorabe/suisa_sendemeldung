@@ -1,96 +1,93 @@
 # serializer version: 1
 # name: test_cli_help
   '''
-  usage: pytest [-h] --bearer-token BEARER_TOKEN --project-id PROJECT_ID
-                --stream-id STREAM_ID [--station-name STATION_NAME]
-                [--station-name-short STATION_NAME_SHORT] [--file]
-                [--filetype {xlsx,csv}] [--email] [--email-from EMAIL_FROM]
-                [--email-to EMAIL_TO] [--email-cc EMAIL_CC]
-                [--email-bcc EMAIL_BCC] [--email-server EMAIL_SERVER]
-                [--email-login EMAIL_LOGIN] [--email-pass EMAIL_PASS]
-                [--email-subject EMAIL_SUBJECT] [--email-text EMAIL_TEXT]
-                [--email-text-template-file EMAIL_TEXT_TEMPLATE_FILE]
-                [--email-footer EMAIL_FOOTER]
-                [--responsible-email RESPONSIBLE_EMAIL]
-                [--start-date START_DATE] [--end-date END_DATE] [--last-month]
-                --timezone TIMEZONE [--locale LOCALE] [--filename FILENAME]
-                [--stdout] [--crid-mode CRID_MODE]
+  Usage: cli [OPTIONS]
   
-  options:
-    -h, --help            show this help message and exit
-    --bearer-token BEARER_TOKEN
-                          the bearer token for ACRCloud (required) [env var:
-                          BEARER_TOKEN]
-    --project-id PROJECT_ID
-                          the id of the project at ACRCloud (required) [env var:
-                          PROJECT_ID]
-    --stream-id STREAM_ID
-                          the id of the stream at ACRCloud (required) [env var:
-                          STREAM_ID]
-    --station-name STATION_NAME
-                          Station name, used in Output and Emails [env var:
-                          STATION_NAME]
-    --station-name-short STATION_NAME_SHORT
-                          Shortname for station as used in Filenames (locally
-                          and in attachment) [env var: STATION_NAME_SHORT]
-    --file                create file [env var: FILE]
-    --filetype {xlsx,csv}
-                          filetype to attach to email or write to file [env var:
-                          FILETYPE]
-    --email               send an email [env var: EMAIL]
-    --email-from EMAIL_FROM
-                          the sender of the email [env var: EMAIL_FROM]
-    --email-to EMAIL_TO   the recipients of the email [env var: EMAIL_TO]
-    --email-cc EMAIL_CC   the cc recipients of the email [env var: EMAIL_CC]
-    --email-bcc EMAIL_BCC
-                          the bcc recipients of the email [env var: EMAIL_BCC]
-    --email-server EMAIL_SERVER
-                          the smtp server to send the mail with [env var:
-                          EMAIL_SERVER]
-    --email-login EMAIL_LOGIN
-                          the username to logon to the smtp server (default:
-                          email_from) [env var: EMAIL_LOGIN]
-    --email-pass EMAIL_PASS
-                          the password for the smtp server [env var: EMAIL_PASS]
-    --email-subject EMAIL_SUBJECT
-                          Template for subject of the email. Placeholders are
-                          $station_name, $year and $month. [env var:
-                          EMAIL_SUBJECT]
-    --email-text EMAIL_TEXT
-                          Template for email text. Placeholders are
-                          $station_name, $month, $year, $previous_year,
-                          $responsible_email, and $email_footer. [env var:
-                          EMAIL_TEXT]
-    --email-text-template-file EMAIL_TEXT_TEMPLATE_FILE
-                          Specifify a path to an email_text template [env var:
-                          EMAIL_TEXT_TEMPLATE_FILE]
-    --email-footer EMAIL_FOOTER
-                          Footer for the Email [env var: EMAIL_FOOTER]
-    --responsible-email RESPONSIBLE_EMAIL
-                          Used to hint whom to contact in the emails text. [env
-                          var: RESPONSIBLE_EMAIL]
-    --start-date START_DATE
-                          the start date of the interval in format YYYY-MM-DD
-                          (default: 30 days before end_date) [env var:
-                          START_DATE]
-    --end-date END_DATE   the end date of the interval in format YYYY-MM-DD
-                          (default: today) [env var: END_DATE]
-    --last-month          download data of whole last month [env var:
-                          LAST_MONTH]
-    --timezone TIMEZONE   set the timezone for localization [env var: TIMEZONE]
-    --locale LOCALE       set locale for date and time formatting [env var:
-                          LOCALE]
-    --filename FILENAME   Output filename. Default: -
-                          <station_name_short>_<year>_<month>.csv when reporting
-                          last month - <station_name_short>_<start_date>.csv
-                          else [env var: FILENAME]
-    --stdout              also print to stdout [env var: STDOUT]
-    --crid-mode CRID_MODE
-                          Choose how to generate CRID identifiers (cridlib or
-                          local) [env var: CRID_MODE]
+    SUISA Sendemeldung.
   
-   In general, command-line values override environment variables which override
-  defaults.
+    Create and send playout reports to SUISA.
+  
+    The reports are based on data from ACRCloud.
+  
+  Options:
+    Settings: 
+      --output [file|email|stdout]  How to output the report  [env var:
+                                    SENDEMELDUNG_OUTPUT; default: file]
+      --crid-mode [local|cridlib]   How to generate the identifier in the report
+                                    [env var: SENDEMELDUNG_CRID_MODE; default:
+                                    local]
+    Configure the range of the report: 
+      --last-month                  Generate report for the full last month,
+                                    overrides --date-start and --date-end  [env
+                                    var: SENDEMELDUNG_DATE_LAST_MONTH]
+      --date-start TEXT             The start date of the interval in format YYYY-
+                                    MM-DD [env var: SENDEMELDUNG_DATE_START;
+                                    default: now - 30d]
+      --date-end TEXT               The end date of the interval in format YYYY-
+                                    MM-DD [env var: SENDEMELDUNG_DATE_END;
+                                    default: now]
+    Basic station information: 
+      --station-name TEXT           Station name, used in output and emails  [env
+                                    var: SENDEMELDUNG_STATION_NAME; default: Radio
+                                    Bern RaBe]
+      --station-name-short TEXT     Shortname for station as used in filenames
+                                    (locally and in attachment)  [env var:
+                                    SENDEMELDUNG_STATION_NAME_SHORT; default:
+                                    rabe]
+    Localization configuration: 
+      --l10n-timezone TEXT          [env var: SENDEMELDUNG_L10N_TIMEZONE; default:
+                                    UTC]
+      --l10n-locale TEXT            [env var: SENDEMELDUNG_L10N_LOCALE; default:
+                                    de_CH]
+    File configuration: 
+      --file-format [xlsx|csv]      [env var: SENDEMELDUNG_FILE_FORMAT; default:
+                                    xlsx]
+      --file-path TEXT              [env var: SENDEMELDUNG_FILE_PATH; default: ""]
+    ACRCloud configuration: 
+      --acr-bearer-token TEXT       Bearer token for ACRCloud API access  [env
+                                    var: SENDEMELDUNG_ACR_BEARER_TOKEN; default:
+                                    (*******)]
+      --acr-project-id INTEGER      Id of the project in ACRCloud  [env var:
+                                    SENDEMELDUNG_ACR_PROJECT_ID; default: 0]
+      --acr-stream-id TEXT          Id of the stream in ACRCloud  [env var:
+                                    SENDEMELDUNG_ACR_STREAM_ID; default: ""]
+    Email configuration: 
+      --email-sender TEXT           the sender of the email  [env var:
+                                    SENDEMELDUNG_EMAIL_SENDER; default: ""]
+      --email-to TEXT               the recipients of the email  [env var:
+                                    SENDEMELDUNG_EMAIL_TO; default: ""]
+      --email-server TEXT           the smtp server to send the mail with  [env
+                                    var: SENDEMELDUNG_EMAIL_SERVER; default: ""]
+      --email-port INTEGER          the port of the smtp server  [env var:
+                                    SENDEMELDUNG_EMAIL_PORT; default: 587]
+      --email-username TEXT         the username to logon to the smtp server
+                                    (default: email_from)  [env var:
+                                    SENDEMELDUNG_EMAIL_USERNAME; default: ""]
+      --email-password TEXT         the password for the smtp server  [env var:
+                                    SENDEMELDUNG_EMAIL_PASSWORD; default:
+                                    (*******)]
+      --email-responsible-email TEXT
+                                    Used to hint whom to contact in the emails
+                                    text.  [env var:
+                                    SENDEMELDUNG_EMAIL_RESPONSIBLE_EMAIL; default:
+                                    ""]
+      --email-cc TEXT               the cc recipients of the email  [env var:
+                                    SENDEMELDUNG_EMAIL_CC; default: ""]
+      --email-bcc TEXT              the bcc recipients of the email  [env var:
+                                    SENDEMELDUNG_EMAIL_BCC; default: ""]
+      --email-subject TEXT          Template for subject of the email.
+                                    
+                                    Placeholders are $station_name, $year and
+                                    $month.  [env var: SENDEMELDUNG_EMAIL_SUBJECT]
+      --email-text TEXT             Template for email text.
+                                    
+                                    Placeholders are $station_name, $month, $year,
+                                    $previous_year, $responsible_email, and
+                                    $email_footer.  [env var:
+                                    SENDEMELDUNG_EMAIL_TEXT]
+      --email-footer TEXT           Footer for the Email  [env var:
+                                    SENDEMELDUNG_EMAIL_FOOTER]
+    --help                          Show this message and exit.
   
   '''
 # ---
