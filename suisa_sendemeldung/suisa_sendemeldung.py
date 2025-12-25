@@ -494,18 +494,25 @@ def get_xlsx(data: list[dict], settings: Settings) -> BytesIO:
 
 
 def reformat_start_date_in_xlsx(worksheet: Worksheet) -> None:
-    """Set date number formatting on "Sendedatum" col."""
+    """Set date number formatting on relevant columns."""
     for idx, row in enumerate(worksheet.rows):
         # skip first row
         if idx < 1:
             continue
-        # turn the str from the CSV into a real datetime.datetime again
-        row[5].value = datetime.strptime(  # noqa: DTZ007
-            f"{row[5].value} {row[7].value}", "%Y-%m-%d %H:%M:%S"
+
+        # turn the str from the CSV into a real datetime.datetime in Sendedatum column
+        row[4].value = datetime.strptime(  # noqa: DTZ007
+            f"{row[4].value} {row[6].value}", "%Y-%m-%d %H:%M:%S"
         ).date()
         # adjust the formatting
-        row[5].number_format = "dd.mm.yyyy"
+        row[4].number_format = "dd.mm.yyyy"
 
+        # same thing for date fields "Aufnahmedatum" and "Erstveröffentlichungsdatum"
+        for col_idx in [13, 15]:
+            row[col_idx].value = datetime.strptime(  # noqa: DTZ007
+                str(row[col_idx].value), "%Y%m%d"
+            ).date() if row[col_idx].value else None
+            row[col_idx].number_format = "dd.mm.yyyy"
 
 def write_csv(filename: str, csv: BytesIO | str) -> None:  # pragma: no cover
     """Write contents of `csv` to file.
