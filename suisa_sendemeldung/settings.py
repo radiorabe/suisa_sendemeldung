@@ -32,8 +32,8 @@ Diese Sendemeldung enthält unter anderem die unter Ziffer 34 geforderten Angabe
 - Sendezeit
 - vom Sender der Aufnahme selbst zugewiesene Identifikationsnummer
 - Kennzeichnung der Eigenaufnahmen
-- Label
 - ISRC der benützten Aufnahme (sofern zusammen mit der Aufnahme vom Lieferanten der Aufnahme irgendeiner Form mitgeteilt bzw. mitgeliefert)
+- Label
 
 Die folgenden subsidiären Angaben melden wir in allen Fällen wo diese vom Lieferanten der Aufnahme mitgeteilt bzw. mitgeliefert wurden, insbesondere in Fällen wo der Lieferant der Aufnahme uns keine ISRC mitgeteilt bzw. mitgeliefert hat.
 
