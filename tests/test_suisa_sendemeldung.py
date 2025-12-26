@@ -368,7 +368,7 @@ def test_get_xlsx(snapshot, settings):
     assert worksheet.column_dimensions == snapshot
 
 
-def test_reformat_start_date_in_xlsx(settings: Settings):
+def test_reformat_start_date_in_xlsx():
     workbook: Workbook = Workbook()
     if not workbook.active:  # pragma: no cover
         raise RuntimeError
@@ -394,7 +394,7 @@ def test_reformat_start_date_in_xlsx(settings: Settings):
             "20250101",  # Erstveröffentlichungsdatum
         ]
     )
-    suisa_sendemeldung.reformat_start_date_in_xlsx(worksheet, settings)
+    suisa_sendemeldung.reformat_start_date_in_xlsx(worksheet)
     row = list(worksheet.rows)[1]
     assert row[4].value == datetime(2025, 1, 1, 1, 1, 1).date()
     assert row[4].number_format == "dd.mm.yyyy"
