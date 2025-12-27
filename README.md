@@ -24,7 +24,7 @@ While we recommend running the script in it's container, you can also install th
 in any python environment using [pip](https://pip.pypa.io/).
 
 We recommend using a dedicated [venv](https://docs.python.org/3/library/venv.html) for
-running the script hould you go down this route:
+running the script should you go down this route:
 
 ```bash
 python -mvenv .venv
@@ -47,18 +47,18 @@ the configuration file.
 
 The configuration files will be evaluated in the following order (last takes precedence over first):
 
-  1. `/etc/suisa_sendemeldung.conf`
-  2. `$HOME/suisa_sendemeldung.conf`
-  3. `./suisa_sendemeldung.conf`
+  1. `/etc/suisa_sendemeldung.toml`
+  2. `$HOME/suisa_sendemeldung.toml`
+  3. `./suisa_sendemeldung.toml`
 
-For details on how to set configuration values, have a look at [suisa_sendemeldung.conf](etc/suisa_sendemeldung.conf).
+For details on how to set configuration values, have a look at [suisa_sendemeldung.conf](etc/suisa_sendemeldung.toml).
 
 #### Environment variables
 
 Environment variables can also be passed as options. The relevant variables are listed in the [Usage](#Usage) part of this document. For example run the script as follows:
 
 ```bash
-podman run --rm -ti -e BEARER_TOKEN=abcdefghijklmnopqrstuvwxyzabcdef -e STREAM_ID=a-bcdefgh -e STDOUT=True ghcr.io/radiorabe/suisasendemeldung:latest suisa_sendemeldung
+podman run --rm -ti -e SENDEMELDUNG_ACR_BEARER_TOKEN=abcdefghijklmnopqrstuvwxyzabcdef -e SENDEMELDUNG_ACR_STREAM_ID=a-bcdefgh -e SENDEMELDUNG_OUTPUT=stdout ghcr.io/radiorabe/suisasendemeldung:latest suisa_sendemeldung
 ```
 
 #### Command line switches
@@ -66,7 +66,7 @@ podman run --rm -ti -e BEARER_TOKEN=abcdefghijklmnopqrstuvwxyzabcdef -e STREAM_I
 As documented in [Usage](#Usage), you can also pass in options on the command line as arguments. Simply run the script as follows:
 
 ```bash
-podman run --rm -ti ghcr.io/radiorabe/suisasendemeldung:latest suisa_sendemeldung --bearer-token=abcdefghijklmnopqrstuvwxyzabcdef --stream_id=a-bcdefgh --stdout
+podman run --rm -ti ghcr.io/radiorabe/suisasendemeldung:latest suisa_sendemeldung --acr-bearer-token=abcdefghijklmnopqrstuvwxyzabcdef --acr-stream-id=a-bcdefgh --output=stdout
 ```
 
 ## Development
