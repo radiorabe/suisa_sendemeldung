@@ -323,7 +323,7 @@ def get_csv(data: list, settings: Settings) -> str:
         "Albumtitel / Titel des Tonträgers",
         "Aufnahmedatum",
         "Aufnahmeland",
-        "Erstveröffentlichungsdatum",
+        "Erstveröffentichungsdatum",
         "Katalog-Nummer / CD ID",
         "Werkverzeichnisangaben",
         "Bestellnummer",
@@ -452,26 +452,40 @@ def get_xlsx(data: list[dict], settings: Settings) -> BytesIO:
 
     # the columns that should be styled as required (grey background)
     required_columns = [
-        "Titel",
-        "Komponist",
-        "Interpret",
+        "Sender",
+        "Titel des Musikwerks",
+        "Name des Komponisten",
+        "Interpret(en)",
         "Sendedatum",
         "Sendedauer",
         "Sendezeit",
         "ISRC",
         "Label",
-        "Label Code",
         "Identifikationsnummer",
+        "Eigenaufnahmen",
+    ]
+    subsidiary_columns = [
+        "EAN/GTIN",
+        "Albumtitel / Titel des Tonträgers",
+        "Aufnahmedatum",
+        "Aufnahmeland",
+        "Erstveröffentichungsdatum",
+        "Katalog-Nummer / CD ID",
+        "Werkverzeichnisangaben",
+        "Bestellnummer",
     ]
     font = Font(name="Calibri", bold=True, size=12)
     side = Side(border_style="thick", color="000000")
     border = Border(top=side, left=side, right=side, bottom=side)
-    fill = PatternFill("solid", bgColor="d9d9d9", fgColor="d9d9d9")
+    required_fill = PatternFill("solid", bgColor="d9d9d9", fgColor="d9d9d9")
+    subsdiary_fill = PatternFill("solid", bgColor="ebf1de", fgColor="ebf1de")
     for cell in worksheet[1]:  # xlsx is 1-indexed
         cell.font = font
         cell.border = border
         if cell.value in required_columns:
-            cell.fill = fill
+            cell.fill = required_fill
+        elif cell.value in subsidiary_columns:
+            cell.fill = subsdiary_fill
 
     # Try to approximate the required width by finding the longest values per column
     dims: dict[str, int] = {}
@@ -507,7 +521,7 @@ def reformat_start_date_in_xlsx(worksheet: Worksheet) -> None:
         # adjust the formatting
         row[4].number_format = "dd.mm.yyyy"
 
-        # same thing for date fields "Aufnahmedatum" and "Erstveröffentlichungsdatum"
+        # same thing for date fields "Aufnahmedatum" and "Erstveröffentichungsdatum"
         for col_idx in [13, 15]:
             row[col_idx].value = (
                 datetime.strptime(  # noqa: DTZ007
@@ -557,12 +571,14 @@ def get_email_attachment(filename: str, filetype: str, data: BytesIO | str) -> M
     """
     maintype = "application"
     subtype = "vnd.ms-excel"
-    payload: str | bytes = str(data)
     if filetype == "csv":
         maintype = "text"
         subtype = "csv"
-        payload = str(data).encode("utf-8")
         part = MIMEBase("text", "csv")
+
+    payload = (
+        data.getvalue() if isinstance(data, BytesIO) else str(data).encode("utf-8")
+    )
 
     part = MIMEBase(maintype, subtype)
     part.set_payload(payload)
