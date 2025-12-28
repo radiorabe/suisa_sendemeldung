@@ -477,8 +477,8 @@ def get_xlsx(data: list[dict], settings: Settings) -> BytesIO:
     font = Font(name="Calibri", bold=True, size=12)
     side = Side(border_style="thick", color="000000")
     border = Border(top=side, left=side, right=side, bottom=side)
-    required_fill = PatternFill("solid", bgColor="d9d9d9", fgColor="d9d9d9")
-    subsdiary_fill = PatternFill("solid", bgColor="ebf1de", fgColor="ebf1de")
+    required_fill = PatternFill("solid", bgColor="bfbfbf", fgColor="bfbfbf")
+    subsdiary_fill = PatternFill("solid", bgColor="aef0dd", fgColor="aef0dd")
     for cell in worksheet[1]:  # xlsx is 1-indexed
         cell.font = font
         cell.border = border

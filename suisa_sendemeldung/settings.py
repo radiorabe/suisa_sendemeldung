@@ -14,7 +14,7 @@ Hallo SUISA
 Im Anhang finden Sie die Sendemeldung von $station_name für den $month $year.
 
 Diese Sendemeldung erfolgt gemäss den Bestimmungen "Gemeinsamer Tarif S 2026 - 2028" [1] unter
-Einhaltung der Einreichefrist für den Monat $month gemäss Ziffer 45 des Tarifs.
+Einhaltung der Einreichefrist für den Monat $month gemäss Ziffer 44 des Tarifs.
 
 In der Sendungsmeldung enthalten sind die unter Buchstaben G (Verzeichnisse) des Tarifs
 genannten Programmangaben, in elektronischer Form. Die Angaben richten sich nach dem
@@ -32,10 +32,10 @@ Diese Sendemeldung enthält unter anderem die unter Ziffer 34 geforderten Angabe
 - Sendezeit
 - vom Sender der Aufnahme selbst zugewiesene Identifikationsnummer
 - Kennzeichnung der Eigenaufnahmen
-- ISRC der benützten Aufnahme (sofern zusammen mit der Aufnahme vom Lieferanten der Aufnahme irgendeiner Form mitgeteilt bzw. mitgeliefert)
+- ISRC der benützten Aufnahme (sofern zusammen mit der Aufnahme vom Lieferanten der Aufnahme in irgendeiner Form mitgeteilt bzw. mitgeliefert)
 - Label
 
-Die folgenden subsidiären Angaben melden wir in allen Fällen wo diese vom Lieferanten der Aufnahme mitgeteilt bzw. mitgeliefert wurden, insbesondere in Fällen wo der Lieferant der Aufnahme uns keine ISRC mitgeteilt bzw. mitgeliefert hat.
+Die folgenden subsidiären Angaben werden in allen Fällen gemeldet, in denen diese vom Lieferanten der Aufnahme mitgeteilt oder mitgeliefert wurden, insbesondere in Fällen, in denen der Lieferant der Aufnahme keine ISRC mitgeteilt oder mitgeliefert hat.
 
 - EAN / GTIN (European Article Number / Global Trade Item Number)
 - Albumtitel / Titel des Tonträgers
@@ -50,12 +50,12 @@ Die folgenden subsidiären Angaben melden wir in allen Fällen wo diese vom Lief
 Allfällige Beanstandungen oder technische Rückfragen zu dieser Sendemeldung müssen in
 schriftlicher, elektronischer Form an $responsible_email gerichtet werden.
 
-Beanstandungen müssen, gemäss Ziffer 46, bis spätestens in drei Monaten vor dem $in_three_months
+Beanstandungen müssen, gemäss Ziffer 45, bis spätestens in drei Monaten vor dem $in_three_months
 erfolgen. Anschliessend gilt die Sendemeldung für $month $year als akzeptiert und die
 Tarifbestimmungen als eingehalten.
 
 Korrekt und termingerecht gemeldete Beanstandungen werden unter Berücksichtigung der
-Nachfrist von 45 Tagen, gemäss Ziffer 46, bearbeitet.
+Nachfrist von 45 Tagen, gemäss Ziffer 45, bearbeitet.
 
 Diese Email und Sendemeldung wurde automatisch generiert.
 
