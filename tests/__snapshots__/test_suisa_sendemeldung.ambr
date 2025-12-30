@@ -93,13 +93,13 @@
 # ---
 # name: test_get_csv
   '''
-  Sender,Titel des Musikwerks,Name des Komponisten,Interpret(en),Sendedatum,Sendedauer,Sendezeit,ISRC,Label,Identifikationsnummer,Eigenaufnahmen,EAN/GTIN,Albumtitel / Titel des Tonträgers,Aufnahmedatum,Aufnahmeland,Erstveröffentichungsdatum,Katalog-Nummer / CD ID,Werkverzeichnisangaben,Bestellnummer,Veröffentichungsland,Liveaufnahme
+  Sender,Titel des Musikwerks,Name des Komponisten,Interpret(en),Sendedatum,Sendedauer,Sendezeit,ISRC,Label,Identifikationsnummer,Eigenaufnahmen,EAN/GTIN,Albumtitel / Titel des Tonträgers,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Katalog-Nummer / CD ID,Werkverzeichnisangaben,Bestellnummer,Veröffentlichungsland,Liveaufnahme
   
   '''
 # ---
 # name: test_get_csv.1
   '''
-  Sender,Titel des Musikwerks,Name des Komponisten,Interpret(en),Sendedatum,Sendedauer,Sendezeit,ISRC,Label,Identifikationsnummer,Eigenaufnahmen,EAN/GTIN,Albumtitel / Titel des Tonträgers,Aufnahmedatum,Aufnahmeland,Erstveröffentichungsdatum,Katalog-Nummer / CD ID,Werkverzeichnisangaben,Bestellnummer,Veröffentichungsland,Liveaufnahme
+  Sender,Titel des Musikwerks,Name des Komponisten,Interpret(en),Sendedatum,Sendedauer,Sendezeit,ISRC,Label,Identifikationsnummer,Eigenaufnahmen,EAN/GTIN,Albumtitel / Titel des Tonträgers,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Katalog-Nummer / CD ID,Werkverzeichnisangaben,Bestellnummer,Veröffentlichungsland,Liveaufnahme
   Station Name,Uhrenvergleich,,,1993-03-01,00:01:00,13:12:00,,,crid://rabe.ch/v1/test,,,,,,,,,,,
   Station Name,Meme Dub,Da Composah,Da Gang,1993-03-01,00:01:00,13:37:00,DEZ650710376,,crid://rabe.ch/v1/test,,,"album, but string",,,,,,,,
   Station Name,Bubbles,,"Mary's Surprise Act, Climmy Jiff",1993-03-01,00:01:00,16:20:00,DEZ650710376,Jane Records,crid://rabe.ch/v1/test,,greedy-capitalist-number,Da Alboom,,,20221213,,,,,
@@ -112,7 +112,7 @@
 # ---
 # name: test_get_csv.2
   '''
-  Sender,Titel des Musikwerks,Name des Komponisten,Interpret(en),Sendedatum,Sendedauer,Sendezeit,ISRC,Label,Identifikationsnummer,Eigenaufnahmen,EAN/GTIN,Albumtitel / Titel des Tonträgers,Aufnahmedatum,Aufnahmeland,Erstveröffentichungsdatum,Katalog-Nummer / CD ID,Werkverzeichnisangaben,Bestellnummer,Veröffentichungsland,Liveaufnahme
+  Sender,Titel des Musikwerks,Name des Komponisten,Interpret(en),Sendedatum,Sendedauer,Sendezeit,ISRC,Label,Identifikationsnummer,Eigenaufnahmen,EAN/GTIN,Albumtitel / Titel des Tonträgers,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Katalog-Nummer / CD ID,Werkverzeichnisangaben,Bestellnummer,Veröffentlichungsland,Liveaufnahme
   Station Name,Uhrenvergleich,,,1993-03-01,00:01:00,13:12:00,,,1993-03-01T13:12:00+00:00#acrid=a1,,,,,,,,,,,
   Station Name,Meme Dub,Da Composah,Da Gang,1993-03-01,00:01:00,13:37:00,DEZ650710376,,1993-03-01T13:37:00+00:00#acrid=a2,,,"album, but string",,,,,,,,
   Station Name,Bubbles,,"Mary's Surprise Act, Climmy Jiff",1993-03-01,00:01:00,16:20:00,DEZ650710376,Jane Records,1993-03-01T16:20:00+00:00#acrid=a3,,greedy-capitalist-number,Da Alboom,,,20221213,,,,,
@@ -141,11 +141,11 @@
       'Albumtitel / Titel des Tonträgers',
       'Aufnahmedatum',
       'Aufnahmeland',
-      'Erstveröffentichungsdatum',
+      'Erstveröffentlichungsdatum',
       'Katalog-Nummer / CD ID',
       'Werkverzeichnisangaben',
       'Bestellnummer',
-      'Veröffentichungsland',
+      'Veröffentlichungsland',
       'Liveaufnahme',
     ),
   ])
@@ -167,11 +167,11 @@
     'M': <ColumnDimension Instance, Attributes={'width': '36', 'customWidth': '1', 'min': '13', 'max': '13'}>,
     'N': <ColumnDimension Instance, Attributes={'width': '16', 'customWidth': '1', 'min': '14', 'max': '14'}>,
     'O': <ColumnDimension Instance, Attributes={'width': '15', 'customWidth': '1', 'min': '15', 'max': '15'}>,
-    'P': <ColumnDimension Instance, Attributes={'width': '28', 'customWidth': '1', 'min': '16', 'max': '16'}>,
+    'P': <ColumnDimension Instance, Attributes={'width': '29', 'customWidth': '1', 'min': '16', 'max': '16'}>,
     'Q': <ColumnDimension Instance, Attributes={'width': '25', 'customWidth': '1', 'min': '17', 'max': '17'}>,
     'R': <ColumnDimension Instance, Attributes={'width': '25', 'customWidth': '1', 'min': '18', 'max': '18'}>,
     'S': <ColumnDimension Instance, Attributes={'width': '16', 'customWidth': '1', 'min': '19', 'max': '19'}>,
-    'T': <ColumnDimension Instance, Attributes={'width': '23', 'customWidth': '1', 'min': '20', 'max': '20'}>,
+    'T': <ColumnDimension Instance, Attributes={'width': '24', 'customWidth': '1', 'min': '20', 'max': '20'}>,
     'U': <ColumnDimension Instance, Attributes={'width': '15', 'customWidth': '1', 'min': '21', 'max': '21'}>,
   })
 # ---

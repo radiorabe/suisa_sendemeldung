@@ -323,11 +323,11 @@ def get_csv(data: list, settings: Settings) -> str:
         "Albumtitel / Titel des Tonträgers",
         "Aufnahmedatum",
         "Aufnahmeland",
-        "Erstveröffentichungsdatum",
+        "Erstveröffentlichungsdatum",
         "Katalog-Nummer / CD ID",
         "Werkverzeichnisangaben",
         "Bestellnummer",
-        "Veröffentichungsland",
+        "Veröffentlichungsland",
         "Liveaufnahme",
     ]
     csv = StringIO()
@@ -417,7 +417,7 @@ def get_csv(data: list, settings: Settings) -> str:
                 "",  # Katalog-Nummer / CD ID
                 "",  # Werkverzeichnisangaben
                 "",  # Bestellnummer
-                "",  # Veröffentichungsland
+                "",  # Veröffentlichungsland
                 "",  # Liveaufnahme
             ],
         )
@@ -469,7 +469,7 @@ def get_xlsx(data: list[dict], settings: Settings) -> BytesIO:
         "Albumtitel / Titel des Tonträgers",
         "Aufnahmedatum",
         "Aufnahmeland",
-        "Erstveröffentichungsdatum",
+        "Erstveröffentlichungsdatum",
         "Katalog-Nummer / CD ID",
         "Werkverzeichnisangaben",
         "Bestellnummer",
@@ -521,7 +521,7 @@ def reformat_start_date_in_xlsx(worksheet: Worksheet) -> None:
         # adjust the formatting
         row[4].number_format = "dd.mm.yyyy"
 
-        # same thing for date fields "Aufnahmedatum" and "Erstveröffentichungsdatum"
+        # same thing for date fields "Aufnahmedatum" and "Erstveröffentlichungsdatum"
         for col_idx in [13, 15]:
             row[col_idx].value = (
                 datetime.strptime(  # noqa: DTZ007
