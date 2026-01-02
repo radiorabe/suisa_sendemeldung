@@ -16,6 +16,13 @@
       --crid-mode [local|cridlib]   How to generate the identifier in the report
                                     [env var: SENDEMELDUNG_CRID_MODE; default:
                                     local]
+    ACRCloud configuration: 
+      --acr-bearer-token TEXT       Bearer token for ACRCloud API access  [env
+                                    var: SENDEMELDUNG_ACR_BEARER_TOKEN; required]
+      --acr-project-id TEXT         Id of the project in ACRCloud  [env var:
+                                    SENDEMELDUNG_ACR_PROJECT_ID; required]
+      --acr-stream-id TEXT          Id of the stream in ACRCloud  [env var:
+                                    SENDEMELDUNG_ACR_STREAM_ID; required]
     Configure the range of the report: 
       --last-month                  Generate report for the full last month,
                                     overrides --date-start and --date-end  [env
@@ -43,14 +50,6 @@
       --file-format [xlsx|csv]      [env var: SENDEMELDUNG_FILE_FORMAT; default:
                                     xlsx]
       --file-path TEXT              [env var: SENDEMELDUNG_FILE_PATH; default: ""]
-    ACRCloud configuration: 
-      --acr-bearer-token TEXT       Bearer token for ACRCloud API access  [env
-                                    var: SENDEMELDUNG_ACR_BEARER_TOKEN; default:
-                                    (*******)]
-      --acr-project-id INTEGER      Id of the project in ACRCloud  [env var:
-                                    SENDEMELDUNG_ACR_PROJECT_ID; default: 0]
-      --acr-stream-id TEXT          Id of the stream in ACRCloud  [env var:
-                                    SENDEMELDUNG_ACR_STREAM_ID; default: ""]
     Email configuration: 
       --email-sender TEXT           the sender of the email  [env var:
                                     SENDEMELDUNG_EMAIL_SENDER; default: ""]

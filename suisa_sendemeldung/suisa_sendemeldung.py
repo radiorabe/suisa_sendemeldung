@@ -666,10 +666,10 @@ def main(settings: Settings) -> None:  # pragma: no cover
     start_date, end_date = parse_date(settings)
     filename = parse_filename(settings, start_date)
 
-    client = ACRClient(bearer_token=settings.acr.bearer_token)
+    client = ACRClient(bearer_token=str(settings.acr.bearer_token))
     data = client.get_interval_data(
         settings.acr.project_id,
-        settings.acr.stream_id,
+        str(settings.acr.stream_id),
         start_date,
         end_date,
         timezone=settings.l10n.timezone,

@@ -7,6 +7,7 @@ from enum import StrEnum
 from zoneinfo import ZoneInfo
 
 import typed_settings as ts
+from attrs import validators
 
 _EMAIL_TEMPLATE = """
 Hallo SUISA
@@ -149,11 +150,19 @@ class FileSettings:
 class ACR:
     """ACRCloud configuration"""  # noqa: D400, D415
 
-    bearer_token: str = ts.secret(
-        help="Bearer token for ACRCloud API access", default=""
+    bearer_token = ts.secret(
+        help="Bearer token for ACRCloud API access",
+        validator=validators.optional(validators.min_len(32)),
     )
-    project_id: int = ts.option(help="Id of the project in ACRCloud", default=0)
-    stream_id: str = ts.option(help="Id of the stream in ACRCloud", default="")
+    project_id = ts.option(
+        help="Id of the project in ACRCloud",
+        validator=validators.ge(0),
+
+    )
+    stream_id = ts.option(
+        help="Id of the stream in ACRCloud",
+        validator=validators.optional(validators.min_len(9)),
+    )
 
 
 @ts.settings
@@ -214,9 +223,9 @@ class Settings:
         default=IdentifierMode.local,
     )
 
+    acr: ACR = ts.option(default=None)
     date: RangeSettings = ts.option(default=RangeSettings())
     station: StationSettings = ts.option(default=StationSettings())
     l10n: LocalizationSettings = ts.option(default=LocalizationSettings())
     file: FileSettings = ts.option(default=FileSettings())
-    acr: ACR = ts.option(default=ACR())
     email: EmailSettings = ts.option(default=EmailSettings())
