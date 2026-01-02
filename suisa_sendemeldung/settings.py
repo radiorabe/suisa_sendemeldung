@@ -2,9 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta
 from enum import StrEnum
-from zoneinfo import ZoneInfo
 
 import typed_settings as ts
 from attrs import validators
@@ -14,13 +12,9 @@ Hallo SUISA
 
 Im Anhang finden Sie die Sendemeldung von $station_name für den $month $year.
 
-Diese Sendemeldung erfolgt gemäss den Bestimmungen "Gemeinsamer Tarif S 2026 - 2028" [1] unter
-Einhaltung der Einreichefrist für den Monat $month gemäss Ziffer 44 des Tarifs.
+Diese Sendemeldung erfolgt gemäss den Bestimmungen "Gemeinsamer Tarif S 2026 - 2028" [1] unter Einhaltung der Einreichefrist für den Monat $month gemäss Ziffer 44 des Tarifs.
 
-In der Sendungsmeldung enthalten sind die unter Buchstaben G (Verzeichnisse) des Tarifs
-genannten Programmangaben, in elektronischer Form. Die Angaben richten sich nach dem
-standardisierten Format gemäss Anhang 1 "Vorlage Sendelisten Radio" des obengenannten Tarifs
-sowie der Abstimmung zwischen SUISA und $station_name.
+In der Sendungsmeldung enthalten sind die unter Buchstaben G (Verzeichnisse) des Tarifs genannten Programmangaben, in elektronischer Form. Die Angaben richten sich nach dem standardisierten Format gemäss Anhang 1 "Vorlage Sendelisten Radio" des obengenannten Tarifs.
 
 
 Diese Sendemeldung enthält unter anderem die unter Ziffer 34 geforderten Angaben:
@@ -36,7 +30,7 @@ Diese Sendemeldung enthält unter anderem die unter Ziffer 34 geforderten Angabe
 - ISRC der benützten Aufnahme (sofern zusammen mit der Aufnahme vom Lieferanten der Aufnahme in irgendeiner Form mitgeteilt bzw. mitgeliefert)
 - Label
 
-Die folgenden subsidiären Angaben werden in allen Fällen gemeldet, in denen diese vom Lieferanten der Aufnahme mitgeteilt oder mitgeliefert wurden, insbesondere in Fällen, in denen der Lieferant der Aufnahme keine ISRC mitgeteilt oder mitgeliefert hat.
+Ebenfalls sind folgende subsidiäre Angaben enthalten, sofern sie für den Sender verfügbar oder leicht zugänglich sind:
 
 - EAN / GTIN (European Article Number / Global Trade Item Number)
 - Albumtitel / Titel des Tonträgers
@@ -48,15 +42,11 @@ Die folgenden subsidiären Angaben werden in allen Fällen gemeldet, in denen di
 - Bestellnummer
 
 
-Allfällige Beanstandungen oder technische Rückfragen zu dieser Sendemeldung müssen in
-schriftlicher, elektronischer Form an $responsible_email gerichtet werden.
+Allfällige Beanstandungen oder technische Rückfragen zu dieser Sendemeldung müssen in schriftlicher, elektronischer Form an $responsible_email gerichtet werden.
 
-Beanstandungen müssen, gemäss Ziffer 45, bis spätestens in drei Monaten vor dem $in_three_months
-erfolgen. Anschliessend gilt die Sendemeldung für $month $year als akzeptiert und die
-Tarifbestimmungen als eingehalten.
+Beanstandungen müssen, gemäss Ziffer 45, bis spätestens in drei Monaten vor dem $in_three_months erfolgen. Anschliessend gilt die Sendemeldung für $month $year als akzeptiert und die Tarifbestimmungen als eingehalten.
 
-Korrekt und termingerecht gemeldete Beanstandungen werden unter Berücksichtigung der
-Nachfrist von 45 Tagen, gemäss Ziffer 45, bearbeitet.
+Korrekt und termingerecht gemeldete Beanstandungen werden unter Berücksichtigung der Nachfrist von 45 Tagen, gemäss Ziffer 45, bearbeitet.
 
 Diese Email und Sendemeldung wurde automatisch generiert.
 
@@ -150,18 +140,17 @@ class FileSettings:
 class ACR:
     """ACRCloud configuration"""  # noqa: D400, D415
 
-    bearer_token = ts.secret(
-        help="Bearer token for ACRCloud API access",
-        validator=validators.optional(validators.min_len(32)),
-    )
-    project_id = ts.option(
+    project_id: int = ts.option(
         help="Id of the project in ACRCloud",
         validator=validators.ge(0),
-
     )
-    stream_id = ts.option(
+    bearer_token: str = ts.secret(
+        help="Bearer token for ACRCloud API access",
+        validator=validators.min_len(32),
+    )
+    stream_id: str = ts.option(
         help="Id of the stream in ACRCloud",
-        validator=validators.optional(validators.min_len(9)),
+        validator=validators.min_len(9),
     )
 
 
@@ -182,24 +171,22 @@ class StationSettings:
 class RangeSettings:
     """Configure the range of the report"""  # noqa: D400, D415
 
+    start: str = ts.option(
+        help="The start date of the interval in format YYYY-MM-DD [env var: SENDEMELDUNG_DATE_START; default: now - 30d]",  # noqa: E501
+        default="",
+        click={"show_default": False, "show_envvar": False},
+    )
+    end: str = ts.option(
+        help="The end date of the interval in format YYYY-MM-DD [env var: SENDEMELDUNG_DATE_END; default: now]",  # noqa: E501
+        default="",
+        click={"show_default": False, "show_envvar": False},
+    )
     last_month: bool = ts.option(
         help="""
         Generate report for the full last month, overrides --date-start and --date-end
         """,
         default=False,
         click={"param_decls": ("--last-month",)},
-    )
-    start: str = ts.option(
-        help="The start date of the interval in format YYYY-MM-DD [env var: SENDEMELDUNG_DATE_START; default: now - 30d]",  # noqa: E501
-        default=(
-            datetime.now(tz=ZoneInfo("Europe/Zurich")) - timedelta(days=30)
-        ).strftime("%Y-%m-%d"),
-        click={"show_default": False, "show_envvar": False},
-    )
-    end: str = ts.option(
-        help="The end date of the interval in format YYYY-MM-DD [env var: SENDEMELDUNG_DATE_END; default: now]",  # noqa: E501
-        default=datetime.now(tz=ZoneInfo("Europe/Zurich")).strftime("%Y-%m-%d"),
-        click={"show_default": False, "show_envvar": False},
     )
 
 

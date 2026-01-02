@@ -88,6 +88,10 @@ def parse_date(settings: Settings) -> tuple[date, date]:
         end_date: the end date of the requested interval
 
     """
+    # default values
+    end_date: date = date.today()  # noqa: DTZ011
+    start_date: date = end_date - timedelta(days=30)
+
     # date parsing logic
     if settings.date.last_month:
         today = date.today()  # noqa: DTZ011
@@ -99,14 +103,8 @@ def parse_date(settings: Settings) -> tuple[date, date]:
     else:
         if settings.date.end:
             end_date = datetime.strptime(settings.date.end, "%Y-%m-%d").date()  # noqa: DTZ007
-        else:
-            # if no end_date was set, default to today
-            end_date = date.today()  # noqa: DTZ011
         if settings.date.start:
             start_date = datetime.strptime(settings.date.start, "%Y-%m-%d").date()  # noqa: DTZ007
-        else:
-            # if no start_date was set, default to 30 days before end_date
-            start_date = end_date - timedelta(days=30)
     return start_date, end_date
 
 
@@ -319,7 +317,7 @@ def get_csv(data: list, settings: Settings) -> str:
         "Label",
         "Identifikationsnummer",
         "Eigenaufnahmen",
-        "EAN/GTIN",
+        "EAN / GTIN",
         "Albumtitel / Titel des Tonträgers",
         "Aufnahmedatum",
         "Aufnahmeland",
@@ -478,7 +476,7 @@ def get_xlsx(data: list[dict], settings: Settings) -> BytesIO:
     side = Side(border_style="thick", color="000000")
     border = Border(top=side, left=side, right=side, bottom=side)
     required_fill = PatternFill("solid", bgColor="bfbfbf", fgColor="bfbfbf")
-    subsdiary_fill = PatternFill("solid", bgColor="aef0dd", fgColor="aef0dd")
+    subsdiary_fill = PatternFill("solid", bgColor="ebf1de", fgColor="ebf1de")
     for cell in worksheet[1]:  # xlsx is 1-indexed
         cell.font = font
         cell.border = border
