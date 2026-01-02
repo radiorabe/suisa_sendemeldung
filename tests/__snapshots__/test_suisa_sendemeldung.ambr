@@ -19,7 +19,7 @@
     ACRCloud configuration: 
       --acr-bearer-token TEXT       Bearer token for ACRCloud API access  [env
                                     var: SENDEMELDUNG_ACR_BEARER_TOKEN; required]
-      --acr-project-id TEXT         Id of the project in ACRCloud  [env var:
+      --acr-project-id INTEGER      Id of the project in ACRCloud  [env var:
                                     SENDEMELDUNG_ACR_PROJECT_ID; required]
       --acr-stream-id TEXT          Id of the stream in ACRCloud  [env var:
                                     SENDEMELDUNG_ACR_STREAM_ID; required]
@@ -92,13 +92,13 @@
 # ---
 # name: test_get_csv
   '''
-  Sender,Titel des Musikwerks,Name des Komponisten,Interpret(en),Sendedatum,Sendedauer,Sendezeit,ISRC,Label,Identifikationsnummer,Eigenaufnahmen,EAN/GTIN,Albumtitel / Titel des Tonträgers,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Katalog-Nummer / CD ID,Werkverzeichnisangaben,Bestellnummer,Veröffentlichungsland,Liveaufnahme
+  Sender,Titel des Musikwerks,Name des Komponisten,Interpret(en),Sendedatum,Sendedauer,Sendezeit,ISRC,Label,Identifikationsnummer,Eigenaufnahmen,EAN / GTIN,Albumtitel / Titel des Tonträgers,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Katalog-Nummer / CD ID,Werkverzeichnisangaben,Bestellnummer,Veröffentlichungsland,Liveaufnahme
   
   '''
 # ---
 # name: test_get_csv.1
   '''
-  Sender,Titel des Musikwerks,Name des Komponisten,Interpret(en),Sendedatum,Sendedauer,Sendezeit,ISRC,Label,Identifikationsnummer,Eigenaufnahmen,EAN/GTIN,Albumtitel / Titel des Tonträgers,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Katalog-Nummer / CD ID,Werkverzeichnisangaben,Bestellnummer,Veröffentlichungsland,Liveaufnahme
+  Sender,Titel des Musikwerks,Name des Komponisten,Interpret(en),Sendedatum,Sendedauer,Sendezeit,ISRC,Label,Identifikationsnummer,Eigenaufnahmen,EAN / GTIN,Albumtitel / Titel des Tonträgers,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Katalog-Nummer / CD ID,Werkverzeichnisangaben,Bestellnummer,Veröffentlichungsland,Liveaufnahme
   Station Name,Uhrenvergleich,,,1993-03-01,00:01:00,13:12:00,,,crid://rabe.ch/v1/test,,,,,,,,,,,
   Station Name,Meme Dub,Da Composah,Da Gang,1993-03-01,00:01:00,13:37:00,DEZ650710376,,crid://rabe.ch/v1/test,,,"album, but string",,,,,,,,
   Station Name,Bubbles,,"Mary's Surprise Act, Climmy Jiff",1993-03-01,00:01:00,16:20:00,DEZ650710376,Jane Records,crid://rabe.ch/v1/test,,greedy-capitalist-number,Da Alboom,,,20221213,,,,,
@@ -111,7 +111,7 @@
 # ---
 # name: test_get_csv.2
   '''
-  Sender,Titel des Musikwerks,Name des Komponisten,Interpret(en),Sendedatum,Sendedauer,Sendezeit,ISRC,Label,Identifikationsnummer,Eigenaufnahmen,EAN/GTIN,Albumtitel / Titel des Tonträgers,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Katalog-Nummer / CD ID,Werkverzeichnisangaben,Bestellnummer,Veröffentlichungsland,Liveaufnahme
+  Sender,Titel des Musikwerks,Name des Komponisten,Interpret(en),Sendedatum,Sendedauer,Sendezeit,ISRC,Label,Identifikationsnummer,Eigenaufnahmen,EAN / GTIN,Albumtitel / Titel des Tonträgers,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Katalog-Nummer / CD ID,Werkverzeichnisangaben,Bestellnummer,Veröffentlichungsland,Liveaufnahme
   Station Name,Uhrenvergleich,,,1993-03-01,00:01:00,13:12:00,,,1993-03-01T13:12:00+00:00#acrid=a1,,,,,,,,,,,
   Station Name,Meme Dub,Da Composah,Da Gang,1993-03-01,00:01:00,13:37:00,DEZ650710376,,1993-03-01T13:37:00+00:00#acrid=a2,,,"album, but string",,,,,,,,
   Station Name,Bubbles,,"Mary's Surprise Act, Climmy Jiff",1993-03-01,00:01:00,16:20:00,DEZ650710376,Jane Records,1993-03-01T16:20:00+00:00#acrid=a3,,greedy-capitalist-number,Da Alboom,,,20221213,,,,,
@@ -136,7 +136,7 @@
       'Label',
       'Identifikationsnummer',
       'Eigenaufnahmen',
-      'EAN/GTIN',
+      'EAN / GTIN',
       'Albumtitel / Titel des Tonträgers',
       'Aufnahmedatum',
       'Aufnahmeland',
@@ -162,7 +162,7 @@
     'I': <ColumnDimension Instance, Attributes={'width': '8', 'customWidth': '1', 'min': '9', 'max': '9'}>,
     'J': <ColumnDimension Instance, Attributes={'width': '24', 'customWidth': '1', 'min': '10', 'max': '10'}>,
     'K': <ColumnDimension Instance, Attributes={'width': '17', 'customWidth': '1', 'min': '11', 'max': '11'}>,
-    'L': <ColumnDimension Instance, Attributes={'width': '11', 'customWidth': '1', 'min': '12', 'max': '12'}>,
+    'L': <ColumnDimension Instance, Attributes={'width': '13', 'customWidth': '1', 'min': '12', 'max': '12'}>,
     'M': <ColumnDimension Instance, Attributes={'width': '36', 'customWidth': '1', 'min': '13', 'max': '13'}>,
     'N': <ColumnDimension Instance, Attributes={'width': '16', 'customWidth': '1', 'min': '14', 'max': '14'}>,
     'O': <ColumnDimension Instance, Attributes={'width': '15', 'customWidth': '1', 'min': '15', 'max': '15'}>,

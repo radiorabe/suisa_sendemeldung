@@ -140,13 +140,13 @@ class FileSettings:
 class ACR:
     """ACRCloud configuration"""  # noqa: D400, D415
 
-    project_id: int = ts.option(
-        help="Id of the project in ACRCloud",
-        validator=validators.ge(0),
-    )
     bearer_token: str = ts.secret(
         help="Bearer token for ACRCloud API access",
         validator=validators.min_len(32),
+    )
+    project_id: int = ts.option(
+        help="Id of the project in ACRCloud",
+        validator=validators.ge(0),
     )
     stream_id: str = ts.option(
         help="Id of the stream in ACRCloud",
@@ -171,6 +171,13 @@ class StationSettings:
 class RangeSettings:
     """Configure the range of the report"""  # noqa: D400, D415
 
+    last_month: bool = ts.option(
+        help="""
+        Generate report for the full last month, overrides --date-start and --date-end
+        """,
+        default=False,
+        click={"param_decls": ("--last-month",)},
+    )
     start: str = ts.option(
         help="The start date of the interval in format YYYY-MM-DD [env var: SENDEMELDUNG_DATE_START; default: now - 30d]",  # noqa: E501
         default="",
@@ -180,13 +187,6 @@ class RangeSettings:
         help="The end date of the interval in format YYYY-MM-DD [env var: SENDEMELDUNG_DATE_END; default: now]",  # noqa: E501
         default="",
         click={"show_default": False, "show_envvar": False},
-    )
-    last_month: bool = ts.option(
-        help="""
-        Generate report for the full last month, overrides --date-start and --date-end
-        """,
-        default=False,
-        click={"param_decls": ("--last-month",)},
     )
 
 
