@@ -517,7 +517,7 @@ def reformat_start_date_in_xlsx(worksheet: Worksheet) -> None:
         # turn the str from the CSV into a real datetime.datetime in Sendedatum column
         row[4].value = datetime.strptime(  # noqa: DTZ007
             f"{row[4].value} {row[6].value}", "%Y-%m-%d %H:%M:%S"
-        )
+        ).date()
         # adjust the formatting
         row[4].number_format = "dd.mm.yyyy"
 
