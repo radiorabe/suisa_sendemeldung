@@ -723,7 +723,7 @@ def main(settings: Settings) -> None:  # pragma: no cover
             text,
             filename,
             settings.file.format,
-            data,
+            data,  # pyright: ignore[reportArgumentType]
             cc=settings.email.cc,
             bcc=settings.email.bcc,
         )
@@ -736,9 +736,9 @@ def main(settings: Settings) -> None:  # pragma: no cover
         )
 
     elif settings.output == OutputMode.file and settings.file.format == FileFormat.xlsx:
-        write_xlsx(filename, data)
+        write_xlsx(filename, data)  # pyright: ignore[reportArgumentType]
     elif settings.output == OutputMode.file and settings.file.format == FileFormat.csv:
-        write_csv(filename, data)
+        write_csv(filename, data)  # pyright: ignore[reportArgumentType]
     elif (
         settings.output == OutputMode.stdout and settings.file.format == FileFormat.csv
     ):
