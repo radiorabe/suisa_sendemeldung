@@ -26,6 +26,8 @@ acr.project-id = "1234"
 #email.sender=sender@example.org
 # Email recipient
 #email.to=receiver@example.org
+# Email used in mail text when asking for replies
+#email.responsible_email = "responsible@example.org"
 # SMTP server and port for sending the email
 #email.server = "smtp.example.org"
 # Password for sender on email server

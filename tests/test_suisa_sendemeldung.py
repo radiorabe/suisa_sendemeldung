@@ -14,6 +14,7 @@ from typed_settings.exceptions import InvalidValueError
 
 from suisa_sendemeldung import suisa_sendemeldung
 from suisa_sendemeldung.settings import (
+    ACR,
     FileFormat,
     FileSettings,
     OutputMode,
@@ -28,6 +29,36 @@ if TYPE_CHECKING:  # pragma: no cover
 
 def test_validate_arguments():
     """Test validate_arguments."""
+
+    with pytest.raises(ValueError) as excinfo:  # noqa: PT011
+        Settings(
+            acr=ACR(
+                bearer_token="short",
+                project_id=123456,
+                stream_id="stream123",
+            )
+        )
+    assert "Length of 'bearer_token' must be >= 32: 5" in str(excinfo.value)
+
+    with pytest.raises(ValueError) as excinfo:  # noqa: PT011
+        Settings(
+            acr=ACR(
+                bearer_token="_" * 32,
+                project_id=-1,  # invalid project id
+                stream_id="stream123",
+            )
+        )
+    assert "'project_id' must be >= 0: -1" in str(excinfo.value)
+
+    with pytest.raises(ValueError) as excinfo:  # noqa: PT011
+        Settings(
+            acr=ACR(
+                bearer_token="_" * 32,
+                project_id=1,  # invalid project id
+                stream_id="0",
+            )
+        )
+    assert "Length of 'stream_id' must be >= 9: 1" in str(excinfo.value)
 
     settings = Settings()
     # last_month is in conflict with start_date and end_date
