@@ -54,8 +54,8 @@ def test_validate_arguments():
         Settings(
             acr=ACR(
                 bearer_token="_" * 32,
-                project_id=1,  # invalid project id
-                stream_id="0",
+                project_id=1,
+                stream_id="0",  # invalid stream id
             )
         )
     assert "Length of 'stream_id' must be >= 9: 1" in str(excinfo.value)
