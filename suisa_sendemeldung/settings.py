@@ -68,8 +68,6 @@ $station_name
 $email_footer
 """  # noqa: E501
 
-_ACRTOKEN_MAXLEN = 32
-
 
 class OutputMode(StrEnum):
     """Output modes for the report."""

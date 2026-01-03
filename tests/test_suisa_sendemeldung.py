@@ -365,8 +365,8 @@ def test_get_xlsx(snapshot, settings):
     xlsx = suisa_sendemeldung.get_xlsx(data, settings=settings)
     workbook = load_workbook(xlsx)
     worksheet = workbook.active
-    assert list(worksheet.values) == snapshot
-    assert worksheet.column_dimensions == snapshot
+    assert list(worksheet.values) == snapshot  # pyright: ignore[reportOptionalMemberAccess]
+    assert worksheet.column_dimensions == snapshot  # pyright: ignore[reportOptionalMemberAccess]
 
 
 def test_reformat_start_date_in_xlsx():
@@ -458,7 +458,7 @@ def test_send_message():
 
     # no auth
     with patch("suisa_sendemeldung.suisa_sendemeldung.SMTP", autospec=True) as mock:
-        suisa_sendemeldung.send_message(msg)
+        suisa_sendemeldung.send_message(msg)  # pyright: ignore[reportArgumentType]
         mock.assert_called_once_with("127.0.0.1", 587)
         ctx = mock.return_value.__enter__.return_value
         ctx.starttls.assert_called_once()
@@ -466,7 +466,7 @@ def test_send_message():
 
     # auth, user provided login
     with patch("suisa_sendemeldung.suisa_sendemeldung.SMTP", autospec=True) as mock:
-        suisa_sendemeldung.send_message(msg, "127.0.0.1", 587, "user", "password")
+        suisa_sendemeldung.send_message(msg, "127.0.0.1", 587, "user", "password")  # pyright: ignore[reportArgumentType]
         mock.assert_called_once_with("127.0.0.1", 587)
         ctx = mock.return_value.__enter__.return_value
         ctx.starttls.assert_called_once()
@@ -475,7 +475,7 @@ def test_send_message():
     # auth, user from msg
     with patch("suisa_sendemeldung.suisa_sendemeldung.SMTP", autospec=True) as mock:
         msg.add_header("From", "test@example.org")
-        suisa_sendemeldung.send_message(msg, "127.0.0.1", 587, None, "password")
+        suisa_sendemeldung.send_message(msg, "127.0.0.1", 587, None, "password")  # pyright: ignore[reportArgumentType]
         mock.assert_called_once_with("127.0.0.1", 587)
         ctx = mock.return_value.__enter__.return_value
         ctx.starttls.assert_called_once()
