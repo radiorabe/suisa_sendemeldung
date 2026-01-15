@@ -99,26 +99,26 @@
 # name: test_get_csv.1
   '''
   Sender,Titel des Musikwerks,Name des Komponisten,Interpret(en),Sendedatum,Sendedauer,Sendezeit,ISRC,Label,Identifikationsnummer,Eigenaufnahmen,EAN / GTIN,Albumtitel / Titel des Tonträgers,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Katalog-Nummer / CD ID,Werkverzeichnisangaben,Bestellnummer,Veröffentlichungsland,Liveaufnahme
-  Station Name,Uhrenvergleich,,,1993-03-01,00:01:00,13:12:00,,,crid://rabe.ch/v1/test,,,,,,,,,,,
-  Station Name,Meme Dub,Da Composah,Da Gang,1993-03-01,00:01:00,13:37:00,DEZ650710376,,crid://rabe.ch/v1/test,,,"album, but string",,,,,,,,
-  Station Name,Bubbles,,"Mary's Surprise Act, Climmy Jiff",1993-03-01,00:01:00,16:20:00,DEZ650710376,Jane Records,crid://rabe.ch/v1/test,,greedy-capitalist-number,Da Alboom,,,20221213,,,,,
-  Station Name,,,Artists as string not list,1993-03-01,00:01:00,17:17:17,,,crid://rabe.ch/v1/test,,,,,,,,,,,
-  Station Name,Long Playing,,,1993-03-01,19:48:57,18:18:18,,,crid://rabe.ch/v1/test,,,,,,,,,,,
-  Station Name,composer in works,Worker,,1993-03-01,19:48:57,18:18:18,,,crid://rabe.ch/v1/test,,,,,,,,,,,
-  Station Name,composer better in works,composer,same,1993-03-01,19:48:57,18:18:18,,,crid://rabe.ch/v1/test,,,,,,,,,,,
+  Station Name,Uhrenvergleich,,,1993-03-01,00:01:00,13:12:00,,,crid://rabe.ch/v1/test,nein,,,,,,,,,,
+  Station Name,Meme Dub,Da Composah,Da Gang,1993-03-01,00:01:00,13:37:00,DEZ650710376,,crid://rabe.ch/v1/test,nein,,"album, but string",,,,,,,,
+  Station Name,Bubbles,,"Mary's Surprise Act, Climmy Jiff",1993-03-01,00:01:00,16:20:00,DEZ650710376,Jane Records,crid://rabe.ch/v1/test,nein,greedy-capitalist-number,Da Alboom,,,20221213,,,,,
+  Station Name,,,Artists as string not list,1993-03-01,00:01:00,17:17:17,,,crid://rabe.ch/v1/test,nein,,,,,,,,,,
+  Station Name,Long Playing,,,1993-03-01,19:48:57,18:18:18,,,crid://rabe.ch/v1/test,nein,,,,,,,,,,
+  Station Name,composer in works,Worker,,1993-03-01,19:48:57,18:18:18,,,crid://rabe.ch/v1/test,nein,,,,,,,,,,
+  Station Name,composer better in works,composer,same,1993-03-01,19:48:57,18:18:18,,,crid://rabe.ch/v1/test,nein,,,,,,,,,,
   
   '''
 # ---
 # name: test_get_csv.2
   '''
   Sender,Titel des Musikwerks,Name des Komponisten,Interpret(en),Sendedatum,Sendedauer,Sendezeit,ISRC,Label,Identifikationsnummer,Eigenaufnahmen,EAN / GTIN,Albumtitel / Titel des Tonträgers,Aufnahmedatum,Aufnahmeland,Erstveröffentlichungsdatum,Katalog-Nummer / CD ID,Werkverzeichnisangaben,Bestellnummer,Veröffentlichungsland,Liveaufnahme
-  Station Name,Uhrenvergleich,,,1993-03-01,00:01:00,13:12:00,,,1993-03-01T13:12:00+00:00#acrid=a1,,,,,,,,,,,
-  Station Name,Meme Dub,Da Composah,Da Gang,1993-03-01,00:01:00,13:37:00,DEZ650710376,,1993-03-01T13:37:00+00:00#acrid=a2,,,"album, but string",,,,,,,,
-  Station Name,Bubbles,,"Mary's Surprise Act, Climmy Jiff",1993-03-01,00:01:00,16:20:00,DEZ650710376,Jane Records,1993-03-01T16:20:00+00:00#acrid=a3,,greedy-capitalist-number,Da Alboom,,,20221213,,,,,
-  Station Name,,,Artists as string not list,1993-03-01,00:01:00,17:17:17,,,1993-03-01T17:17:17+00:00#acrid=a4,,,,,,,,,,,
-  Station Name,Long Playing,,,1993-03-01,19:48:57,18:18:18,,,1993-03-01T18:18:18+00:00#acrid=a5,,,,,,,,,,,
-  Station Name,composer in works,Worker,,1993-03-01,19:48:57,18:18:18,,,1993-03-01T18:18:18+00:00#acrid=a6,,,,,,,,,,,
-  Station Name,composer better in works,composer,same,1993-03-01,19:48:57,18:18:18,,,1993-03-01T18:18:18+00:00#acrid=a6,,,,,,,,,,,
+  Station Name,Uhrenvergleich,,,1993-03-01,00:01:00,13:12:00,,,1993-03-01T13:12:00+00:00#acrid=a1,nein,,,,,,,,,,
+  Station Name,Meme Dub,Da Composah,Da Gang,1993-03-01,00:01:00,13:37:00,DEZ650710376,,1993-03-01T13:37:00+00:00#acrid=a2,nein,,"album, but string",,,,,,,,
+  Station Name,Bubbles,,"Mary's Surprise Act, Climmy Jiff",1993-03-01,00:01:00,16:20:00,DEZ650710376,Jane Records,1993-03-01T16:20:00+00:00#acrid=a3,nein,greedy-capitalist-number,Da Alboom,,,20221213,,,,,
+  Station Name,,,Artists as string not list,1993-03-01,00:01:00,17:17:17,,,1993-03-01T17:17:17+00:00#acrid=a4,nein,,,,,,,,,,
+  Station Name,Long Playing,,,1993-03-01,19:48:57,18:18:18,,,1993-03-01T18:18:18+00:00#acrid=a5,nein,,,,,,,,,,
+  Station Name,composer in works,Worker,,1993-03-01,19:48:57,18:18:18,,,1993-03-01T18:18:18+00:00#acrid=a6,nein,,,,,,,,,,
+  Station Name,composer better in works,composer,same,1993-03-01,19:48:57,18:18:18,,,1993-03-01T18:18:18+00:00#acrid=a6,nein,,,,,,,,,,
   
   '''
 # ---

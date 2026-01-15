@@ -408,7 +408,7 @@ def get_csv(data: list, settings: Settings) -> str:
                 isrc,
                 label,
                 local_id,
-                "",  # Eigenaufnahmen
+                "nein",  # Eigenaufnahmen
                 upc,
                 album,
                 "",  # Aufnahmedatum
