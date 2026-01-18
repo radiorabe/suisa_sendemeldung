@@ -1,0 +1,51 @@
+# This is the configuration file for suisa_sendemeldung.py.
+# - Values that are not commented out are examples and need to be replaced with
+#   a valid value.
+# - Values that are commented out are not required but can be overriden by this
+#   config file.
+# - All values can also be set by environment variables or with command line
+#   arguments
+
+[sendemeldung]
+output = "file"
+
+# Credentials for ACRCloud
+acr.bearer-token = "ey..."
+acr.stream-id = "a-bcdefgh"
+acr.project-id = "1234"
+
+# Start date to fetch data from ACRCloud
+#date.start = "2018-10-01"
+# End date to fetch data from ACRCloud
+#date.end = "2018-10-31"
+# Specify whether to fetch the whole last month in data
+#date.last-month=True
+
+# Configure the values below and set output = "email" to send an email
+# Email sender
+#email.sender=sender@example.org
+# Email recipient
+#email.to=receiver@example.org
+# Email used in mail text when asking for replies
+#email.responsible_email = "responsible@example.org"
+# SMTP server and port for sending the email
+#email.server = "smtp.example.org"
+# Password for sender on email server
+#email.pass = "HlZ5gPpHeugNpMk6"
+# Subject for the email
+#email.subject = "SUISA report"
+# Text for the email
+#email.text = """
+#Hi SUISA
+#
+#Please find the report attached to this mail.
+#
+#--
+#$email_footer
+#"""
+
+# Set timezone to use for conversion
+#l10n.timezone = 'Europe/Zurich'
+
+# The filename for writing to file and sending as email attachment
+#file.path = "suisa_sendemeldung.csv"
