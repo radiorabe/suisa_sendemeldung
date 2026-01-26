@@ -78,6 +78,19 @@ line as arguments. Simply run the script as follows:
 podman run --rm -ti ghcr.io/radiorabe/suisasendemeldung:latest suisa_sendemeldung --acr-bearer-token=abcdefghijklmnopqrstuvwxyzabcdef --acr-stream-id=a-bcdefgh --output=stdout
 ```
 
+## Support
+
+We support users where is reasonably possible on a best-efforts base.
+
+The following versions of SUISA Sendemeldung are actively supported.
+
+| Version | Supported | Supported GST | Python Version | Description |
+| ------- | --------- | ------------- | ---------------| ----------- |
+| 0.x | (✅) | GST 2020 | | Developed during the GST lifetime, internal use at RaBe |
+| 1.x | ✅ | GST 2026 | >=3.12| Cleanup and first release with features for external use |
+
+* old versions are supported on a case by case base if we need to regenerate old reports
+
 ## Upgrading
 
 ### Upgrade from 0.x to 1.0
@@ -85,7 +98,7 @@ podman run --rm -ti ghcr.io/radiorabe/suisasendemeldung:latest suisa_sendemeldun
 * The config file was renamed from `suisa_sendemeldung.conf` to `susia_sendemeldung.toml`
 * The config file format has been changed from an `ini` style file to TOML.
 * The command line arguments have been reworked to match the new config file format, check `susia_sendemeldung --help`. for the new flags.
-* The "last 30 days from today" mode has been dropped, call the script with `--date-start` and `--date-end`.
+* The "last 30 days from today" mode has been dropped, call the script with `--by-date`, `--date-start` and `--date-end`.
 
 ## Development
 
