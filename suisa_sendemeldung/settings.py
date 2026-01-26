@@ -180,10 +180,11 @@ class RangeSettings:
 
     last_month: bool = ts.option(
         help="""
-        Generate report for the full last month, overrides --date-start and --date-end
+        The default is to generate ia report for the full last month,
+        use --by-date with --date-start and --date-end for a range
         """,
-        default=False,
-        click={"param_decls": ("--last-month",)},
+        default=True,
+        click={"param_decls": ("--last-month/--by-date",)},
     )
     start: str = ts.option(
         help="The start date of the interval in format YYYY-MM-DD [env var: SENDEMELDUNG_DATE_START; default: now - 30d]",  # noqa: E501

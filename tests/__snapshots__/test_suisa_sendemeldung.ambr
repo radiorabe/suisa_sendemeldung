@@ -24,9 +24,11 @@
       --acr-stream-id TEXT          Id of the stream in ACRCloud  [env var:
                                     SENDEMELDUNG_ACR_STREAM_ID; required]
     Configure the range of the report: 
-      --last-month                  Generate report for the full last month,
-                                    overrides --date-start and --date-end  [env
-                                    var: SENDEMELDUNG_DATE_LAST_MONTH]
+      --last-month / --by-date      The default is to generate ia report for the
+                                    full last month, use --by-date with --date-
+                                    start and --date-end for a range  [env var:
+                                    SENDEMELDUNG_DATE_LAST_MONTH; default: last-
+                                    month]
       --date-start TEXT             The start date of the interval in format YYYY-
                                     MM-DD [env var: SENDEMELDUNG_DATE_START;
                                     default: now - 30d]
