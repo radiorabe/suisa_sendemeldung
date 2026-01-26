@@ -12,7 +12,8 @@ package.
 
 These usage instructions show how to install the script and how to configure it.
 There are different ways to run it at a schedule. We recommend using
-[systemd-timers](https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html).
+[systemd-timers](https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html)
+an example to do so is provded in the `etc/` directory.
 
 To output the scripts usage information, check out it's `--help` output:
 
