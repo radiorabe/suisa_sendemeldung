@@ -49,7 +49,7 @@ types-python-dateutil = "^2.9.0.20240316"
 types-pytz = ">=2024.1.0.20240203,<2026.0.0.0"
 types-requests = "^2.31.0.1"
 types-tqdm = "^4.66.0.20240106"
-wheel = ">=0.40,<0.46"
+wheel = ">=0.40,<0.47"
 
 [tool.pytest]
 minversion = "9.0"
