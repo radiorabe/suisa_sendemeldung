@@ -1,0 +1,15 @@
+[Unit]
+Description=SUISA Sendemeldung container
+Requires=podman.socket
+
+[Service]
+Type=oneshot
+ExecStartPre=-/usr/bin/podman stop %p-%i
+ExecStartPre=-/usr/bin/podman rm %p-%i
+ExecStartPre=/usr/bin/podman pull ghcr.io/radiorabe/suisasendemeldung:latest
+ExecStartPre=/usr/bin/touch -a /etc/suisa_sendemeldung/%i.toml
+ExecStart=/usr/bin/podman run --rm --name %p-%i -v /etc/suisa_sendemeldung/%i.toml:/etc/suisa_sendemeldung.toml ghcr.io/radiorabe/suisasendemeldung:latest
+# ExecStartPost=-/bin/sh -c 'zabbix_sender -c "/etc/zabbix/zabbix_agent2.conf" -s sendemeldung.examplel.org -k "rabe.suisa_sendemeldung.run.success" -o "$$(date +%%s)"'
+
+[Install]
+WantedBy=multi-user.target

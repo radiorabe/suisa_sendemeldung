@@ -1,0 +1,10 @@
+[Unit]
+Description=Run SUISA Sendemeldung container
+
+[Timer]
+Persistent=true
+OnCalendar=
+OnCalendar=*-*-14 9:00:00
+
+[Install]
+WantedBy=timers.target
