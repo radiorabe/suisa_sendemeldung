@@ -7,7 +7,6 @@ takes care of sending the report to SUISA via email for hands-off operations.
 
 from __future__ import annotations
 
-import sys
 from csv import reader, writer
 from datetime import date, datetime, timedelta
 from email.encoders import encode_base64
@@ -19,328 +18,69 @@ from io import BytesIO, StringIO
 from pathlib import Path
 from smtplib import SMTP
 from string import Template
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, TypeVar, cast
 
+import click
 import cridlib
 import pytz
+import typed_settings
 from babel.dates import format_date
-from configargparse import ArgumentParser  # type: ignore[import-untyped]
 from dateutil.relativedelta import relativedelta
 from iso3901 import ISRC
 from openpyxl import Workbook
 from openpyxl.cell.cell import Cell, MergedCell
 from openpyxl.styles import Border, Font, PatternFill, Side
 from tqdm import tqdm
+from typed_settings.cli_click import OptionGroupFactory
+from typed_settings.exceptions import InvalidValueError
+
+from suisa_sendemeldung.settings import FileFormat, IdentifierMode, OutputMode, Settings
 
 from .acrclient import ACRClient
 
 if TYPE_CHECKING:  # pragma: no cover
-    from argparse import Namespace as ArgparseNamespace
-
     from openpyxl.worksheet.worksheet import Worksheet
 
-_EMAIL_TEMPLATE = """
-Hallo SUISA
 
-Im Anhang finden Sie die Sendemeldung von $station_name für den $month $year.
-
-Diese Sendemeldung erfolgt gemäss den Bestimmungen "Gemeinsamer Tarif S 2020 - 2024" [1] unter
-Einhaltung der Einreichefrist für den Monat $month gemäss Ziffer 45 des Tarifs.
-
-In der Sendungsmeldung enthalten sind die unter Buchstaben G (Verzeichnisse) des Tarifs
-genannten Programmangaben, in elektronischer Form. Die Angaben richten sich nach dem
-standardisierten Format gemäss der "Vorlage für Sendemeldungen: Gemeinsamer Tarif S" [2]
-sowie der Abstimmung zwischen SUISA und $station_name.
+T = TypeVar("T")
 
 
-Diese Sendemeldung enthält unter anderem die unter Ziffer 34 geforderten Angaben:
-
-- Titel des Musikwerks
-- Name des Komponisten
-- Name des bzw. der Hauptinterpreten
-- Label
-- ISRC der benützten Aufnahme (sofern zusammen mit der Aufnahme vom Lieferanten der Aufnahme mitgeliefert)
-- vom Sender der Aufnahme selbst zugewiesene Identifikationsnummer
-- Sendezeit
-- Sendedauer
-
-
-Allfällige Beanstandungen oder technische Rückfragen zu dieser Sendemeldung müssen in
-schriftlicher, elektronischer Form an $responsible_email gerichtet werden.
-
-Beanstandungen müssen, gemäss Ziffer 46, bis spätestens in drei Monaten vor dem $in_three_months
-erfolgen. Anschliessend gilt die Sendemeldung für $month $year als akzeptiert und die
-Tarifbestimmungen als eingehalten.
-
-Korrekt und termingerecht gemeldete Beanstandungen werden unter Berücksichtigung der
-Nachfrist von 45 Tagen, gemäss Ziffer 46, bearbeitet.
-
-Diese Email und Sendemeldung wurde automatisch generiert.
-
-Freundliche Grüsse,
-$station_name
-
-[1] <https://www.suisa.ch/dam/jcr:1d82128b-8cc7-4cf0-b0ef-1890ae9d434d/GTS_2020-2024_GER.pdf>
-[2] <https://www.suisa.ch/dam/jcr:6934be98-4319-4565-8936-05007d83fd35/Vorlage_fuer_Sendemeldungen__GTS__2020-2022.xlsx>
-
---
-$email_footer
-"""  # noqa: E501
-
-_ACRTOKEN_MAXLEN = 32
-
-
-def validate_arguments(parser: ArgumentParser, args: ArgparseNamespace) -> None:
+def validate_arguments(settings: Settings) -> None:
     """Validate the arguments provided to the script.
 
     After this function we are sure that there are no conflicts in the arguments.
 
     Arguments:
     ---------
-        parser: the ArgumentParser to use for throwing errors
-        args: the arguments to validate
+        settings: the Settings instance to validate
+
+    Raises:
+    ------
+        InvalidValueErrors: if there are invalid argument combinations
 
     """
     msgs = []
-    # check length of bearer_token
-    if not len(args.bearer_token) >= _ACRTOKEN_MAXLEN:
-        msgs.append(
-            "".join(
-                (
-                    "wrong format on bearer_token, "
-                    "expected larger than 32 characters "
-                    f"but got {len(args.bearer_token)}"
-                ),
-            ),
-        )
-    # check length of stream_id
-    if len(args.stream_id) not in [9, 10]:
-        msgs.append(
-            (
-                "wrong format on stream_id, "
-                f"expected 9 or 10 characters but got {len(args.stream_id)}"
-            ),
-        )
-    # crid mode can be local or cridlib
-    if args.crid_mode not in ["cridlib", "local"]:
-        msgs.append("wrong CRID mode, expected 'cridlib' or 'local'")
-    # one output option has to be set
-    if not (args.file or args.email or args.stdout):
-        msgs.append(
-            "no output option has been set, specify one of --file, --email or --stdout",
-        )
     # xlsx cannot be printed to stdout
-    if args.stdout and args.filetype == "xlsx":
-        msgs.append("xlsx cannot be printed to stdout, please set --filetype to csv")
+    if (
+        settings.output == OutputMode.stdout
+        and settings.file
+        and settings.file.format == FileFormat.xlsx
+    ):
+        msgs.append("xlsx cannot be printed to stdout, please set --file-format to csv")
     # last_month is in conflict with start_date and end_date
-    if args.last_month and (args.start_date or args.end_date):
-        msgs.append("argument --last_month not allowed with --start_date or --end_date")
+    if settings.date.last_month and (settings.date.start or settings.date.end):
+        msgs.append("argument --last-month not allowed with --date-start or --date-end")
     # exit if there are error messages
     if msgs:
-        parser.error("\n- " + "\n- ".join(msgs))
+        raise InvalidValueError(msgs)
 
 
-def get_arguments(parser: ArgumentParser, sysargs: list[str]) -> ArgparseNamespace:
-    """Create :class:`ArgumentParser` with arguments.
-
-    Arguments:
-    ---------
-        parser: the parser to add arguments
-        sysargs: sys.arg[1:] or something else for testing
-
-    Returns:
-    -------
-        args: the parsed args from the parser
-
-    """
-    parser.add_argument(
-        "--bearer-token",
-        env_var="BEARER_TOKEN",
-        help="the bearer token for ACRCloud (required)",
-        required=True,
-    )
-    parser.add_argument(
-        "--project-id",
-        env_var="PROJECT_ID",
-        help="the id of the project at ACRCloud (required)",
-        required=True,
-    )
-    parser.add_argument(
-        "--stream-id",
-        env_var="STREAM_ID",
-        help="the id of the stream at ACRCloud (required)",
-        required=True,
-    )
-    parser.add_argument(
-        "--station-name",
-        env_var="STATION_NAME",
-        help="Station name, used in Output and Emails",
-        default="Radio Bern RaBe",
-    )
-    parser.add_argument(
-        "--station-name-short",
-        env_var="STATION_NAME_SHORT",
-        help="Shortname for station as used in Filenames (locally and in attachment)",
-        default="rabe",
-    )
-    parser.add_argument(
-        "--file",
-        env_var="FILE",
-        help="create file",
-        action="store_true",
-    )
-    parser.add_argument(
-        "--filetype",
-        env_var="FILETYPE",
-        help="filetype to attach to email or write to file",
-        choices=("xlsx", "csv"),
-        default="xlsx",
-    )
-    parser.add_argument(
-        "--email",
-        env_var="EMAIL",
-        help="send an email",
-        action="store_true",
-    )
-    parser.add_argument(
-        "--email-from",
-        env_var="EMAIL_FROM",
-        help="the sender of the email",
-    )
-    parser.add_argument(
-        "--email-to",
-        env_var="EMAIL_TO",
-        help="the recipients of the email",
-    )
-    parser.add_argument(
-        "--email-cc",
-        env_var="EMAIL_CC",
-        help="the cc recipients of the email",
-    )
-    parser.add_argument(
-        "--email-bcc",
-        env_var="EMAIL_BCC",
-        help="the bcc recipients of the email",
-    )
-    parser.add_argument(
-        "--email-server",
-        env_var="EMAIL_SERVER",
-        help="the smtp server to send the mail with",
-    )
-    parser.add_argument(
-        "--email-login",
-        env_var="EMAIL_LOGIN",
-        help="the username to logon to the smtp server (default: email_from)",
-    )
-    parser.add_argument(
-        "--email-pass",
-        env_var="EMAIL_PASS",
-        help="the password for the smtp server",
-    )
-    parser.add_argument(
-        "--email-subject",
-        env_var="EMAIL_SUBJECT",
-        help="""
-        Template for subject of the email.
-
-        Placeholders are $station_name, $year and $month.
-        """,
-        default="SUISA Sendemeldung von $station_name für $year-$month",
-    )
-    parser.add_argument(
-        "--email-text",
-        env_var="EMAIL_TEXT",
-        help="""
-        Template for email text.
-
-        Placeholders are $station_name, $month, $year, $previous_year,
-        $responsible_email, and $email_footer.
-        """,
-        default=_EMAIL_TEMPLATE,
-    )
-    parser.add_argument(
-        "--email-text-template-file",
-        env_var="EMAIL_TEXT_TEMPLATE_FILE",
-        help="Specifify a path to an email_text template",
-    )
-    parser.add_argument(
-        "--email-footer",
-        env_var="EMAIL_FOOTER",
-        help="Footer for the Email",
-        default="Email generated by <https://github.com/radiorabe/suisa_sendemeldung>",
-    )
-    parser.add_argument(
-        "--responsible-email",
-        env_var="RESPONSIBLE_EMAIL",
-        help="Used to hint whom to contact in the emails text.",
-    )
-    parser.add_argument(
-        "--start-date",
-        env_var="START_DATE",
-        help="the start date of the interval in format YYYY-MM-DD (default: 30 days\
-                              before end_date)",
-    )
-    parser.add_argument(
-        "--end-date",
-        env_var="END_DATE",
-        help="the end date of the interval in format YYYY-MM-DD (default: today)",
-    )
-    parser.add_argument(
-        "--last-month",
-        env_var="LAST_MONTH",
-        action="store_true",
-        help="download data of whole last month",
-    )
-    parser.add_argument(
-        "--timezone",
-        env_var="TIMEZONE",
-        help="set the timezone for localization",
-        required=True,
-        default="UTC",
-    )
-    parser.add_argument(
-        "--locale",
-        env_var="LOCALE",
-        help="set locale for date and time formatting",
-        default="de_CH",
-    )
-    parser.add_argument(
-        "--filename",
-        env_var="FILENAME",
-        help="""
-        Output filename.
-
-        Default:
-        - <station_name_short>_<year>_<month>.csv when reporting last month
-        - <station_name_short>_<start_date>.csv else
-        """,
-    )
-    parser.add_argument(
-        "--stdout",
-        env_var="STDOUT",
-        help="also print to stdout",
-        action="store_true",
-    )
-    parser.add_argument(
-        "--crid-mode",
-        env_var="CRID_MODE",
-        help="Choose how to generate CRID identifiers (cridlib or local)",
-        default="cridlib",
-    )
-    args = parser.parse_args(sysargs)
-    validate_arguments(parser, args)  # pragma: no cover
-    if args.email_text_template_file:  # pragma: no cover
-        with Path(args.email_text_template_file).open("r") as template_file:
-            args.email_text = template_file.read()
-    return args  # pragma: no cover
-
-
-def parse_date(args: ArgparseNamespace) -> tuple[date, date]:
+def parse_date(settings: Settings) -> tuple[date, date]:
     """Parse date from args.
 
     Arguments:
     ---------
-        args: the arguments provided to the script
+        settings: The settings provided to the script
 
     Returns:
     -------
@@ -348,8 +88,12 @@ def parse_date(args: ArgparseNamespace) -> tuple[date, date]:
         end_date: the end date of the requested interval
 
     """
+    # default values
+    end_date: date = date.today()  # noqa: DTZ011
+    start_date: date = end_date - timedelta(days=30)
+
     # date parsing logic
-    if args.last_month:
+    if settings.date.last_month:
         today = date.today()  # noqa: DTZ011
         # get first of this month
         this_month = today.replace(day=1)
@@ -357,25 +101,19 @@ def parse_date(args: ArgparseNamespace) -> tuple[date, date]:
         end_date = this_month - timedelta(days=1)
         start_date = end_date.replace(day=1)
     else:
-        if args.end_date:
-            end_date = datetime.strptime(args.end_date, "%Y-%m-%d").date()  # noqa: DTZ007
-        else:
-            # if no end_date was set, default to today
-            end_date = date.today()  # noqa: DTZ011
-        if args.start_date:
-            start_date = datetime.strptime(args.start_date, "%Y-%m-%d").date()  # noqa: DTZ007
-        else:
-            # if no start_date was set, default to 30 days before end_date
-            start_date = end_date - timedelta(days=30)
+        if settings.date.end:
+            end_date = datetime.strptime(settings.date.end, "%Y-%m-%d").date()  # noqa: DTZ007
+        if settings.date.start:
+            start_date = datetime.strptime(settings.date.start, "%Y-%m-%d").date()  # noqa: DTZ007
     return start_date, end_date
 
 
-def parse_filename(args: ArgparseNamespace, start_date: date) -> str:
-    """Parse filename from args and start_date.
+def parse_filename(settings: Settings, start_date: date) -> str:
+    """Parse filename from settings and start_date.
 
     Arguments:
     ---------
-        args: the arguments provided to the script
+        settings: the settings provided to the script
         start_date: start of reporting period
 
     Returns:
@@ -383,21 +121,21 @@ def parse_filename(args: ArgparseNamespace, start_date: date) -> str:
         filename: the filename to use for the csv data
 
     """
-    if args.filename:
-        filename = args.filename
+    if settings.file.path:
+        filename = settings.file.path
     # depending on date args either append the month or the start_date
-    elif args.last_month:
+    elif settings.date.last_month:
         date_part = f"{start_date.strftime('%Y')}_{start_date.strftime('%m')}"
-        filename = f"{args.station_name_short}_{date_part}.{args.filetype}"
+        filename = f"{settings.station.name_short}_{date_part}.{settings.file.format}"
     else:
         filename = (
-            f"{args.station_name_short}_"
-            f"{start_date.strftime('%Y-%m-%d')}.{args.filetype}"
+            f"{settings.station.name_short}_"
+            f"{start_date.strftime('%Y-%m-%d')}.{settings.file.format}"
         )
     return filename
 
 
-def check_duplicate(entry_a: Any, entry_b: Any) -> bool:  # noqa: ANN401
+def check_duplicate(entry_a: dict, entry_b: dict) -> bool:
     """Check if two entries are duplicates by checking their acrid in all music items.
 
     Arguments:
@@ -425,7 +163,7 @@ def check_duplicate(entry_a: Any, entry_b: Any) -> bool:  # noqa: ANN401
     return False
 
 
-def merge_duplicates(data: Any) -> Any:  # noqa: ANN401
+def merge_duplicates(data: list) -> list:
     """Merge consecutive entries into one if they are duplicates.
 
     Arguments:
@@ -471,7 +209,7 @@ def funge_release_date(release_date: str = "") -> str:
     return ""
 
 
-def get_artist(music: Any) -> str:  # noqa: ANN401
+def get_artist(music: dict) -> str:
     """Get artist from a given dict.
 
     Arguments:
@@ -492,19 +230,19 @@ def get_artist(music: Any) -> str:  # noqa: ANN401
             # Yet another 'wrong' entry in the database:
             # artists in custom_files was sometimes recorded as single value
             # @TODO also remove once way in the past? (2023-01-31)
-            artist = artists
+            artist = cast("str", artists)
     elif music.get("artist") is not None:
-        artist = music.get("artist")
+        artist = cast("str", music.get("artist"))
     elif music.get("Artist") is not None:  # pragma: no cover
         # Uppercase is a hack needed for Jun 2021 since there is a 'wrong' entry
         # in the database. Going forward the record will be available as 'artist'
         # in lowercase.
         # @TODO remove once is waaaay in the past
-        artist = music.get("Artist")
+        artist = cast("str", music.get("Artist"))
     return artist
 
 
-def get_composer(music: Any) -> str:  # noqa: ANN401
+def get_composer(music: dict) -> str:
     """Get composer from a given dict.
 
     Arguments:
@@ -528,13 +266,13 @@ def get_composer(music: Any) -> str:  # noqa: ANN401
     return composer
 
 
-def get_isrc(music: Any) -> str:  # noqa: ANN401
+def get_isrc(music: dict) -> str:
     """Get a valid ISRC from the music record or return an empty string."""
     isrc = ""
     if music.get("external_ids", {}).get("isrc"):
-        isrc = music.get("external_ids").get("isrc")
+        isrc = music.get("external_ids", {}).get("isrc")
     elif music.get("isrc"):
-        isrc = music.get("isrc")
+        isrc = cast("str", music.get("isrc"))
     # was a list with a singular entry for a while back in 2021
     if isinstance(isrc, list):
         isrc = isrc[0]
@@ -553,46 +291,42 @@ def get_isrc(music: Any) -> str:  # noqa: ANN401
     return isrc
 
 
-def get_csv(data: dict, args: ArgparseNamespace) -> str:
+def get_csv(data: list, settings: Settings) -> str:
     """Create SUISA compatible csv data.
 
     Arguments:
     ---------
         data: To data to create csv from
-        args: Parsed arguments
+        settings: The settings provided to the script
 
     Returns:
     -------
         csv: The converted data
 
     """
-    station_name = args.station_name
+    station_name = settings.station.name
     header = [
-        "Titel",
-        "Komponist",
-        "Interpret",
-        "Interpreten-Info",
         "Sender",
+        "Titel des Musikwerks",
+        "Name des Komponisten",
+        "Interpret(en)",
         "Sendedatum",
         "Sendedauer",
         "Sendezeit",
-        "Werkverzeichnisangaben",
         "ISRC",
         "Label",
-        "CD ID / Katalog-Nummer",
+        "Identifikationsnummer",
+        "Eigenaufnahmen",
+        "EAN / GTIN",
+        "Albumtitel / Titel des Tonträgers",
         "Aufnahmedatum",
         "Aufnahmeland",
         "Erstveröffentlichungsdatum",
-        "Titel des Tonträgers (Albumtitel)",
-        "Autor Text",
-        "Track Nummer",
-        "Genre",
-        "Programm",
+        "Katalog-Nummer / CD ID",
+        "Werkverzeichnisangaben",
         "Bestellnummer",
-        "Marke",
-        "Label Code",
-        "EAN/GTIN",
-        "Identifikationsnummer",
+        "Veröffentlichungsland",
+        "Liveaufnahme",
     ]
     csv = StringIO()
     csv_writer = writer(csv, dialect="excel")
@@ -603,7 +337,7 @@ def get_csv(data: dict, args: ArgparseNamespace) -> str:
         # parse timestamp
         timestamp = datetime.strptime(metadata.get("timestamp_local"), ACRClient.TS_FMT)  # noqa: DTZ007
 
-        ts_date = timestamp.strftime("%Y%m%d")
+        ts_date = timestamp.strftime("%Y-%m-%d")
         ts_time = timestamp.strftime("%H:%M:%S")
         hours, remainder = divmod(metadata.get("played_duration"), 60 * 60)
         minutes, seconds = divmod(remainder, 60)
@@ -638,13 +372,15 @@ def get_csv(data: dict, args: ArgparseNamespace) -> str:
 
         # load some "best-effort" fields
         album = music.get("album", "")
+        cd_id = ""
         # it's a dict if it's from the ACRCloud bucket, a string if from a custom bucket
         if isinstance(album, dict):
+            cd_id = album.get("cd_id", "")
             album = album.get("name", "")
         upc = music.get("external_ids", {}).get("upc", "")
         release_date = funge_release_date(music.get("release_date", ""))
 
-        local_id: str
+        local_id: str = ""
         # cridlib only supports timezone-aware datetime values, so we convert one
         timestamp_utc = pytz.utc.localize(
             datetime.strptime(metadata.get("timestamp_utc"), ACRClient.TS_FMT),  # noqa: DTZ007
@@ -653,63 +389,60 @@ def get_csv(data: dict, args: ArgparseNamespace) -> str:
         # in case any questions about the data we delivered are asked
         acrid = music.get("acrid")
 
-        if args.crid_mode == "cridlib":
+        if settings.crid_mode == IdentifierMode.cridlib:
             local_id = str(
                 cridlib.get(timestamp=timestamp_utc, fragment=f"acrid={acrid}")
             )
-        elif args.crid_mode == "local":
+        elif settings.crid_mode == IdentifierMode.local:
             local_id = f"{timestamp_utc.isoformat()}#acrid={acrid}"
 
         csv_writer.writerow(
             [
+                station_name,
                 title,
                 composer,
                 artist,
-                "",  # Interpreten-Info
-                station_name,
                 ts_date,
                 duration,
                 ts_time,
-                "",  # Werkverzeichnisangaben
                 isrc,
                 label,
-                "",  # CD ID / Katalog-Nummer
+                local_id,
+                "nein",  # Eigenaufnahmen
+                upc,
+                album,
                 "",  # Aufnahmedatum
                 "",  # Aufnahmeland
                 release_date,
-                album,
-                "",  # Autor Text
-                "",  # Track Nummer
-                "",  # Genre
-                "",  # Programm
+                cd_id,
+                "",  # Werkverzeichnisangaben
                 "",  # Bestellnummer
-                "",  # Marke
-                "",  # Label Code
-                upc,
-                local_id,
+                "",  # Veröffentlichungsland
+                "",  # Liveaufnahme
             ],
         )
     return csv.getvalue()
 
 
-def get_xlsx(data: Any, args: ArgparseNamespace) -> BytesIO:  # noqa: ANN401
+def get_xlsx(data: list[dict], settings: Settings) -> BytesIO:
     """Create SUISA compatible xlsx data.
 
     Arguments:
     ---------
         data: The data to create xlsx from
-        args: Parsed arguments
+        settings: The settings provided to the script
 
     Returns:
     -------
         xlsx: The converted data as BytesIO object
 
     """
-    csv = get_csv(data, args=args)
+    csv = get_csv(data, settings=settings)
     csv_reader = reader(StringIO(csv))
 
     xlsx = BytesIO()
     workbook: Workbook = Workbook()
+    workbook.iso_dates = True
     if not workbook.active:  # pragma: no cover
         raise RuntimeError
     worksheet: Worksheet = workbook.active  # type: ignore[assignment]
@@ -719,26 +452,40 @@ def get_xlsx(data: Any, args: ArgparseNamespace) -> BytesIO:  # noqa: ANN401
 
     # the columns that should be styled as required (grey background)
     required_columns = [
-        "Titel",
-        "Komponist",
-        "Interpret",
+        "Sender",
+        "Titel des Musikwerks",
+        "Name des Komponisten",
+        "Interpret(en)",
         "Sendedatum",
         "Sendedauer",
         "Sendezeit",
         "ISRC",
         "Label",
-        "Label Code",
         "Identifikationsnummer",
+        "Eigenaufnahmen",
+    ]
+    subsidiary_columns = [
+        "EAN/GTIN",
+        "Albumtitel / Titel des Tonträgers",
+        "Aufnahmedatum",
+        "Aufnahmeland",
+        "Erstveröffentlichungsdatum",
+        "Katalog-Nummer / CD ID",
+        "Werkverzeichnisangaben",
+        "Bestellnummer",
     ]
     font = Font(name="Calibri", bold=True, size=12)
     side = Side(border_style="thick", color="000000")
     border = Border(top=side, left=side, right=side, bottom=side)
-    fill = PatternFill("solid", bgColor="d9d9d9", fgColor="d9d9d9")
+    required_fill = PatternFill("solid", bgColor="bfbfbf", fgColor="bfbfbf")
+    subsdiary_fill = PatternFill("solid", bgColor="ebf1de", fgColor="ebf1de")
     for cell in worksheet[1]:  # xlsx is 1-indexed
         cell.font = font
         cell.border = border
         if cell.value in required_columns:
-            cell.fill = fill
+            cell.fill = required_fill
+        elif cell.value in subsidiary_columns:
+            cell.fill = subsdiary_fill
 
     # Try to approximate the required width by finding the longest values per column
     dims: dict[str, int] = {}
@@ -754,11 +501,39 @@ def get_xlsx(data: Any, args: ArgparseNamespace) -> BytesIO:  # noqa: ANN401
     for col, value in dims.items():
         worksheet.column_dimensions[col].width = value + padding
 
+    reformat_start_date_in_xlsx(worksheet)
+
     workbook.save(xlsx)
     return xlsx
 
 
-def write_csv(filename: str, csv: str) -> None:  # pragma: no cover
+def reformat_start_date_in_xlsx(worksheet: Worksheet) -> None:
+    """Set date number formatting on relevant columns."""
+    for idx, row in enumerate(worksheet.rows):
+        # skip first row
+        if idx < 1:
+            continue
+
+        # turn the str from the CSV into a real datetime.datetime in Sendedatum column
+        row[4].value = datetime.strptime(  # noqa: DTZ007
+            f"{row[4].value} {row[6].value}", "%Y-%m-%d %H:%M:%S"
+        ).date()  # pyright: ignore[reportAttributeAccessIssue]
+        # adjust the formatting
+        row[4].number_format = "dd.mm.yyyy"
+
+        # same thing for date fields "Aufnahmedatum" and "Erstveröffentlichungsdatum"
+        for col_idx in [13, 15]:
+            row[col_idx].value = (
+                datetime.strptime(  # noqa: DTZ007
+                    str(row[col_idx].value), "%Y%m%d"
+                ).date()
+                if row[col_idx].value
+                else None
+            )  # pyright: ignore[reportAttributeAccessIssue]
+            row[col_idx].number_format = "dd.mm.yyyy"
+
+
+def write_csv(filename: str, csv: BytesIO | str) -> None:  # pragma: no cover
     """Write contents of `csv` to file.
 
     Arguments:
@@ -768,7 +543,7 @@ def write_csv(filename: str, csv: str) -> None:  # pragma: no cover
 
     """
     with Path(filename).open("w", encoding="utf-8") as csvfile:
-        csvfile.write(csv)
+        csvfile.write(str(csv))
 
 
 def write_xlsx(filename: str, xlsx: BytesIO) -> None:  # pragma: no cover
@@ -784,7 +559,7 @@ def write_xlsx(filename: str, xlsx: BytesIO) -> None:  # pragma: no cover
         xlsxfile.write(xlsx.getvalue())
 
 
-def get_email_attachment(filename: str, filetype: str, data: Any) -> MIMEBase:  # noqa: ANN401
+def get_email_attachment(filename: str, filetype: str, data: BytesIO | str) -> MIMEBase:
     """Create attachment based on required filetype and data.
 
     Arguments:
@@ -794,18 +569,16 @@ def get_email_attachment(filename: str, filetype: str, data: Any) -> MIMEBase:  
         data: The attachment data
 
     """
-    maintype: str
-    subtype: str
-    payload: str
-    if filetype == "xlsx":
-        maintype = "application"
-        subtype = "vnd.ms-excel"
-        payload = data.getvalue()
-    elif filetype == "csv":
+    maintype = "application"
+    subtype = "vnd.ms-excel"
+    if filetype == "csv":
         maintype = "text"
         subtype = "csv"
-        payload = data.encode("utf-8")
         part = MIMEBase("text", "csv")
+
+    payload = (
+        data.getvalue() if isinstance(data, BytesIO) else str(data).encode("utf-8")
+    )
 
     part = MIMEBase(maintype, subtype)
     part.set_payload(payload)
@@ -823,7 +596,7 @@ def create_message(  # noqa: PLR0913
     text: str,
     filename: str,
     filetype: str,
-    data: Any,  # noqa: ANN401
+    data: BytesIO | str,
     cc: str | None = None,
     bcc: str | None = None,
 ) -> MIMEMultipart:
@@ -861,6 +634,7 @@ def create_message(  # noqa: PLR0913
 def send_message(
     msg: MIMEMultipart,
     server: str = "127.0.0.1",
+    port: int = 587,
     login: str | None = None,
     password: str | None = None,
 ) -> None:
@@ -870,11 +644,12 @@ def send_message(
     ---------
         msg: The message to send (an email.messag.Message object)
         server: The SMTP server to use to send the email.
+        port: The port of the SMTP server.
         login: The username for `sender`@`server`.
         password: The password for `sender`@`server`.
 
     """
-    with SMTP(server) as smtp:
+    with SMTP(host=server, port=port) as smtp:
         smtp.starttls()
         if password:
             if login:
@@ -884,90 +659,114 @@ def send_message(
         smtp.send_message(msg)
 
 
-def main() -> None:  # pragma: no cover
-    """Entrypoint for SUISA Sendemeldung ."""
-    default_config_file: str = Path(__file__).name.replace(".py", ".conf")
-    # config file in /etc gets overriden by the one in $HOME which gets overriden by the
-    # one in the current directory
-    default_config_files = [
-        str(Path("/etc") / default_config_file),
-        str(Path("~").expanduser() / default_config_file),
-        default_config_file,
-    ]
-    parser = ArgumentParser(
-        default_config_files=default_config_files,
-        description="ACRCloud client for SUISA reporting @ RaBe.",
-    )
-    args = get_arguments(parser, sys.argv[1:])
+def main(settings: Settings) -> None:  # pragma: no cover
+    """ACRCloud client for SUISA reporting @ RaBe."""
+    validate_arguments(settings)
 
-    start_date, end_date = parse_date(args)
-    filename = parse_filename(args, start_date)
+    start_date, end_date = parse_date(settings)
+    filename = parse_filename(settings, start_date)
 
-    client = ACRClient(bearer_token=args.bearer_token)
+    client = ACRClient(bearer_token=str(settings.acr.bearer_token))
     data = client.get_interval_data(
-        args.project_id,
-        args.stream_id,
+        settings.acr.project_id,
+        str(settings.acr.stream_id),
         start_date,
         end_date,
-        timezone=args.timezone,
+        timezone=settings.l10n.timezone,
     )
     data = merge_duplicates(data)
-    if args.filetype == "xlsx":
-        data = get_xlsx(data, args=args)
-    elif args.filetype == "csv":
-        data = get_csv(data, args=args)
-    if args.email:
-        email_subject = Template(args.email_subject).substitute(
+    if settings.file.format == FileFormat.xlsx:
+        data = get_xlsx(data, settings=settings)
+    elif settings.file.format == FileFormat.csv:
+        data = get_csv(data, settings=settings)
+
+    if settings.output == OutputMode.email:
+        email_subject = Template(settings.email.subject).substitute(
             {
-                "station_name": args.station_name,
-                "year": format_date(start_date, format="yyyy", locale=args.locale),
-                "month": format_date(start_date, format="MM", locale=args.locale),
+                "station_name": settings.station.name,
+                "year": format_date(
+                    start_date, format="yyyy", locale=settings.l10n.locale
+                ),
+                "month": format_date(
+                    start_date, format="MM", locale=settings.l10n.locale
+                ),
             },
         )
         # generate body
-        text = Template(args.email_text).substitute(
+        text = Template(settings.email.text).substitute(
             {
-                "station_name": args.station_name,
-                "month": format_date(start_date, format="MMMM", locale=args.locale),
-                "year": format_date(start_date, format="yyyy", locale=args.locale),
+                "station_name": settings.station.name,
+                "month": format_date(
+                    start_date, format="MMMM", locale=settings.l10n.locale
+                ),
+                "year": format_date(
+                    start_date, format="yyyy", locale=settings.l10n.locale
+                ),
                 "previous_year": format_date(
                     start_date - timedelta(days=365),
                     format="yyyy",
-                    locale=args.locale,
+                    locale=settings.l10n.locale,
                 ),
                 "in_three_months": format_date(
                     datetime.now() + relativedelta(months=+3),  # noqa: DTZ005
                     format="long",
-                    locale=args.locale,
+                    locale=settings.l10n.locale,
                 ),
-                "responsible_email": args.responsible_email,
-                "email_footer": args.email_footer,
+                "responsible_email": settings.email.responsible_email,
+                "email_footer": settings.email.footer,
             },
         )
         msg = create_message(
-            args.email_from,
-            args.email_to,
+            settings.email.sender,
+            settings.email.to,
             email_subject,
             text,
             filename,
-            args.filetype,
-            data,
-            cc=args.email_cc,
-            bcc=args.email_bcc,
+            settings.file.format,
+            data,  # pyright: ignore[reportArgumentType]
+            cc=settings.email.cc,
+            bcc=settings.email.bcc,
         )
         send_message(
             msg,
-            server=args.email_server,
-            login=args.email_login,
-            password=args.email_pass,
+            server=settings.email.server,
+            port=settings.email.port,
+            login=settings.email.username,
+            password=settings.email.password,
         )
-    if args.file and args.filetype == "xlsx":
-        write_xlsx(filename, data)
-    elif args.file and args.filetype == "csv":
-        write_csv(filename, data)
-    if args.stdout and args.filetype == "csv":
+
+    elif settings.output == OutputMode.file and settings.file.format == FileFormat.xlsx:
+        write_xlsx(filename, data)  # pyright: ignore[reportArgumentType]
+    elif settings.output == OutputMode.file and settings.file.format == FileFormat.csv:
+        write_csv(filename, data)  # pyright: ignore[reportArgumentType]
+    elif (
+        settings.output == OutputMode.stdout and settings.file.format == FileFormat.csv
+    ):
         print(data)  # noqa: T201
 
 
+@click.command()
+@typed_settings.click_options(
+    Settings,
+    loaders=typed_settings.default_loaders(
+        "sendemeldung",
+        [
+            "/etc/suisa_sendemeldung.toml",
+            "suisa_sendemeldung.toml",
+        ],
+    ),
+    decorator_factory=OptionGroupFactory(),
+    show_envvars_in_help=True,
+)
+def cli(settings: Settings) -> None:  # pragma: no cover
+    """SUISA Sendemeldung.
+
+    Create and send playout reports to SUISA.
+
+    The reports are based on data from ACRCloud.
+    """
+    main(settings)
+
+
 if __name__ == "__main__":  # pragma: no cover
-    main()
+    cli()

@@ -1,19 +1,28 @@
 import pytest
-from configargparse import ArgumentParser  # type: ignore[import-untyped]
 
-from suisa_sendemeldung.suisa_sendemeldung import get_arguments
+from suisa_sendemeldung.settings import (
+    ACR,
+    IdentifierMode,
+    LocalizationSettings,
+    OutputMode,
+    Settings,
+    StationSettings,
+)
 
 
 @pytest.fixture
-def args():
-    return get_arguments(
-        ArgumentParser(),
-        [
-            "--bearer-token=butaisheeph6sewoo8aiDa8ieyaethoo",
-            "--project-id=123456789",
-            "--stream-id=123456789",
-            "--timezone=UTC",
-            "--file",
-            "--station-name=Station Name",
-        ],
+def settings():
+    return Settings(
+        output=OutputMode.file,
+        crid_mode=IdentifierMode.cridlib,
+        acr=ACR(
+            bearer_token="butaisheeph6sewoo8aiDa8ieyaethoo",
+            project_id=123456789,
+            stream_id="123456789",
+        ),
+        l10n=LocalizationSettings(timezone="UTC"),
+        station=StationSettings(
+            name="Station Name",
+            name_short="stationname",
+        ),
     )
