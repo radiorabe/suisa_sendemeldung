@@ -387,6 +387,45 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#support" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Support
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#upgrading" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Upgrading
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Upgrading">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#upgrade-from-0x-to-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Upgrade from 0.x to 1.0
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#development" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -505,6 +544,34 @@
   
   
     <li class="md-nav__item">
+      <a href="reference/settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="reference/suisa_sendemeldung/" class="md-nav__link">
         
   
@@ -551,12 +618,17 @@
 
 
 <h1 id="suisa_sendemeldung">suisa_sendemeldung</h1>
-<p>ACRCloud client that fetches data on our playout history and formats them in a CSV file format containing the data (like Track, Title and ISRC) requested by SUISA. Also takes care of sending the report to SUISA via email for hands-off operations.</p>
+<p>ACRCloud client that fetches data on our playout history and formats them in a
+CSV file format containing the data (like Track, Title and ISRC) requested by
+SUISA. Also takes care of sending the report to SUISA via email for hands-off
+operations.</p>
 <h2 id="usage">Usage</h2>
-<p>We provide the SUISA Sendmeldung script as a container image or as a python package.</p>
+<p>We provide the SUISA Sendmeldung script as a container image or as a python
+package.</p>
 <p>These usage instructions show how to install the script and how to configure it.
 There are different ways to run it at a schedule. We recommend using
-<a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html">systemd-timers</a>.</p>
+<a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html">systemd-timers</a>
+an example to do so is provded in the <code>etc/</code> directory.</p>
 <p>To output the scripts usage information, check out it's <code>--help</code> output:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Using Podman</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>podman<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-ti<span class="w"> </span>ghcr.io/radiorabe/suisasendemeldung:latest<span class="w"> </span>suisa_sendemeldung<span class="w"> </span>--help
@@ -564,10 +636,10 @@ There are different ways to run it at a schedule. We recommend using
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Using Docker</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>docker<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-ti<span class="w"> </span>ghcr.io/radiorabe/suisasendemeldung:latest<span class="w"> </span>suisa_sendemeldung<span class="w"> </span>--help
 </code></pre></div>
-<p>While we recommend running the script in it's container, you can also install the script
-in any python environment using <a href="https://pip.pypa.io/">pip</a>.</p>
-<p>We recommend using a dedicated <a href="https://docs.python.org/3/library/venv.html">venv</a> for
-running the script hould you go down this route:</p>
+<p>While we recommend running the script in it's container, you can also install
+the script in any python environment using <a href="https://pip.pypa.io/">pip</a>.</p>
+<p>We recommend using a dedicated <a href="https://docs.python.org/3/library/venv.html">venv</a>
+for running the script should you go down this route:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python<span class="w"> </span>-mvenv<span class="w"> </span>.venv
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>.<span class="w"> </span>venv/bin/activate
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
@@ -577,35 +649,83 @@ running the script hould you go down this route:</p>
 <a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>suisa_sendemeldung
 </code></pre></div>
 <h3 id="configuration">Configuration</h3>
-<p>You can configure this script with a configuration file (default is <code>suisa_sendemeldung.conf</code>),
+<p>You can configure this script with a configuration file (default is <code>suisa_sendemeldung.toml</code>),
 environment variables, or command line arguments.</p>
-<p>Command line arguments override environment variables which themselves override settings in
-the configuration file.</p>
+<p>Command line arguments override environment variables which themselves override
+settings in the configuration file.</p>
 <h4 id="configuration-file">Configuration file</h4>
-<p>The configuration files will be evaluated in the following order (last takes precedence over first):</p>
+<p>The configuration files will be evaluated in the following order (last takes
+precedence over first):</p>
 <ol>
-<li><code>/etc/suisa_sendemeldung.conf</code></li>
-<li><code>$HOME/suisa_sendemeldung.conf</code></li>
-<li><code>./suisa_sendemeldung.conf</code></li>
+<li><code>/etc/suisa_sendemeldung.toml</code></li>
+<li><code>./suisa_sendemeldung.toml</code></li>
 </ol>
-<p>For details on how to set configuration values, have a look at <a href="etc/suisa_sendemeldung.conf">suisa_sendemeldung.conf</a>.</p>
+<p>For details on how to set configuration values, have a look at
+<a href="etc/suisa_sendemeldung.toml">suisa_sendemeldung.toml</a>.</p>
 <h4 id="environment-variables">Environment variables</h4>
-<p>Environment variables can also be passed as options. The relevant variables are listed in the <a href="#Usage">Usage</a> part of this document. For example run the script as follows:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>podman<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-ti<span class="w"> </span>-e<span class="w"> </span><span class="nv">BEARER_TOKEN</span><span class="o">=</span>abcdefghijklmnopqrstuvwxyzabcdef<span class="w"> </span>-e<span class="w"> </span><span class="nv">STREAM_ID</span><span class="o">=</span>a-bcdefgh<span class="w"> </span>-e<span class="w"> </span><span class="nv">STDOUT</span><span class="o">=</span>True<span class="w"> </span>ghcr.io/radiorabe/suisasendemeldung:latest<span class="w"> </span>suisa_sendemeldung
+<p>Environment variables can also be passed as options. The relevant variables are
+listed in the output of <code>suisa_sendemeldung --help</code>.</p>
+<p>For example run the script as follows:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>podman<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-ti<span class="w"> </span>-e<span class="w"> </span><span class="nv">SENDEMELDUNG_ACR_BEARER_TOKEN</span><span class="o">=</span>abcdefghijklmnopqrstuvwxyzabcdef<span class="w"> </span>-e<span class="w"> </span><span class="nv">SENDEMELDUNG_ACR_STREAM_ID</span><span class="o">=</span>a-bcdefgh<span class="w"> </span>-e<span class="w"> </span><span class="nv">SENDEMELDUNG_OUTPUT</span><span class="o">=</span>stdout<span class="w"> </span>ghcr.io/radiorabe/suisasendemeldung:latest<span class="w"> </span>suisa_sendemeldung
 </code></pre></div>
 <h4 id="command-line-switches">Command line switches</h4>
-<p>As documented in <a href="#Usage">Usage</a>, you can also pass in options on the command line as arguments. Simply run the script as follows:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>podman<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-ti<span class="w"> </span>ghcr.io/radiorabe/suisasendemeldung:latest<span class="w"> </span>suisa_sendemeldung<span class="w"> </span>--bearer-token<span class="o">=</span>abcdefghijklmnopqrstuvwxyzabcdef<span class="w"> </span>--stream_id<span class="o">=</span>a-bcdefgh<span class="w"> </span>--stdout
+<p>As documented in <a href="#Usage">Usage</a>, you can also pass in options on the command
+line as arguments. Simply run the script as follows:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>podman<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-ti<span class="w"> </span>ghcr.io/radiorabe/suisasendemeldung:latest<span class="w"> </span>suisa_sendemeldung<span class="w"> </span>--acr-bearer-token<span class="o">=</span>abcdefghijklmnopqrstuvwxyzabcdef<span class="w"> </span>--acr-stream-id<span class="o">=</span>a-bcdefgh<span class="w"> </span>--output<span class="o">=</span>stdout
 </code></pre></div>
+<h2 id="support">Support</h2>
+<p>We support users where is reasonably possible on a best-efforts base.</p>
+<p>The following versions of SUISA Sendemeldung are actively supported.</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Supported</th>
+<th>Supported GST</th>
+<th>Python Version</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0.x</td>
+<td>(✅)</td>
+<td>GST 2020</td>
+<td></td>
+<td>Developed during the GST lifetime, internal use at RaBe</td>
+</tr>
+<tr>
+<td>1.x</td>
+<td>✅</td>
+<td>GST 2026</td>
+<td>&gt;=3.12</td>
+<td>Cleanup and first release with features for external use</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>old versions are supported on a case by case base if we need to regenerate old reports</li>
+</ul>
+<h2 id="upgrading">Upgrading</h2>
+<h3 id="upgrade-from-0x-to-10">Upgrade from 0.x to 1.0</h3>
+<ul>
+<li>The config file was renamed from <code>suisa_sendemeldung.conf</code> to <code>susia_sendemeldung.toml</code></li>
+<li>The config file format has been changed from an <code>ini</code> style file to TOML.</li>
+<li>The command line arguments have been reworked to match the new config file format, check <code>susia_sendemeldung --help</code>. for the new flags.</li>
+<li>The "last 30 days from today" mode has been dropped, call the script with <code>--by-date</code>, <code>--date-start</code> and <code>--date-end</code>.</li>
+</ul>
 <h2 id="development">Development</h2>
-<p>Snapshot testing is used to test the help output, you can update the snapshots like so:
+<p>Snapshot testing is used to test the help output, you can update the snapshots
+like so:
 <div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>poetry run pytest -- --snapshot-update
 </code></pre></div></p>
 <h2 id="release-management">Release Management</h2>
-<p>At RaBe we run the script on the first and 14th of each month. Matching this we only release new versions of the script in the second half of each month.</p>
+<p>At RaBe we run the script on the first and 14th of each month. Matching this we
+only release new versions of the script in the second half of each month.</p>
 <p>The CI/CD setup uses semantic commit messages following the <a href="https://www.conventionalcommits.org/en/v1.0.0/">conventional commits standard</a>.
 There is a GitHub Action in <a href="./.github/workflows/semantic-release.yaml">.github/workflows/semantic-release.yaml</a>
-that uses <a href="https://go-semantic-release.xyz/">go-semantic-commit</a> to create new releases.</p>
+that uses <a href="https://go-semantic-release.xyz/">go-semantic-commit</a> to create new
+releases.</p>
 <p>The commit message should be structured as follows:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>&lt;type&gt;[optional scope]: &lt;description&gt;
 <a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
@@ -613,7 +733,8 @@ that uses <a href="https://go-semantic-release.xyz/">go-semantic-commit</a> to c
 <a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
 <a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>[optional footer(s)]
 </code></pre></div>
-<p>The commit contains the following structural elements, to communicate intent to the consumers of your library:</p>
+<p>The commit contains the following structural elements, to communicate intent to
+the consumers of your library:</p>
 <ol>
 <li><strong>fix:</strong> a commit of the type <code>fix</code> patches gets released with a PATCH version bump</li>
 <li><strong>feat:</strong> a commit of the type <code>feat</code> gets released as a MINOR version bump</li>
@@ -622,9 +743,11 @@ that uses <a href="https://go-semantic-release.xyz/">go-semantic-commit</a> to c
 </ol>
 <p>If a commit does not contain a conventional commit style message you can fix
 it during the squash and merge operation on the PR.</p>
-<p>Once a commit has landed on the <code>main</code> branch a release will be created and automatically published to <a href="https://pypi.org/">pypi</a>
-using the GitHub Action in <a href="./.github/workflows/reliease.yaml">.github/workflows/release.yaml</a> which uses <a href="https://twine.readthedocs.io/">twine</a>
-to publish the package to pypi. The <code>release.yaml</code> action also takes care of pushing a <a href="https://opencontainers.org/">container</a>
+<p>Once a commit has landed on the <code>main</code> branch a release will be created and
+automatically published to <a href="https://pypi.org/">pypi</a> using the GitHub Action in
+<a href="./.github/workflows/reliease.yaml">.github/workflows/release.yaml</a> which uses
+<a href="https://twine.readthedocs.io/">twine</a> to publish the package to pypi. The
+<code>release.yaml</code> action also takes care of pushing a <a href="https://opencontainers.org/">container</a>
 image to <a href="https://github.com/features/packages">GitHub Packages</a>.</p>
 
 

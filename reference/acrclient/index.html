@@ -12,7 +12,7 @@
         <link rel="prev" href="../SUMMARY/">
       
       
-        <link rel="next" href="../suisa_sendemeldung/">
+        <link rel="next" href="../settings/">
       
       
         
@@ -477,6 +477,34 @@
   
   
     <li class="md-nav__item">
+      <a href="../settings/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Settings
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
       <a href="../suisa_sendemeldung/" class="md-nav__link">
         
   
@@ -543,7 +571,10 @@
 
 
 
-  <div class="doc doc-children">
+
+
+<div class="doc doc-children">
+
 
 
 
@@ -568,6 +599,7 @@
               Bases: <code><span title="Client">Client</span></code></p>
 
 
+
         <p>ACRCloud client wrapper to fetch metadata.</p>
         <hr />
 <div class="highlight"><pre><span></span><code>bearer_token: The bearer token for ACRCloud.
@@ -578,7 +610,9 @@
 
 
 
-              <details class="quote">
+
+
+              <details class="mkdocstrings-source">
                 <summary>Source code in <code>suisa_sendemeldung/acrclient.py</code></summary>
                 <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-14"> 14</a></span>
 <span class="normal"><a href="#__codelineno-0-15"> 15</a></span>
@@ -710,7 +744,7 @@
 <span class="normal"><a href="#__codelineno-0-141">141</a></span>
 <span class="normal"><a href="#__codelineno-0-142">142</a></span>
 <span class="normal"><a href="#__codelineno-0-143">143</a></span>
-<span class="normal"><a href="#__codelineno-0-144">144</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-14" name="__codelineno-0-14"></a><span class="k">class</span> <span class="nc">ACRClient</span><span class="p">(</span><span class="n">Client</span><span class="p">):</span>
+<span class="normal"><a href="#__codelineno-0-144">144</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-14" name="__codelineno-0-14"></a><span class="k">class</span><span class="w"> </span><span class="nc">ACRClient</span><span class="p">(</span><span class="n">Client</span><span class="p">):</span>
 <a id="__codelineno-0-15" name="__codelineno-0-15"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;ACRCloud client wrapper to fetch metadata.</span>
 <a id="__codelineno-0-16" name="__codelineno-0-16"></a>
 <a id="__codelineno-0-17" name="__codelineno-0-17"></a><span class="sd">    Arguments:</span>
@@ -724,14 +758,14 @@
 <a id="__codelineno-0-25" name="__codelineno-0-25"></a>    <span class="c1"># timezone of ACRCloud</span>
 <a id="__codelineno-0-26" name="__codelineno-0-26"></a>    <span class="n">ACR_TIMEZONE</span> <span class="o">=</span> <span class="s2">&quot;UTC&quot;</span>
 <a id="__codelineno-0-27" name="__codelineno-0-27"></a>
-<a id="__codelineno-0-28" name="__codelineno-0-28"></a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<a id="__codelineno-0-28" name="__codelineno-0-28"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 <a id="__codelineno-0-29" name="__codelineno-0-29"></a>        <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">bearer_token</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">base_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;https://eu-api-v2.acrcloud.com&quot;</span>
 <a id="__codelineno-0-30" name="__codelineno-0-30"></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-31" name="__codelineno-0-31"></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Init subclass with default_date.&quot;&quot;&quot;</span>
 <a id="__codelineno-0-32" name="__codelineno-0-32"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">bearer_token</span><span class="o">=</span><span class="n">bearer_token</span><span class="p">,</span> <span class="n">base_url</span><span class="o">=</span><span class="n">base_url</span><span class="p">)</span>
 <a id="__codelineno-0-33" name="__codelineno-0-33"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">default_date</span><span class="p">:</span> <span class="n">date</span> <span class="o">=</span> <span class="n">date</span><span class="o">.</span><span class="n">today</span><span class="p">()</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># noqa: DTZ011</span>
 <a id="__codelineno-0-34" name="__codelineno-0-34"></a>
-<a id="__codelineno-0-35" name="__codelineno-0-35"></a>    <span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span>
+<a id="__codelineno-0-35" name="__codelineno-0-35"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_data</span><span class="p">(</span>
 <a id="__codelineno-0-36" name="__codelineno-0-36"></a>        <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
 <a id="__codelineno-0-37" name="__codelineno-0-37"></a>        <span class="n">project_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <a id="__codelineno-0-38" name="__codelineno-0-38"></a>        <span class="n">stream_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -772,7 +806,7 @@
 <a id="__codelineno-0-73" name="__codelineno-0-73"></a>
 <a id="__codelineno-0-74" name="__codelineno-0-74"></a>        <span class="k">return</span> <span class="n">data</span>
 <a id="__codelineno-0-75" name="__codelineno-0-75"></a>
-<a id="__codelineno-0-76" name="__codelineno-0-76"></a>    <span class="k">def</span> <span class="nf">get_interval_data</span><span class="p">(</span>  <span class="c1"># noqa: ANN201</span>
+<a id="__codelineno-0-76" name="__codelineno-0-76"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_interval_data</span><span class="p">(</span>  <span class="c1"># noqa: ANN201</span>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a>        <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
 <a id="__codelineno-0-78" name="__codelineno-0-78"></a>        <span class="n">project_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <a id="__codelineno-0-79" name="__codelineno-0-79"></a>        <span class="n">stream_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -846,7 +880,8 @@
 
 
 
-  <div class="doc doc-children">
+<div class="doc doc-children">
+
 
 
 
@@ -869,14 +904,15 @@
 
         <p>Init subclass with default_date.</p>
 
-            <details class="quote">
+
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>suisa_sendemeldung/acrclient.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-28">28</a></span>
 <span class="normal"><a href="#__codelineno-0-29">29</a></span>
 <span class="normal"><a href="#__codelineno-0-30">30</a></span>
 <span class="normal"><a href="#__codelineno-0-31">31</a></span>
 <span class="normal"><a href="#__codelineno-0-32">32</a></span>
-<span class="normal"><a href="#__codelineno-0-33">33</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-28" name="__codelineno-0-28"></a><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-33">33</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-28" name="__codelineno-0-28"></a><span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 <a id="__codelineno-0-29" name="__codelineno-0-29"></a>    <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span> <span class="n">bearer_token</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">base_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;https://eu-api-v2.acrcloud.com&quot;</span>
 <a id="__codelineno-0-30" name="__codelineno-0-30"></a><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <a id="__codelineno-0-31" name="__codelineno-0-31"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Init subclass with default_date.&quot;&quot;&quot;</span>
@@ -910,7 +946,8 @@ timezone: The timezone to use for localization.
 <div class="highlight"><pre><span></span><code>json: The ACR data from date
 </code></pre></div>
 
-            <details class="quote">
+
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>suisa_sendemeldung/acrclient.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-35">35</a></span>
 <span class="normal"><a href="#__codelineno-0-36">36</a></span>
@@ -951,7 +988,7 @@ timezone: The timezone to use for localization.
 <span class="normal"><a href="#__codelineno-0-71">71</a></span>
 <span class="normal"><a href="#__codelineno-0-72">72</a></span>
 <span class="normal"><a href="#__codelineno-0-73">73</a></span>
-<span class="normal"><a href="#__codelineno-0-74">74</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="k">def</span> <span class="nf">get_data</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-0-74">74</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-35" name="__codelineno-0-35"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_data</span><span class="p">(</span>
 <a id="__codelineno-0-36" name="__codelineno-0-36"></a>    <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
 <a id="__codelineno-0-37" name="__codelineno-0-37"></a>    <span class="n">project_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <a id="__codelineno-0-38" name="__codelineno-0-38"></a>    <span class="n">stream_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
@@ -1020,7 +1057,8 @@ timezone (optional): will be passed to `get_data()`.
 <div class="highlight"><pre><span></span><code>json: The ACR data from start to end.
 </code></pre></div>
 
-            <details class="quote">
+
+            <details class="mkdocstrings-source">
               <summary>Source code in <code>suisa_sendemeldung/acrclient.py</code></summary>
               <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-76"> 76</a></span>
 <span class="normal"><a href="#__codelineno-0-77"> 77</a></span>
@@ -1090,7 +1128,7 @@ timezone (optional): will be passed to `get_data()`.
 <span class="normal"><a href="#__codelineno-0-141">141</a></span>
 <span class="normal"><a href="#__codelineno-0-142">142</a></span>
 <span class="normal"><a href="#__codelineno-0-143">143</a></span>
-<span class="normal"><a href="#__codelineno-0-144">144</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="k">def</span> <span class="nf">get_interval_data</span><span class="p">(</span>  <span class="c1"># noqa: ANN201</span>
+<span class="normal"><a href="#__codelineno-0-144">144</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-76" name="__codelineno-0-76"></a><span class="k">def</span><span class="w"> </span><span class="nf">get_interval_data</span><span class="p">(</span>  <span class="c1"># noqa: ANN201</span>
 <a id="__codelineno-0-77" name="__codelineno-0-77"></a>    <span class="bp">self</span><span class="p">:</span> <span class="n">Self</span><span class="p">,</span>
 <a id="__codelineno-0-78" name="__codelineno-0-78"></a>    <span class="n">project_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
 <a id="__codelineno-0-79" name="__codelineno-0-79"></a>    <span class="n">stream_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
