@@ -39,7 +39,6 @@ pytest = ">=7.4,<10.0"
 pytest-cov = ">=4.1,<8.0"
 pytest-env = ">=0.8.2,<1.6.0"
 pytest-mypy = ">=0.10.3,<1.1.0"
-pytest-pylint = ">=0.19,<0.22"
 pytest-ruff = ">=0.3.1,<0.6.0"
 requests-mock = "^1.11.0"
 ruff = ">=0.5.1,<0.16.0"
@@ -53,19 +52,7 @@ wheel = ">=0.40,<0.47"
 
 [tool.pytest]
 minversion = "9.0"
-addopts = ["--doctest-modules", "--cov=suisa_sendemeldung", "--cov-fail-under=100", "--ignore=docs/", "--mypy", "--pylint", "--ruff"]
-
-[tool.pylint.design]
-max-args = 6
-max-positional-arguments = 6
-max-locals = 32
-min-public-methods = 0
-
-[tool.pylint.format]
-max-line-length = 150
-
-[tool.pylint.basic]
-class-const-naming-style = "any"
+addopts = ["--doctest-modules", "--cov=suisa_sendemeldung", "--cov-fail-under=100", "--ignore=docs/", "--mypy", "--ruff"]
 
 [build-system]
 requires = ["poetry-core"]

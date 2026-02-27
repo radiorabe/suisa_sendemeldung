@@ -111,9 +111,6 @@ class ACRClient(Client):
                 computed_start = start
                 computed_end = end + timedelta(days=1)
                 trim = True
-            else:  # pragma: no cover
-                computed_start = start
-                computed_end = end
         else:
             computed_start = start
             computed_end = end

@@ -80,7 +80,7 @@ Key characteristics:
   third‑party libs (`openpyxl`, `pytz`, `babel`, `tqdm`, `cridlib`).
 
 - The code is type‑annotated, linted with `ruff` and statically checked
-  via `pytest-mypy`/`pytest-pylint` integrated into the test run.
+  via `pytest-mypy` integrated into the test run.
 
 - There is logic to handle quirks in the ACRCloud response, e.g. inconsistent
   field names, custom files vs music, malformed ISRCs, timezone offsets etc.
@@ -111,7 +111,7 @@ Maintainers (and intelligent agents) should be comfortable with:
 - **GitHub Actions** & conventional commits for CI/CD and releases.
 - **Docker** – understanding multi‑stage builds and using container images.
 - **pytest** with mocking, snapshot testing, and plugins (`pytest-cov`,
-  `pytest-mypy`, `pytest-pylint`, `pytest-ruff`).
+  `pytest-mypy`, `pytest-ruff`).
 - **Libraries used**:
   - `openpyxl` for XLSX manipulation.
   - `acrclient` (and the ACRCloud API semantics).
@@ -169,7 +169,7 @@ poetry install       # creates and populates a virtualenv automatically
 poetry run <command>
 # e.g.:
 poetry run ruff .          # linting
-poetry run pytest          # run all tests (including mypy/pylint/ruff plugins)
+poetry run pytest          # run all tests (including mypy/ruff plugins)
 
 # if you need interactive access, spawn a shell
 poetry shell
