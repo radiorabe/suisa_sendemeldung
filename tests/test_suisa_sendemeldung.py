@@ -210,11 +210,29 @@ def test_merge_duplicates():
     assert len(results) == 2  # noqa: PLR2004
     assert results[0]["metadata"]["played_duration"] == 20  # noqa: PLR2004
 
+    # all unique records - nothing should be merged
+    record_a = {"metadata": {"music": [{"acrid": "aaa"}], "played_duration": 5}}
+    record_b = {"metadata": {"music": [{"acrid": "bbb"}], "played_duration": 5}}
+    record_c = {"metadata": {"music": [{"acrid": "ccc"}], "played_duration": 5}}
+    results = suisa_sendemeldung.merge_duplicates([record_a, record_b, record_c])
+    assert len(results) == 3  # noqa: PLR2004
+    assert all(r["metadata"]["played_duration"] == 5 for r in results)  # noqa: PLR2004
+
+    # non-consecutive duplicates should NOT be merged
+    same_1 = {"metadata": {"music": [{"acrid": "same"}], "played_duration": 10}}
+    diff = {"metadata": {"music": [{"acrid": "diff"}], "played_duration": 10}}
+    same_2 = {"metadata": {"music": [{"acrid": "same"}], "played_duration": 10}}
+    results = suisa_sendemeldung.merge_duplicates([same_1, diff, same_2])
+    assert len(results) == 3  # noqa: PLR2004
+
 
 @pytest.mark.parametrize(
     ("test_date", "expected"),
     [
-        ("0000-00-00", ""),
+        ("", ""),  # empty string returns empty
+        ("2022-12-13", "20221213"),  # valid date converts to compact form
+        ("2023", ""),  # year-only has no day-precision, discarded
+        ("0000-00-00", ""),  # invalid date returns empty
     ],
 )
 def test_funge_release_date(test_date, expected):
@@ -517,6 +535,7 @@ def test_send_message():
 @pytest.mark.parametrize(
     ("test_music", "expected"),
     [
+        ({}, ""),  # no artist key at all
         ({"external_ids": {"isrc": "DEZ650710376"}}, "DEZ650710376"),
         ({"external_ids": {"isrc": ["DEZ650710376"]}}, "DEZ650710376"),
         ({"external_ids": {"isrc": "DE Z65 07 10376"}}, "DEZ650710376"),
@@ -534,6 +553,34 @@ def test_get_isrc(test_music, expected):
 
     isrc = suisa_sendemeldung.get_isrc(test_music)
     assert isrc == expected
+
+
+@pytest.mark.parametrize(
+    ("test_music", "expected"),
+    [
+        ({}, ""),  # no artist fields at all
+        ({"artist": "Solo Artist"}, "Solo Artist"),  # singular 'artist' key
+        ({"artists": [{"name": "A"}, {"name": "B"}]}, "A, B"),  # list of artists
+        ({"artists": "String Artist"}, "String Artist"),  # legacy: artists as a string
+    ],
+)
+def test_get_artist(test_music, expected):
+    """Test get_artist."""
+    assert suisa_sendemeldung.get_artist(test_music) == expected
+
+
+@pytest.mark.parametrize(
+    ("test_music", "expected"),
+    [
+        ({}, ""),  # no contributors key
+        ({"contributors": {}}, ""),  # contributors with no composers key
+        ({"contributors": {"composers": None}}, ""),  # composers is None
+        ({"contributors": {"composers": ["A", "B"]}}, "A, B"),  # standard list
+    ],
+)
+def test_get_composer(test_music, expected):
+    """Test get_composer."""
+    assert suisa_sendemeldung.get_composer(test_music) == expected
 
 
 def test_cli_help(snapshot):

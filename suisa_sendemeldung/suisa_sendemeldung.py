@@ -574,7 +574,6 @@ def get_email_attachment(filename: str, filetype: str, data: BytesIO | str) -> M
     if filetype == "csv":
         maintype = "text"
         subtype = "csv"
-        part = MIMEBase("text", "csv")
 
     payload = (
         data.getvalue() if isinstance(data, BytesIO) else str(data).encode("utf-8")
