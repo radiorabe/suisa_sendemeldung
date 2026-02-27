@@ -37,12 +37,15 @@ def test_get_data():
     # calling without requested_date uses the default date (yesterday)
     with freeze_time("1993-03-02"):
         acr = acrclient.ACRClient(bearer_token)
+    expected_date = acr.default_date.strftime("%Y%m%d")
     with requests_mock.Mocker() as mock:
         mock.get(
             _ACR_URL,
             json=data,
         )
         result = acr.get_data(project_id, stream_id, requested_date=None)
+        # ensure the client actually used the default date in the request
+        assert mock.last_request.qs.get("date") == [expected_date]
     assert len(result) == 1
 
 
@@ -83,7 +86,8 @@ def test_get_interval_data():
     assert len(result) > 0
 
     # ahead of UTC (Europe/Zurich): out-of-range entries are trimmed
-    # "1993-03-31 23:30:00 UTC" = "1993-04-01 00:30:00 Zurich" → outside end, trimmed
+    # "1993-03-31 23:30:00 UTC" = "1993-04-01 01:30:00 Zurich" (UTC+2, DST)
+    # → outside end, trimmed
     with freeze_time("1993-04-02"):
         acr = acrclient.ACRClient(bearer_token)
     with requests_mock.Mocker() as mock:
