@@ -1,3 +1,5 @@
+"""Pytest fixtures for suisa_sendemeldung tests."""
+
 import pytest
 
 from suisa_sendemeldung.settings import (
@@ -12,6 +14,7 @@ from suisa_sendemeldung.settings import (
 
 @pytest.fixture
 def settings():
+    """Return a Settings instance for testing."""
     return Settings(
         output=OutputMode.file,
         crid_mode=IdentifierMode.cridlib,
