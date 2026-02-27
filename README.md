@@ -13,7 +13,7 @@ package.
 These usage instructions show how to install the script and how to configure it.
 There are different ways to run it at a schedule. We recommend using
 [systemd-timers](https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html)
-an example to do so is provded in the `etc/` directory.
+an example to do so is provided in the `etc/` directory.
 
 To output the scripts usage information, check out it's `--help` output:
 
@@ -33,7 +33,7 @@ for running the script should you go down this route:
 
 ```bash
 python -mvenv .venv
-. venv/bin/activate
+. .venv/bin/activate
 
 pip install suisa_sendemeldung
 
@@ -72,7 +72,7 @@ podman run --rm -ti -e SENDEMELDUNG_ACR_BEARER_TOKEN=abcdefghijklmnopqrstuvwxyza
 
 #### Command line switches
 
-As documented in [Usage](#Usage), you can also pass in options on the command
+As documented in [Usage](#usage), you can also pass in options on the command
 line as arguments. Simply run the script as follows:
 
 ```bash
@@ -96,9 +96,9 @@ The following versions of SUISA Sendemeldung are actively supported.
 
 ### Upgrade from 0.x to 1.0
 
-* The config file was renamed from `suisa_sendemeldung.conf` to `susia_sendemeldung.toml`
+* The config file was renamed from `suisa_sendemeldung.conf` to `suisa_sendemeldung.toml`
 * The config file format has been changed from an `ini` style file to TOML.
-* The command line arguments have been reworked to match the new config file format, check `susia_sendemeldung --help`. for the new flags.
+* The command line arguments have been reworked to match the new config file format, check `suisa_sendemeldung --help`. for the new flags.
 * The "last 30 days from today" mode has been dropped, call the script with `--by-date`, `--date-start` and `--date-end`.
 
 ## Development
@@ -142,7 +142,7 @@ it during the squash and merge operation on the PR.
 
 Once a commit has landed on the `main` branch a release will be created and
 automatically published to [pypi](https://pypi.org/) using the GitHub Action in
-[.github/workflows/release.yaml](./.github/workflows/reliease.yaml) which uses
+[.github/workflows/release.yaml](./.github/workflows/release.yaml) which uses
 [twine](https://twine.readthedocs.io/) to publish the package to pypi. The
 `release.yaml` action also takes care of pushing a [container](https://opencontainers.org/)
 image to [GitHub Packages](https://github.com/features/packages).

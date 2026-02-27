@@ -1,6 +1,6 @@
 # Run SUISA Sendemeldung using SystemD timers
 
-The provided SystemD tempalte units expect the configuration to be stored
+The provided SystemD template units expect the configuration to be stored
 in the `/etc/suisa_sendemeldung` directory of the host system.
 
 ```bash

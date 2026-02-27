@@ -56,7 +56,7 @@ def validate_arguments(settings: Settings) -> None:
 
     Raises:
     ------
-        InvalidValueErrors: if there are invalid argument combinations
+        InvalidValueError: if there are invalid argument combinations
 
     """
     msgs = []
@@ -642,7 +642,7 @@ def send_message(
 
     Arguments:
     ---------
-        msg: The message to send (an email.messag.Message object)
+        msg: The message to send (an email.message.Message object)
         server: The SMTP server to use to send the email.
         port: The port of the SMTP server.
         login: The username for `sender`@`server`.
