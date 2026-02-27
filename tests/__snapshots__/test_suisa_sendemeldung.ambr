@@ -51,31 +51,30 @@
     File configuration: 
       --file-format [xlsx|csv]      [env var: SENDEMELDUNG_FILE_FORMAT; default:
                                     xlsx]
-      --file-path TEXT              [env var: SENDEMELDUNG_FILE_PATH; default: ""]
+      --file-path TEXT              [env var: SENDEMELDUNG_FILE_PATH]
     Email configuration: 
       --email-sender TEXT           the sender of the email  [env var:
-                                    SENDEMELDUNG_EMAIL_SENDER; default: ""]
+                                    SENDEMELDUNG_EMAIL_SENDER]
       --email-to TEXT               the recipients of the email  [env var:
-                                    SENDEMELDUNG_EMAIL_TO; default: ""]
+                                    SENDEMELDUNG_EMAIL_TO]
       --email-server TEXT           the smtp server to send the mail with  [env
-                                    var: SENDEMELDUNG_EMAIL_SERVER; default: ""]
+                                    var: SENDEMELDUNG_EMAIL_SERVER]
       --email-port INTEGER          the port of the smtp server  [env var:
                                     SENDEMELDUNG_EMAIL_PORT; default: 587]
       --email-username TEXT         the username to logon to the smtp server
                                     (default: email_from)  [env var:
-                                    SENDEMELDUNG_EMAIL_USERNAME; default: ""]
+                                    SENDEMELDUNG_EMAIL_USERNAME]
       --email-password TEXT         the password for the smtp server  [env var:
                                     SENDEMELDUNG_EMAIL_PASSWORD; default:
                                     (*******)]
       --email-responsible-email TEXT
                                     Used to hint whom to contact in the emails
                                     text.  [env var:
-                                    SENDEMELDUNG_EMAIL_RESPONSIBLE_EMAIL; default:
-                                    ""]
+                                    SENDEMELDUNG_EMAIL_RESPONSIBLE_EMAIL]
       --email-cc TEXT               the cc recipients of the email  [env var:
-                                    SENDEMELDUNG_EMAIL_CC; default: ""]
+                                    SENDEMELDUNG_EMAIL_CC]
       --email-bcc TEXT              the bcc recipients of the email  [env var:
-                                    SENDEMELDUNG_EMAIL_BCC; default: ""]
+                                    SENDEMELDUNG_EMAIL_BCC]
       --email-subject TEXT          Template for subject of the email.
                                     
                                     Placeholders are $station_name, $year and
