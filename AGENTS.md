@@ -118,7 +118,6 @@ sections before writing or reviewing code.
 | mkdocstrings | API documentation generation | <https://mkdocstrings.github.io/llms.txt> |
 | mkdocstrings-python | Python handler for mkdocstrings | <https://mkdocstrings.github.io/python/llms.txt> |
 | Griffe | Python source / signature parser (mkdocstrings back-end) | <https://mkdocstrings.github.io/griffe/llms.txt> |
-| uv | Fast Python package and project manager | <https://docs.astral.sh/uv/llms.txt> |
 
 > **Tip for agents**: Many MkDocs-based documentation sites expose this endpoint.  For any
 > library *not* listed above, try appending `/llms.txt` to its documentation root URL
