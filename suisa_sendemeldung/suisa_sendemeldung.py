@@ -589,7 +589,7 @@ def get_email_attachment(filename: str, filetype: str, data: BytesIO | str) -> M
     return part
 
 
-def create_message(  # noqa: PLR0913
+def create_message(  # noqa: PLR0913  # pylint: disable=too-many-arguments,too-many-positional-arguments
     sender: str,
     recipient: str,
     subject: str,
@@ -769,4 +769,4 @@ def cli(settings: Settings) -> None:  # pragma: no cover
 
 
 if __name__ == "__main__":  # pragma: no cover
-    cli()
+    cli()  # pylint: disable=no-value-for-parameter

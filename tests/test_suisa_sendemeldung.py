@@ -401,6 +401,7 @@ def test_get_xlsx(snapshot, settings):
 
 
 def test_reformat_start_date_in_xlsx():
+    """Test that reformat_start_date_in_xlsx reformats the start date column."""
     workbook: Workbook = Workbook()
     if not workbook.active:  # pragma: no cover
         raise RuntimeError

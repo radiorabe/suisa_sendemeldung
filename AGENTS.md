@@ -31,9 +31,9 @@ compatible with SUISA's reporting format and optionally emails the report.
 
 ## 🔧 Build chain & CI
 
-- **Local build** is driven by `poetry build` (done inside `Dockerfile`'s
-  `build` stage) and results in a wheel; the container is then constructed
-  from a minimal python base image.
+- **Local build** is driven by `python3.12 -m build .` (run inside the
+  `Dockerfile`'s `build` stage) and results in a wheel; the container is then
+  constructed from a minimal python base image.
 
 - **Dockerfile** uses our internal `radiorabe` base images (`s2i-python` for
   build, `python-minimal` for runtime) and installs the freshly-built wheel.
@@ -44,10 +44,12 @@ compatible with SUISA's reporting format and optionally emails the report.
   - `.github/workflows/semantic-release.yaml` – triggers on pushes to `main`
     and `release/*`; runs semantic release logic, bumping versions based on
     conventional commit messages.
-  - `.github/workflows/release.yaml` – triggered on tags, PRs to `main`, and
-    release events. It builds/publishes the container image and uploads the
-    package to PyPI using internal reusable workflows (release-container and
-    python-poetry).
+  - `.github/workflows/release.yaml` – runs on any `pull_request`, on `push`
+    to `main` and tags, and on `release` events of type `created`. It
+    builds/publishes the container image and uploads the package to PyPI
+    using internal reusable workflows (release-container and python-poetry).
+    Agents with pipeline access should wait for these workflow results before
+    proceeding.
 
 - **Release process** is described in `README.md`; maintainers only need to
   ensure commit messages follow the conventional commit standard and push to

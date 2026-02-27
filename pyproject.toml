@@ -53,7 +53,19 @@ wheel = ">=0.40,<0.47"
 
 [tool.pytest]
 minversion = "9.0"
-addopts = ["--doctest-modules", "--cov=suisa_sendemeldung", "--cov-fail-under=100", "--ignore=docs/", "--mypy", "--ruff"]
+addopts = ["--doctest-modules", "--cov=suisa_sendemeldung", "--cov-fail-under=100", "--ignore=docs/", "--mypy", "--pylint", "--ruff"]
+
+[tool.pylint.design]
+max-args = 6
+max-positional-arguments = 6
+max-locals = 32
+min-public-methods = 0
+
+[tool.pylint.format]
+max-line-length = 150
+
+[tool.pylint.basic]
+class-const-naming-style = "any"
 
 [build-system]
 requires = ["poetry-core"]
