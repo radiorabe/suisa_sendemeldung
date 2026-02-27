@@ -98,10 +98,9 @@ Key characteristics:
 - External dependencies are mocked (`requests_mock` for HTTP, `unittest.mock`
   for SMTP, `cridlib.get`), enabling fast, offline runs.
 
-- The `pytest` configuration in `pyproject.toml` enforces minimum version 9.0
-  and runs all static analysis plugins; coverage target is **100%**.
-
-
+- The `pytest` configuration in `pyproject.toml` is aligned with the Poetry
+  dependency constraints and runs all static analysis plugins; coverage
+  target is **100%**.
 ## 🧠 Skills & knowledge required
 
 Maintainers (and intelligent agents) should be comfortable with:
