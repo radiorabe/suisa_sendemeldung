@@ -137,7 +137,9 @@ class ACRClient(Client):
             for entry in reversed(data):
                 metadata = entry.get("metadata")
                 timestamp = metadata.get("timestamp_local")
-                timestamp_date = datetime.strptime(timestamp, ACRClient.TS_FMT).date()  # noqa: DTZ007
+                timestamp_date = datetime.strptime(  # noqa: DTZ007
+                    timestamp, ACRClient.TS_FMT
+                ).date()
                 if timestamp_date < start or timestamp_date > end:
                     data.remove(entry)
 

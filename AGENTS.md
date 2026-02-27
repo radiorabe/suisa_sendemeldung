@@ -31,9 +31,9 @@ compatible with SUISA's reporting format and optionally emails the report.
 
 ## 🔧 Build chain & CI
 
-- **Local build** is driven by `poetry build` (done inside `Dockerfile`'s
-  `build` stage) and results in a wheel; the container is then constructed
-  from a minimal python base image.
+- **Local build** is driven by `python3.12 -m build .` (run inside the
+  `Dockerfile`'s `build` stage) and results in a wheel; the container is then
+  constructed from a minimal python base image.
 
 - **Dockerfile** uses our internal `radiorabe` base images (`s2i-python` for
   build, `python-minimal` for runtime) and installs the freshly-built wheel.
@@ -44,10 +44,12 @@ compatible with SUISA's reporting format and optionally emails the report.
   - `.github/workflows/semantic-release.yaml` – triggers on pushes to `main`
     and `release/*`; runs semantic release logic, bumping versions based on
     conventional commit messages.
-  - `.github/workflows/release.yaml` – triggered on tags, PRs to `main`, and
-    release events. It builds/publishes the container image and uploads the
-    package to PyPI using internal reusable workflows (release-container and
-    python-poetry).
+  - `.github/workflows/release.yaml` – runs on any `pull_request`, on `push`
+    to `main` and tags, and on `release` events of type `created`. It
+    builds/publishes the container image and uploads the package to PyPI
+    using internal reusable workflows (release-container and python-poetry).
+    Agents with pipeline access should wait for these workflow results before
+    proceeding.
 
 - **Release process** is described in `README.md`; maintainers only need to
   ensure commit messages follow the conventional commit standard and push to
@@ -78,7 +80,7 @@ Key characteristics:
   third‑party libs (`openpyxl`, `pytz`, `babel`, `tqdm`, `cridlib`).
 
 - The code is type‑annotated, linted with `ruff` and statically checked
-  via `pytest-mypy`/`pytest-pylint` integrated into the test run.
+  via `pytest-mypy` integrated into the test run.
 
 - There is logic to handle quirks in the ACRCloud response, e.g. inconsistent
   field names, custom files vs music, malformed ISRCs, timezone offsets etc.
@@ -109,7 +111,7 @@ Maintainers (and intelligent agents) should be comfortable with:
 - **GitHub Actions** & conventional commits for CI/CD and releases.
 - **Docker** – understanding multi‑stage builds and using container images.
 - **pytest** with mocking, snapshot testing, and plugins (`pytest-cov`,
-  `pytest-mypy`, `pytest-pylint`, `pytest-ruff`).
+  `pytest-mypy`, `pytest-ruff`).
 - **Libraries used**:
   - `openpyxl` for XLSX manipulation.
   - `acrclient` (and the ACRCloud API semantics).
@@ -167,7 +169,7 @@ poetry install       # creates and populates a virtualenv automatically
 poetry run <command>
 # e.g.:
 poetry run ruff .          # linting
-poetry run pytest          # run all tests (including mypy/pylint/ruff plugins)
+poetry run pytest          # run all tests (including mypy/ruff plugins)
 
 # if you need interactive access, spawn a shell
 poetry shell
