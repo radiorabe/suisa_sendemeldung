@@ -628,7 +628,7 @@ package.</p>
 <p>These usage instructions show how to install the script and how to configure it.
 There are different ways to run it at a schedule. We recommend using
 <a href="https://www.freedesktop.org/software/systemd/man/latest/systemd.timer.html">systemd-timers</a>
-an example to do so is provded in the <code>etc/</code> directory.</p>
+an example to do so is provided in the <code>etc/</code> directory.</p>
 <p>To output the scripts usage information, check out it's <code>--help</code> output:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Using Podman</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>podman<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-ti<span class="w"> </span>ghcr.io/radiorabe/suisasendemeldung:latest<span class="w"> </span>suisa_sendemeldung<span class="w"> </span>--help
@@ -641,7 +641,7 @@ the script in any python environment using <a href="https://pip.pypa.io/">pip</a
 <p>We recommend using a dedicated <a href="https://docs.python.org/3/library/venv.html">venv</a>
 for running the script should you go down this route:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>python<span class="w"> </span>-mvenv<span class="w"> </span>.venv
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>.<span class="w"> </span>venv/bin/activate
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>.<span class="w"> </span>.venv/bin/activate
 <a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
 <a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>pip<span class="w"> </span>install<span class="w"> </span>suisa_sendemeldung
 <a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
@@ -669,7 +669,7 @@ listed in the output of <code>suisa_sendemeldung --help</code>.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>podman<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-ti<span class="w"> </span>-e<span class="w"> </span><span class="nv">SENDEMELDUNG_ACR_BEARER_TOKEN</span><span class="o">=</span>abcdefghijklmnopqrstuvwxyzabcdef<span class="w"> </span>-e<span class="w"> </span><span class="nv">SENDEMELDUNG_ACR_STREAM_ID</span><span class="o">=</span>a-bcdefgh<span class="w"> </span>-e<span class="w"> </span><span class="nv">SENDEMELDUNG_OUTPUT</span><span class="o">=</span>stdout<span class="w"> </span>ghcr.io/radiorabe/suisasendemeldung:latest<span class="w"> </span>suisa_sendemeldung
 </code></pre></div>
 <h4 id="command-line-switches">Command line switches</h4>
-<p>As documented in <a href="#Usage">Usage</a>, you can also pass in options on the command
+<p>As documented in <a href="#usage">Usage</a>, you can also pass in options on the command
 line as arguments. Simply run the script as follows:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>podman<span class="w"> </span>run<span class="w"> </span>--rm<span class="w"> </span>-ti<span class="w"> </span>ghcr.io/radiorabe/suisasendemeldung:latest<span class="w"> </span>suisa_sendemeldung<span class="w"> </span>--acr-bearer-token<span class="o">=</span>abcdefghijklmnopqrstuvwxyzabcdef<span class="w"> </span>--acr-stream-id<span class="o">=</span>a-bcdefgh<span class="w"> </span>--output<span class="o">=</span>stdout
 </code></pre></div>
@@ -709,9 +709,9 @@ line as arguments. Simply run the script as follows:</p>
 <h2 id="upgrading">Upgrading</h2>
 <h3 id="upgrade-from-0x-to-10">Upgrade from 0.x to 1.0</h3>
 <ul>
-<li>The config file was renamed from <code>suisa_sendemeldung.conf</code> to <code>susia_sendemeldung.toml</code></li>
+<li>The config file was renamed from <code>suisa_sendemeldung.conf</code> to <code>suisa_sendemeldung.toml</code></li>
 <li>The config file format has been changed from an <code>ini</code> style file to TOML.</li>
-<li>The command line arguments have been reworked to match the new config file format, check <code>susia_sendemeldung --help</code>. for the new flags.</li>
+<li>The command line arguments have been reworked to match the new config file format, check <code>suisa_sendemeldung --help</code>. for the new flags.</li>
 <li>The "last 30 days from today" mode has been dropped, call the script with <code>--by-date</code>, <code>--date-start</code> and <code>--date-end</code>.</li>
 </ul>
 <h2 id="development">Development</h2>
@@ -745,7 +745,7 @@ the consumers of your library:</p>
 it during the squash and merge operation on the PR.</p>
 <p>Once a commit has landed on the <code>main</code> branch a release will be created and
 automatically published to <a href="https://pypi.org/">pypi</a> using the GitHub Action in
-<a href="./.github/workflows/reliease.yaml">.github/workflows/release.yaml</a> which uses
+<a href="./.github/workflows/release.yaml">.github/workflows/release.yaml</a> which uses
 <a href="https://twine.readthedocs.io/">twine</a> to publish the package to pypi. The
 <code>release.yaml</code> action also takes care of pushing a <a href="https://opencontainers.org/">container</a>
 image to <a href="https://github.com/features/packages">GitHub Packages</a>.</p>
