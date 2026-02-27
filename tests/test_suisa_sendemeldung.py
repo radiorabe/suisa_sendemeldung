@@ -535,7 +535,7 @@ def test_send_message():
 @pytest.mark.parametrize(
     ("test_music", "expected"),
     [
-        ({}, ""),  # no artist key at all
+        ({}, ""),  # no ISRC/external_ids information at all
         ({"external_ids": {"isrc": "DEZ650710376"}}, "DEZ650710376"),
         ({"external_ids": {"isrc": ["DEZ650710376"]}}, "DEZ650710376"),
         ({"external_ids": {"isrc": "DE Z65 07 10376"}}, "DEZ650710376"),

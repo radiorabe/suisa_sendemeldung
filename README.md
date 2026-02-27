@@ -76,7 +76,7 @@ podman run --rm -ti \
 
 #### 💻 Command line switches
 
-As documented in [Usage](#-usage), you can also pass options directly on the
+As documented in [Usage](#usage), you can also pass options directly on the
 command line:
 
 ```bash
