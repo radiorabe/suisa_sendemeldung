@@ -137,22 +137,21 @@ The following actions are good candidates for autonomous agents:
    `types-...` packages via `poetry add --dev` or `pip` inside the environment.
 2. **Lint and type‑check** with `ruff`, `mypy` and the pytest plugins; propose
    fixes for violations.
-3. **Prepare releases**: inspect commit history, determine next version, run
-   `poetry version`, update changelog (if applicable), tag and push.
-4. **Build container images** and verify they run; scan for security issues.
-5. **Dependency maintenance**: check for outdated packages, test upgrades,
-   raise PRs or apply fixes. An agent can monitor PyPI and GitHub Advisory DB.
-6. **Documentation**: regenerate docs via `mkdocs` or `gen_ref_pages.py`,
+3. **Dependency maintenance**: test upgrades and raise PRs or apply fixes.
+   An agent can monitor the GitHub Advisory DB for security issues.
+4. **Merge request review**: if the agent has access to pull requests, it can
+   aid with reviewing them, checking for correctness and style.
+5. **Documentation**: regenerate docs via `mkdocs` or `gen_ref_pages.py`,
    ensure `README.md` consistency. Agents may update `AGENTS.md` itself.
-7. **Configuration validation**: parse sample `etc/suisa_sendemeldung.toml`,
+6. **Configuration validation**: parse sample `etc/suisa_sendemeldung.toml`,
    ensure options correspond to `settings.py`.
-8. **Environment setup**: create reproducible dev container/venv, ensure
+7. **Environment setup**: create reproducible dev container/venv, ensure
    pre-commit hooks work (pre‑commit config via poetry dev deps).
-9. **Automated health checks**: run the CLI with a mock ACRCloud server and
+8. **Automated health checks**: run the CLI with a mock ACRCloud server and
    validate output format remains valid for SUISA.
 
 Agents should respect the existing conventional commit rules when pushing
-changes and acquire credentials (PyPI token, Docker registry) via secrets.
+changes.
 
 
 ## 🚀 Getting started (for humans or agents)
