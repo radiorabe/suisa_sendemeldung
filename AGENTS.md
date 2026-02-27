@@ -101,6 +101,30 @@ Key characteristics:
 - The `pytest` configuration in `pyproject.toml` is aligned with the Poetry
   dependency constraints and runs all static analysis plugins; coverage
   target is **100%**.
+
+
+## 📖 Upstream documentation
+
+The [`/llms.txt` standard](https://llmstxt.org/) provides machine-readable documentation
+indexes that LLMs can follow to discover and retrieve relevant upstream documentation pages
+in clean Markdown format.  When tasked with work that touches any of the libraries listed
+below, **fetch the corresponding `/llms.txt` endpoint first** to discover available
+documentation pages, then follow the listed Markdown links to retrieve the relevant
+sections before writing or reviewing code.
+
+| Library | Role in this project | `/llms.txt` |
+|---------|----------------------|-------------|
+| Ruff | Linter and formatter | <https://docs.astral.sh/ruff/llms.txt> |
+| mkdocstrings | API documentation generation | <https://mkdocstrings.github.io/llms.txt> |
+| mkdocstrings-python | Python handler for mkdocstrings | <https://mkdocstrings.github.io/python/llms.txt> |
+| Griffe | Python source / signature parser (mkdocstrings back-end) | <https://mkdocstrings.github.io/griffe/llms.txt> |
+
+> **Tip for agents**: Many MkDocs-based documentation sites expose this endpoint.  For any
+> library *not* listed above, try appending `/llms.txt` to its documentation root URL
+> (e.g. `https://example.readthedocs.io/en/stable/llms.txt`).  Some sites also publish a
+> richer `llms-full.txt` variant that contains the full page content; prefer it when deep
+> API knowledge is needed.
+
 ## 🧠 Skills & knowledge required
 
 Maintainers (and intelligent agents) should be comfortable with:
