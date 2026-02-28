@@ -1,37 +1,86 @@
 site_name: SUISA Sendemeldung
+site_description: >-
+  Automated broadcast reporting for Swiss radio stations — ACRCloud to
+  SUISA-compliant CSV/XLSX with optional email delivery.
+site_url: https://radiorabe.github.io/suisa_sendemeldung/
 repo_url: https://github.com/radiorabe/suisa_sendemeldung
 repo_name: radiorabe/suisa_sendemeldung
 
 theme:
   name: "material"
+  custom_dir: docs/overrides
   palette:
     # Palette toggle for dark mode
     - scheme: slate
       primary: '#00c9bf'
+      accent: '#00c9bf'
       toggle:
         icon: material/brightness-4
         name: Switch to light mode
     # Palette toggle for light mode
     - scheme: default
       primary: '#00c9bf'
+      accent: '#00c9bf'
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
+  font:
+    text: Roboto
+    code: Roboto Mono
   icon:
-    repo: fontawesome/brands/git-alt
+    repo: fontawesome/brands/github
+    logo: material/radio
   features:
+    - announce.dismiss
+    - content.code.annotate
     - content.code.copy
-    - toc.integrate
+    - navigation.footer
+    - navigation.indexes
+    - navigation.sections
+    - navigation.tabs
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
 
 markdown_extensions:
+- admonition
+- attr_list
+- def_list
+- md_in_html
+- toc:
+    permalink: true
+- pymdownx.details
+- pymdownx.emoji:
+    emoji_index: !!python/name:material.extensions.emoji.twemoji
+    emoji_generator: !!python/name:material.extensions.emoji.to_svg
 - pymdownx.highlight:
     anchor_linenums: true
 - pymdownx.inlinehilite
 - pymdownx.snippets
 - pymdownx.superfences
+- pymdownx.tabbed:
+    alternate_style: true
+- pymdownx.tasklist:
+    custom_checkbox: true
 
 extra_css:
 - css/style.css
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/radiorabe/suisa_sendemeldung
+      name: GitHub
+    - icon: fontawesome/brands/python
+      link: https://pypi.org/project/suisa_sendemeldung/
+      name: PyPI
+    - icon: material/docker
+      link: https://github.com/radiorabe/suisa_sendemeldung/pkgs/container/suisasendemeldung
+      name: Container image
+  generator: false
 
 plugins:
 - search
@@ -48,7 +97,12 @@ plugins:
         paths: [suisa_sendemeldung]
 
 nav:
-  - README: index.md
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Configuration: configuration.md
+  - Deployment: deployment.md
+  - Upgrading: upgrading.md
+  - Development: development.md
   - Python Reference: reference/
 
 watch:
