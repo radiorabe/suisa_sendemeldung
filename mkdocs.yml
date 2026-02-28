@@ -89,7 +89,7 @@ plugins:
     scripts:
     - docs/gen_ref_pages.py
 - literate-nav:
-    nav_file: SUMMARY.md
+    nav_file: reference/SUMMARY.md
 - section-index
 - mkdocstrings:
     handlers:
@@ -103,7 +103,6 @@ nav:
   - Deployment: deployment.md
   - Upgrading: upgrading.md
   - Development: development.md
-  - Python Reference: reference/
 
 watch:
   - README.md

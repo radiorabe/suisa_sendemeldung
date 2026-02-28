@@ -72,5 +72,5 @@ suisa_sendemeldung --help
   options.
 - Set up [automated deployment](deployment.md) with systemd timers or a
   container orchestrator.
-- Check the [Python API Reference](reference/) if you want to use
+- Check the [Python API Reference](reference/SUMMARY.md) if you want to use
   the library programmatically.
