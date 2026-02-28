@@ -1,0 +1,126 @@
+{% extends "main.html" %}
+
+{% block tabs %}
+  {{ super() }}
+
+  <section class="tx-hero">
+    <div class="md-grid md-typeset">
+      <div class="tx-hero__content">
+        <h1>📻 SUISA Sendemeldung</h1>
+        <p>
+          Automated broadcast reporting for Swiss radio stations.<br>
+          Fetch playout data from <strong>ACRCloud</strong>, generate
+          <strong>SUISA-compliant</strong> CSV/XLSX reports, and deliver
+          them by email — fully hands-off.
+        </p>
+        <a
+          href="{{ 'getting-started/' | url }}"
+          title="Getting Started"
+          class="md-button md-button--primary"
+        >
+          Get started
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" style="vertical-align:middle;margin-left:.4em"><path d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/></svg>
+        </a>
+        <a
+          href="{{ 'reference/SUMMARY' | url }}"
+          title="Python API Reference"
+          class="md-button"
+        >
+          API Reference
+        </a>
+      </div>
+      <div class="tx-hero__image">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none" aria-hidden="true">
+          <!-- Radio tower -->
+          <circle cx="256" cy="256" r="240" fill="var(--md-primary-fg-color)" opacity=".08"/>
+          <circle cx="256" cy="256" r="180" fill="var(--md-primary-fg-color)" opacity=".06"/>
+          <circle cx="256" cy="256" r="120" fill="var(--md-primary-fg-color)" opacity=".10"/>
+          <!-- Antenna mast -->
+          <rect x="250" y="140" width="12" height="200" rx="4" fill="var(--md-primary-fg-color)"/>
+          <polygon points="256,100 240,160 272,160" fill="var(--md-primary-fg-color)"/>
+          <!-- Signal arcs -->
+          <path d="M190 200 Q256 150 322 200" stroke="var(--md-primary-fg-color)" stroke-width="6" fill="none" stroke-linecap="round" opacity=".8"/>
+          <path d="M160 230 Q256 165 352 230" stroke="var(--md-primary-fg-color)" stroke-width="5" fill="none" stroke-linecap="round" opacity=".6"/>
+          <path d="M130 260 Q256 180 382 260" stroke="var(--md-primary-fg-color)" stroke-width="4" fill="none" stroke-linecap="round" opacity=".4"/>
+          <!-- Base -->
+          <rect x="210" y="340" width="92" height="12" rx="4" fill="var(--md-primary-fg-color)" opacity=".7"/>
+          <rect x="230" y="352" width="52" height="40" rx="6" fill="var(--md-primary-fg-color)" opacity=".5"/>
+          <!-- CSV/file icon hint -->
+          <rect x="300" y="320" width="70" height="80" rx="8" fill="var(--md-primary-fg-color)" opacity=".25"/>
+          <line x1="312" y1="345" x2="358" y2="345" stroke="var(--md-primary-fg-color)" stroke-width="4" stroke-linecap="round" opacity=".6"/>
+          <line x1="312" y1="360" x2="358" y2="360" stroke="var(--md-primary-fg-color)" stroke-width="4" stroke-linecap="round" opacity=".6"/>
+          <line x1="312" y1="375" x2="345" y2="375" stroke="var(--md-primary-fg-color)" stroke-width="4" stroke-linecap="round" opacity=".6"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+{% endblock %}
+
+{% block content %}
+  <section class="tx-features">
+    <div class="md-grid">
+      <div class="tx-features__grid md-typeset">
+
+        <div class="tx-feature">
+          <div class="tx-feature__icon">🎵</div>
+          <h2>ACRCloud Integration</h2>
+          <p>
+            Identifies every track played via ACRCloud's audio fingerprinting API.
+            Supports configurable time intervals, pagination, and automatic
+            timezone localisation.
+          </p>
+        </div>
+
+        <div class="tx-feature">
+          <div class="tx-feature__icon">📊</div>
+          <h2>CSV &amp; XLSX Reports</h2>
+          <p>
+            Exports fully SUISA-compliant playout reports with all mandatory
+            fields — title, artist, ISRC, CRID, label, duration, and more — in
+            CSV or XLSX format.
+          </p>
+        </div>
+
+        <div class="tx-feature">
+          <div class="tx-feature__icon">📧</div>
+          <h2>Automated Email Delivery</h2>
+          <p>
+            Sends the monthly report directly to SUISA via SMTP with a
+            pre-formatted Swiss German cover letter referencing the correct
+            tariff articles.
+          </p>
+        </div>
+
+        <div class="tx-feature">
+          <div class="tx-feature__icon">⚙️</div>
+          <h2>Flexible Configuration</h2>
+          <p>
+            Configure via a TOML file, environment variables, or CLI flags.
+            Settings cascade in that order so containers stay secret-free and
+            overrides stay simple.
+          </p>
+        </div>
+
+        <div class="tx-feature">
+          <div class="tx-feature__icon">🐳</div>
+          <h2>Container Ready</h2>
+          <p>
+            Official container image published to GitHub Packages. Pair it with
+            the included systemd timer units for a zero-touch monthly reporting
+            pipeline.
+          </p>
+        </div>
+
+        <div class="tx-feature">
+          <div class="tx-feature__icon">🔒</div>
+          <h2>Duplicate Removal &amp; ISRC Normalisation</h2>
+          <p>
+            Automatically deduplicates consecutive plays and normalises ISRCs
+            and CRIDs so every entry in the final report is clean and unique.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+{% endblock %}
