@@ -30,7 +30,7 @@ If you prefer a plain Python install, use `pip` in a dedicated virtual
 environment:
 
 ```bash
-python -mvenv .venv
+python -m venv .venv
 . .venv/bin/activate
 
 pip install suisa_sendemeldung
@@ -56,15 +56,15 @@ suisa_sendemeldung --help
 3. **Run the script** for the previous month:
 
     ```bash
-    suisa_sendemeldung --date-last-month
+    suisa_sendemeldung --last-month
     ```
 
     The report is printed to standard output. Change `output` to `"file"` or
     `"email"` when you're ready for production.
 
 !!! tip "Date selection"
-    Use `--date-last-month` for the most common case. For custom ranges pass
-    `--date-start YYYY-MM-DD` and `--date-end YYYY-MM-DD`.
+    Use `--last-month` for the most common case. For custom ranges pass
+    `--by-date` with explicit `--date-start YYYY-MM-DD` and `--date-end YYYY-MM-DD`.
 
 ## Next steps
 

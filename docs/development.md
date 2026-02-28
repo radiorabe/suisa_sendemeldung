@@ -44,7 +44,7 @@ poetry run pytest
 poetry run pytest -v
 
 # Update snapshots after intentional output changes
-poetry run pytest -- --snapshot-update
+poetry run pytest --snapshot-update
 ```
 
 !!! warning "100 % coverage required"

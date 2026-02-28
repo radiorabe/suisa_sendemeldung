@@ -19,27 +19,29 @@ def site(tmp_path_factory):
 
 
 def test_home_page_contains_headline(site):
-    assert "SUISA Sendemeldung" in (site / "index.html").read_text()
+    assert "SUISA Sendemeldung" in (site / "index.html").read_text(encoding="utf-8")
 
 
 def test_getting_started_recommends_podman(site):
-    assert "podman" in (site / "getting-started" / "index.html").read_text()
+    html = (site / "getting-started" / "index.html").read_text(encoding="utf-8")
+    assert "podman" in html
 
 
 def test_configuration_page_exists(site):
-    assert "TOML" in (site / "configuration" / "index.html").read_text()
+    assert "TOML" in (site / "configuration" / "index.html").read_text(encoding="utf-8")
 
 
 def test_deployment_recommends_podman(site):
-    assert "podman" in (site / "deployment" / "index.html").read_text()
+    assert "podman" in (site / "deployment" / "index.html").read_text(encoding="utf-8")
 
 
 def test_development_page_mentions_pytest(site):
-    assert "pytest" in (site / "development" / "index.html").read_text()
+    assert "pytest" in (site / "development" / "index.html").read_text(encoding="utf-8")
 
 
 def test_upgrading_page_exists(site):
-    assert "Upgrading" in (site / "upgrading" / "index.html").read_text()
+    html = (site / "upgrading" / "index.html").read_text(encoding="utf-8")
+    assert "Upgrading" in html
 
 
 def test_api_reference_is_generated(site):

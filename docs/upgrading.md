@@ -39,9 +39,9 @@ Run `suisa_sendemeldung --help` to see the current list of flags.
 ### Removed features
 
 The **"last 30 days from today"** mode has been dropped. Use
-`--date-last-month` (or `date.last-month = true` in the config file) to
-report on the previous calendar month, or pass explicit `--date-start` /
-`--date-end` values for a custom range.
+Use `--last-month` (or `date.last-month = true` in the config file) to
+report on the previous calendar month, or use `--by-date` together with
+explicit `--date-start` / `--date-end` values for a custom range.
 
 ### Python version
 

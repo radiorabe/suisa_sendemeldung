@@ -47,11 +47,12 @@ Control the reporting period.
 | ------ | ------- | ------- | ----------- |
 | `date.start` | `SENDEMELDUNG_DATE_START` | — | Start date (`YYYY-MM-DD`) |
 | `date.end` | `SENDEMELDUNG_DATE_END` | — | End date (`YYYY-MM-DD`) |
-| `date.last-month` | `SENDEMELDUNG_DATE_LAST_MONTH` | `false` | Fetch the whole previous calendar month |
+| `date.last-month` | `SENDEMELDUNG_DATE_LAST_MONTH` | `true` | Fetch the whole previous calendar month |
 
 !!! note "Date modes"
-    Either set `date.last-month = true` **or** provide an explicit
-    `date.start` / `date.end` pair. The two modes are mutually exclusive.
+    Use the CLI flag `--last-month` (default) to report on the previous
+    calendar month. Pass `--by-date` together with `--date-start` /
+    `--date-end` for a custom range. The two modes are mutually exclusive.
 
 ### Output settings
 
@@ -81,20 +82,25 @@ Used when `output = "email"`.
 | `email.subject` | `SENDEMELDUNG_EMAIL_SUBJECT` | `SUISA report` | Email subject |
 | `email.text` | `SENDEMELDUNG_EMAIL_TEXT` | *(Swiss German template)* | Email body (`$`-substitution supported) |
 | `email.responsible-email` | `SENDEMELDUNG_EMAIL_RESPONSIBLE_EMAIL` | — | Address for SUISA queries (used in email body) |
+| `email.footer` | `SENDEMELDUNG_EMAIL_FOOTER` | *(project URL)* | Footer appended to the email body |
 
 !!! tip "Email template variables"
     The default email body is a fully SUISA-compliant Swiss German letter that
     automatically substitutes `$station_name`, `$month`, `$year`,
     `$responsible_email`, `$in_three_months`, and `$email_footer`.
-    Override individual variables via `l10n` settings below.
+
+### Station settings
+
+| Option | Env var | Default | Description |
+| ------ | ------- | ------- | ----------- |
+| `station.name` | `SENDEMELDUNG_STATION_NAME` | `Radio Bern RaBe` | Station name used in output and emails |
+| `station.name-short` | `SENDEMELDUNG_STATION_NAME_SHORT` | `rabe` | Short name used in filenames |
 
 ### Localisation settings
 
 | Option | Env var | Default | Description |
 | ------ | ------- | ------- | ----------- |
 | `l10n.timezone` | `SENDEMELDUNG_L10N_TIMEZONE` | `Europe/Zurich` | Timezone for date output |
-| `l10n.station-name` | `SENDEMELDUNG_L10N_STATION_NAME` | — | Station name used in email body |
-| `l10n.email-footer` | `SENDEMELDUNG_L10N_EMAIL_FOOTER` | — | Footer appended to the email body |
 
 ### Identifier settings
 
@@ -102,7 +108,7 @@ Controls how the unique track identifier (`CRID`) is generated.
 
 | Option | Env var | Default | Description |
 | ------ | ------- | ------- | ----------- |
-| `identifier.mode` | `SENDEMELDUNG_IDENTIFIER_MODE` | `cridlib` | `cridlib` (standard CRID) or `local` (UUID-based) |
+| `crid-mode` | `SENDEMELDUNG_CRID_MODE` | `local` | `cridlib` (standard CRID) or `local` (UUID-based) |
 
 ## Minimal example
 
@@ -133,9 +139,10 @@ email.server            = "smtp.example.org"
 email.password          = "s3cr3t"
 email.responsible-email = "responsible@example.org"
 
-l10n.timezone     = "Europe/Zurich"
-l10n.station-name = "Radio Example"
-l10n.email-footer = "Radio Example | Musterstrasse 1 | 3000 Bern"
+station.name   = "Radio Example"
+email.footer   = "Radio Example | Musterstrasse 1 | 3000 Bern"
+
+l10n.timezone  = "Europe/Zurich"
 ```
 
 ## Environment variables example

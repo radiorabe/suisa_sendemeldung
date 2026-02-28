@@ -92,7 +92,7 @@ Run the container once for a specific month using
 podman run --rm \
   -v /etc/suisa_sendemeldung/production.toml:/etc/suisa_sendemeldung.toml:ro \
   ghcr.io/radiorabe/suisasendemeldung:latest \
-  suisa_sendemeldung --date-last-month
+  suisa_sendemeldung --last-month
 ```
 
 !!! note "Docker"
@@ -127,7 +127,7 @@ If systemd is not available, use cron:
 0 9 14 * * podman run --rm \
   -v /etc/suisa_sendemeldung/production.toml:/etc/suisa_sendemeldung.toml:ro \
   ghcr.io/radiorabe/suisasendemeldung:latest \
-  suisa_sendemeldung --date-last-month
+  suisa_sendemeldung --last-month
 ```
 
 ---
