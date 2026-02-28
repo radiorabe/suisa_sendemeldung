@@ -11,23 +11,18 @@ We provide SUISA Sendemeldung as a **container image** or as a **Python package*
 
 ### Container (recommended)
 
-The easiest way to run SUISA Sendemeldung is with the official container image:
+The easiest way to run SUISA Sendemeldung is with the official container image
+via [rootless Podman](https://podman.io/):
 
-=== "Podman"
+```bash
+podman run --rm -ti \
+  ghcr.io/radiorabe/suisasendemeldung:latest \
+  suisa_sendemeldung --help
+```
 
-    ```bash
-    podman run --rm -ti \
-      ghcr.io/radiorabe/suisasendemeldung:latest \
-      suisa_sendemeldung --help
-    ```
-
-=== "Docker"
-
-    ```bash
-    docker run --rm -ti \
-      ghcr.io/radiorabe/suisasendemeldung:latest \
-      suisa_sendemeldung --help
-    ```
+!!! note "Docker"
+    Docker works as a drop-in replacement — substitute `docker` for `podman`
+    in any of the commands above. Rootless Podman is strongly recommended.
 
 ### Python package
 

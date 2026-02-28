@@ -8,7 +8,7 @@ monthly report is generated and sent **automatically** on a schedule.
 | Model | Recommended for |
 | ----- | --------------- |
 | [systemd timer](#systemd-timer) | Self-hosted Linux servers (bare metal or VM) |
-| [Container (one-shot)](#container-one-shot) | Any host with Podman or Docker |
+| [Container (one-shot)](#container-one-shot) | Any host with rootless Podman |
 | [Cron job](#cron-job) | Minimal setups without systemd |
 
 ---
@@ -85,25 +85,19 @@ sudo systemctl restart suisa_sendemeldung@production.timer
 
 ## Container (one-shot)
 
-Run the container once for a specific month:
+Run the container once for a specific month using
+[rootless Podman](https://podman.io/):
 
-=== "Podman"
+```bash
+podman run --rm \
+  -v /etc/suisa_sendemeldung/production.toml:/etc/suisa_sendemeldung.toml:ro \
+  ghcr.io/radiorabe/suisasendemeldung:latest \
+  suisa_sendemeldung --date-last-month
+```
 
-    ```bash
-    podman run --rm \
-      -v /etc/suisa_sendemeldung/production.toml:/etc/suisa_sendemeldung.toml:ro \
-      ghcr.io/radiorabe/suisasendemeldung:latest \
-      suisa_sendemeldung --date-last-month
-    ```
-
-=== "Docker"
-
-    ```bash
-    docker run --rm \
-      -v /etc/suisa_sendemeldung/production.toml:/etc/suisa_sendemeldung.toml:ro \
-      ghcr.io/radiorabe/suisasendemeldung:latest \
-      suisa_sendemeldung --date-last-month
-    ```
+!!! note "Docker"
+    Docker works as a drop-in replacement — substitute `docker` for `podman`
+    in any of the commands above. Rootless Podman is strongly recommended.
 
 All configuration can also be passed as environment variables without a
 mounted config file:
