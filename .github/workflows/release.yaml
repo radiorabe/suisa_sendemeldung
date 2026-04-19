@@ -11,7 +11,7 @@ on:
 
 jobs:
   release-container:
-    uses: radiorabe/actions/.github/workflows/release-container.yaml@c7aef9928f610ec51b44f84debf2321189276d54 # v0.41.3
+    uses: radiorabe/actions/.github/workflows/release-container.yaml@5459c6e6550bcc6969303a65ef6c44bb1cd0ccf1 # v0.43.2
     with:
       image: 'ghcr.io/radiorabe/suisasendemeldung'
       name: suisasendemeldung
@@ -19,6 +19,6 @@ jobs:
       tags: rabe python suisa
 
   python-poetry:
-    uses: radiorabe/actions/.github/workflows/release-python-poetry.yaml@c7aef9928f610ec51b44f84debf2321189276d54 # v0.41.3
+    uses: radiorabe/actions/.github/workflows/release-python-poetry.yaml@5459c6e6550bcc6969303a65ef6c44bb1cd0ccf1 # v0.43.2
     secrets:
       RABE_PYPI_TOKEN: ${{ secrets.RABE_PYPI_TOKEN }}
