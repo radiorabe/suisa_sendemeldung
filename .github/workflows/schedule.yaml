@@ -7,6 +7,6 @@ on:
 
 jobs:
   schedule-trivy:
-    uses: radiorabe/actions/.github/workflows/schedule-trivy.yaml@c7aef9928f610ec51b44f84debf2321189276d54 # v0.41.3
+    uses: radiorabe/actions/.github/workflows/schedule-trivy.yaml@5459c6e6550bcc6969303a65ef6c44bb1cd0ccf1 # v0.43.2
     with:
       image-ref: 'ghcr.io/radiorabe/suisasendemeldung:latest'
