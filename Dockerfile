@@ -1,11 +1,11 @@
-FROM ghcr.io/radiorabe/s2i-python:3.4.4@sha256:16aba71b85c5d048a1abb368236a85e758ae8b2e099eb59e0aa6873f8d532826 AS build
+FROM ghcr.io/radiorabe/s2i-python:3.5.0@sha256:8c020bc0808b8fac25cad6a1e849d0d4c305417ebcdeb9d9ac0fe4c6e430eb23 AS build
 
 COPY --chown=1001:0 ./ /opt/app-root/src/
 
 RUN python3.12 -m build .
 
 
-FROM ghcr.io/radiorabe/python-minimal:3.3.4@sha256:595d5e42983954707aab8526b7ec39b12d8946a5567869defa9a35abdc139f79 AS app
+FROM ghcr.io/radiorabe/python-minimal:3.4.0@sha256:371258ed70856e017b60c95201643cedaeae7a97bb78fc134be845a09dfb2dcf AS app
 
 COPY --from=build /opt/app-root/src/dist/*.whl /tmp/dist/
 
