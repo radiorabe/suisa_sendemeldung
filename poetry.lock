@@ -1831,14 +1831,14 @@ pydantic = ["pydantic (>=2) ; python_version < \"3.14\"", "pydantic (>=2.12.0a1)
 
 [[package]]
 name = "types-openpyxl"
-version = "3.1.5.20260518"
+version = "3.1.5.20260807"
 description = "Typing stubs for openpyxl"
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "types_openpyxl-3.1.5.20260518-py3-none-any.whl", hash = "sha256:e6ca4b116c8b979ed57f3045edcd3d49c25917d6dae99e90358f41322a19d375"},
-    {file = "types_openpyxl-3.1.5.20260518.tar.gz", hash = "sha256:da9cd644e4e80215a3f60a8c2c2c8e980e941a9b581cffa3876285aa791ca5af"},
+    {file = "types_openpyxl-3.1.5.20260807-py3-none-any.whl", hash = "sha256:e64e9342cdac8a2d7b09f992d3606c532b75da43874f8107b6b5a122dc9d5681"},
+    {file = "types_openpyxl-3.1.5.20260807.tar.gz", hash = "sha256:1a0a42b125f8023d3ae83cc057e379d301a87f45e60b6160917824fef28ab015"},
 ]
 
 [[package]]
