@@ -588,7 +588,7 @@ def get_email_attachment(filename: str, filetype: str, data: BytesIO | str) -> M
     return part
 
 
-def create_message(  # noqa: PLR0913
+def create_message(  # noqa: PLR0913,PLR0917
     sender: str,
     recipient: str,
     subject: str,
