@@ -1800,14 +1800,14 @@ telegram = ["envwrap", "requests"]
 
 [[package]]
 name = "typed-settings"
-version = "25.3.0"
+version = "26.0.0"
 description = "Typed settings based on attrs classes"
 optional = false
 python-versions = ">=3.10"
 groups = ["main"]
 files = [
-    {file = "typed_settings-25.3.0-py3-none-any.whl", hash = "sha256:8fe578c84ae2e44f6e8bdde256d2449fbff45f47dca3c4092aeee03900efc12c"},
-    {file = "typed_settings-25.3.0.tar.gz", hash = "sha256:865eb52c3184f467705645a1e58db9d719e08b9d7957448a2ad8cbbc22ed21a6"},
+    {file = "typed_settings-26.0.0-py3-none-any.whl", hash = "sha256:5ab31409af33d7912f02df51b38d66738e0dc990c042ce1b45a6b30dc9caba04"},
+    {file = "typed_settings-26.0.0.tar.gz", hash = "sha256:88d0da33e440a0419f194e24b92ecce4c12e7c165b5b96697fe4140c83d386ea"},
 ]
 
 [package.dependencies]
@@ -1823,7 +1823,9 @@ click = ["click (>=7)"]
 dotenv = ["python-dotenv"]
 jinja = ["jinja2"]
 option-groups = ["click (>=7)", "click-option-group"]
+orjson = ["orjson"]
 pydantic = ["pydantic (>=2) ; python_version < \"3.14\"", "pydantic (>=2.12.0a1) ; python_version >= \"3.14\""]
+yaml = ["pyyaml"]
 
 [[package]]
 name = "types-openpyxl"
@@ -2012,4 +2014,4 @@ packaging = ">=24.0"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "5ca7055c1ea5beacc33841ab9e86551b50e7a664e18ca414ec599a34d200e08e"
+content-hash = "3967c65758a475b3a47e673f766c4f13198a675486de86bf70ffe6db21d5171b"
