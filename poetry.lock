@@ -2049,30 +2049,32 @@ telegram = ["envwrap", "requests"]
 
 [[package]]
 name = "typed-settings"
-version = "25.3.0"
+version = "26.1.0"
 description = "Typed settings based on attrs classes"
 optional = false
-python-versions = ">=3.10"
+python-versions = ">=3.11"
 groups = ["main"]
 files = [
-    {file = "typed_settings-25.3.0-py3-none-any.whl", hash = "sha256:8fe578c84ae2e44f6e8bdde256d2449fbff45f47dca3c4092aeee03900efc12c"},
-    {file = "typed_settings-25.3.0.tar.gz", hash = "sha256:865eb52c3184f467705645a1e58db9d719e08b9d7957448a2ad8cbbc22ed21a6"},
+    {file = "typed_settings-26.1.0-py3-none-any.whl", hash = "sha256:7f6504e0aea41668b6cac4d3d6b72047302e063084acd23c97dcb69247c7c702"},
+    {file = "typed_settings-26.1.0.tar.gz", hash = "sha256:ebd8fbcf8d314f922a7f0307f622a482dc3a6eacdef6ea644d39a4dc2a41b049"},
 ]
 
 [package.dependencies]
-attrs = {version = ">=23.1", optional = true, markers = "extra == \"attrs\""}
-click = {version = ">=7", optional = true, markers = "extra == \"click\" or extra == \"option-groups\""}
+attrs = {version = ">=26.1", optional = true, markers = "extra == \"attrs\""}
+click = {version = ">=8", optional = true, markers = "extra == \"click\" or extra == \"option-groups\""}
 click-option-group = {version = "*", optional = true, markers = "extra == \"option-groups\""}
 
 [package.extras]
-all = ["attrs (>=23.1)", "cattrs (>=24.1)", "click (>=7)", "click-option-group", "jinja2", "pydantic (>=2) ; python_version < \"3.14\"", "pydantic (>=2.12.0a1) ; python_version >= \"3.14\""]
-attrs = ["attrs (>=23.1)"]
-cattrs = ["cattrs (>=24.1)"]
-click = ["click (>=7)"]
+all = ["attrs (>=26.1)", "cattrs (>=26.1)", "click (>=8)", "click-option-group", "jinja2", "orjson", "pydantic (>=2.13)", "python-dotenv", "pyyaml"]
+attrs = ["attrs (>=26.1)"]
+cattrs = ["cattrs (>=26.1)"]
+click = ["click (>=8)"]
 dotenv = ["python-dotenv"]
 jinja = ["jinja2"]
-option-groups = ["click (>=7)", "click-option-group"]
-pydantic = ["pydantic (>=2) ; python_version < \"3.14\"", "pydantic (>=2.12.0a1) ; python_version >= \"3.14\""]
+option-groups = ["click (>=8)", "click-option-group"]
+orjson = ["orjson"]
+pydantic = ["pydantic (>=2.13)"]
+yaml = ["pyyaml"]
 
 [[package]]
 name = "types-openpyxl"
@@ -2290,4 +2292,4 @@ packaging = ">=24.0"
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "1a8de6da6c1438ddd64febd4763c08d84a54856386b0a31b68647d3b63efe8c5"
+content-hash = "e2605181b77a659a815f035cd597dffd15c6f393e3331f24b92f5dc0bf567478"
