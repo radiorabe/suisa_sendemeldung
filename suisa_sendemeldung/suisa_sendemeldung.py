@@ -527,7 +527,7 @@ def reformat_start_date_in_xlsx(worksheet: Worksheet) -> None:
                 datetime.strptime(  # noqa: DTZ007
                     str(row[col_idx].value), "%Y%m%d"
                 ).date()
-                if row[col_idx].value
+                if (row[col_idx].value and len(str(row[col_idx].value)) != 5)  # noqa: PLR2004
                 else None
             )  # pyright: ignore[reportAttributeAccessIssue]
             row[col_idx].number_format = "dd.mm.yyyy"

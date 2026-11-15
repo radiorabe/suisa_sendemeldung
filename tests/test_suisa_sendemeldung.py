@@ -1,6 +1,6 @@
 """Test the suisa_sendemeldung.suisa_sendemeldung module."""
 
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from email.message import Message
 from io import BytesIO
 from typing import TYPE_CHECKING
@@ -376,23 +376,23 @@ def test_get_csv(mock_cridlib_get, snapshot, settings):
     mock_cridlib_get.assert_has_calls(
         [
             call(
-                timestamp=datetime(1993, 3, 1, 13, 12, tzinfo=timezone.utc),
+                timestamp=datetime(1993, 3, 1, 13, 12, tzinfo=UTC),
                 fragment="acrid=a1",
             ),
             call(
-                timestamp=datetime(1993, 3, 1, 13, 37, tzinfo=timezone.utc),
+                timestamp=datetime(1993, 3, 1, 13, 37, tzinfo=UTC),
                 fragment="acrid=a2",
             ),
             call(
-                timestamp=datetime(1993, 3, 1, 16, 20, tzinfo=timezone.utc),
+                timestamp=datetime(1993, 3, 1, 16, 20, tzinfo=UTC),
                 fragment="acrid=a3",
             ),
             call(
-                timestamp=datetime(1993, 3, 1, 17, 17, 17, tzinfo=timezone.utc),
+                timestamp=datetime(1993, 3, 1, 17, 17, 17, tzinfo=UTC),
                 fragment="acrid=a4",
             ),
             call(
-                timestamp=datetime(1993, 3, 1, 18, 18, 18, tzinfo=timezone.utc),
+                timestamp=datetime(1993, 3, 1, 18, 18, 18, tzinfo=UTC),
                 fragment="acrid=a5",
             ),
         ],
@@ -452,6 +452,43 @@ def test_reformat_start_date_in_xlsx():
     assert row[13].value == datetime(2025, 1, 1).date()
     assert row[13].number_format == "dd.mm.yyyy"
     assert row[15].value == datetime(2025, 1, 1).date()
+    assert row[15].number_format == "dd.mm.yyyy"
+
+
+def test_reformat_start_date_in_xlsx_invalid_date():
+    """Test that reformat_start_date_in_xlsx reformats the start date column."""
+    workbook: Workbook = Workbook()
+    if not workbook.active:  # pragma: no cover
+        raise RuntimeError
+    worksheet: Worksheet = workbook.active  # type: ignore[assignment]
+    worksheet.append([])
+    worksheet.append(
+        [
+            "",
+            "",
+            "",
+            "",
+            "2025-01-01",  # Sendedatum
+            "",
+            "01:01:01",  # Sendezeit
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "20101",  # Aufnahmedatum
+            "",
+            "10101",  # Erstveröffentlichungsdatum
+        ]
+    )
+    suisa_sendemeldung.reformat_start_date_in_xlsx(worksheet)
+    row = list(worksheet.rows)[1]
+    assert row[4].value == datetime(2025, 1, 1).date()
+    assert row[4].number_format == "dd.mm.yyyy"
+    assert row[13].value is None
+    assert row[13].number_format == "dd.mm.yyyy"
+    assert row[15].value is None
     assert row[15].number_format == "dd.mm.yyyy"
 
 
